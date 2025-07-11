@@ -24,7 +24,7 @@ public class ReplacerCache {
     }
 
     public String get(String key) {
-        return cache.computeIfAbsent(key, (k) -> ReplacerUtil.apply(k, player));
+        return cache.computeIfAbsent(key, (k) -> ReplacerUtil.parsePapi(k, player));
     }
 
 }

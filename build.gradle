@@ -8,6 +8,13 @@ plugins {
 group = 'cn.gloomcore'
 version = '1.0.0.0'
 
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+shadowJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 allprojects {
     repositories {

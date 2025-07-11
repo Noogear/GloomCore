@@ -11,12 +11,12 @@ public class CommandAction implements DefaultAction {
     private Function<Player, String> command;
 
     @Override
-    public boolean initFromString(String s, Function<String, ?> argPreprocessor) {
+    public boolean initFromString(String s) {
         if (s.isEmpty()) {
             return false;
         }
-        if (ReplacerUtil.contains(s)) {
-            command = (player) -> ReplacerUtil.apply(s, player);
+        if (ReplacerUtil.checkPapi(s)) {
+            command = (player) -> ReplacerUtil.parsePapi(s, player);
         } else {
             command = (player) -> s;
         }
