@@ -5,7 +5,7 @@ include("module:item", "module:skull")
 include("module:gui")
 include("module:action")
 include("module:replacer")
-include("module:scheduler:common", "module:scheduler:async", "module:scheduler:global")
+include("module:scheduler:common", "module:scheduler:async", "module:scheduler:global", "module:scheduler:entity")
 
 
 include("implement:action")
