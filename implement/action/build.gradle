@@ -3,4 +3,6 @@ dependencies {
     implementation(project(":module:common"))
     implementation(project(":module:replacer"))
     implementation(project(":module:action"))
+    implementation(project(":module:scheduler:entity"))
+    implementation(project(":module:scheduler:common"))
 }
