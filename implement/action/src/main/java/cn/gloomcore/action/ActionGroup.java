@@ -1,22 +1,22 @@
 package cn.gloomcore.action;
 
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ActionGroup implements Action {
-    private final List<Action> actions;
+public class ActionGroup implements PlayerAction {
+    private final List<PlayerAction> actions;
 
-    public ActionGroup(Supplier<List<Action>> supplier) {
+    public ActionGroup(Supplier<List<PlayerAction>> supplier) {
         this(supplier.get());
     }
 
-    public ActionGroup(List<Action> actions) {
+    public ActionGroup(List<PlayerAction> actions) {
         this.actions = actions;
     }
 
@@ -24,18 +24,18 @@ public class ActionGroup implements Action {
         this(new ArrayList<>());
     }
 
-    public ActionGroup addAction(Action... action) {
+    public ActionGroup addAction(PlayerAction... action) {
         actions.addAll(List.of(action));
         return this;
     }
 
     @Override
-    public void run(Player player, Consumer<Boolean> callback) {
+    public void run(Player player, BooleanConsumer callback) {
         RunContext context = new RunContext(player, new LinkedList<>(actions));
         context.start();
     }
 
-    private record RunContext(Player player, Queue<Action> queue) {
+    private record RunContext(Player player, Queue<PlayerAction> queue) {
 
         void start() {
             runNext();
@@ -45,13 +45,14 @@ public class ActionGroup implements Action {
             if (queue.isEmpty()) {
                 return;
             }
-            Action nextAction = queue.poll();
+            PlayerAction nextAction = queue.poll();
             nextAction.run(player, success -> {
-                if (!success) {
+                if (success) {
+                    runNext();
+                } else {
                     queue.clear();
-                    return;
                 }
-                runNext();
+
             });
         }
     }

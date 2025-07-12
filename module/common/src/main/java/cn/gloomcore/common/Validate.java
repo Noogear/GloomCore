@@ -12,14 +12,6 @@ import java.util.UUID;
 public class Validate {
     private Validate () {}
 
-    public static Optional<BigDecimal> parseNumber(@NotNull String input) {
-        try {
-            return Optional.of(new BigDecimal(input));
-        } catch (NumberFormatException ex) {
-            return Optional.empty();
-        }
-    }
-
     public static Optional<Boolean> parseBoolean(@NotNull String input) {
         try {
             return Optional.of(Boolean.parseBoolean(input.trim()));
