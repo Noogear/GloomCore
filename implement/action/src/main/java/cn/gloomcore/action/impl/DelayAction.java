@@ -1,14 +1,13 @@
 package cn.gloomcore.action.impl;
 
-import cn.gloomcore.action.Action;
 import cn.gloomcore.action.PlayerAction;
 import cn.gloomcore.replacer.ReplacerUtil;
 import cn.gloomcore.scheduler.entity.EntityScheduler;
 import com.google.common.primitives.Longs;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class DelayAction implements PlayerAction {
@@ -20,7 +19,7 @@ public class DelayAction implements PlayerAction {
         this.entityScheduler = EntityScheduler.get(JavaPlugin.getProvidingPlugin(DelayAction.class));
     }
 
-    public static Action initFromString(String s) {
+    public static PlayerAction initFromString(String s) {
         if (s.isEmpty()) {
             return null;
         }
@@ -36,15 +35,17 @@ public class DelayAction implements PlayerAction {
     }
 
     @Override
-    public void run(Player player, BooleanConsumer callback) {
-        Long delayTick = this.delay.apply(player);
-        if (delayTick == null) {
-            callback.accept(false);
-            return;
+    public void run(Player player, Consumer<Boolean> callback) {
+        if (callback != null) {
+            Long delayTick = this.delay.apply(player);
+            if (delayTick == null) {
+                callback.accept(false);
+                return;
+            }
+            entityScheduler.runLater(player,
+                    () -> callback.accept(true),
+                    () -> callback.accept(false),
+                    delayTick);
         }
-        entityScheduler.runLater(player,
-                () -> callback.accept(true),
-                () -> callback.accept(false),
-                delayTick);
     }
 }

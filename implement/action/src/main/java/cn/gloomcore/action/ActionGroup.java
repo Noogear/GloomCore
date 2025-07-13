@@ -1,12 +1,12 @@
 package cn.gloomcore.action;
 
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ActionGroup implements PlayerAction {
@@ -30,7 +30,7 @@ public class ActionGroup implements PlayerAction {
     }
 
     @Override
-    public void run(Player player, BooleanConsumer callback) {
+    public void run(Player player, Consumer<Boolean> callback) {
         RunContext context = new RunContext(player, new LinkedList<>(actions));
         context.start();
     }

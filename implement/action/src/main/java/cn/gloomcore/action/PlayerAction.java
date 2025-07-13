@@ -1,15 +1,12 @@
 package cn.gloomcore.action;
 
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import org.bukkit.entity.Player;
 
-@FunctionalInterface
-public interface PlayerAction extends Action {
+import java.util.function.Consumer;
 
-    void run(Player player, BooleanConsumer callback);
+public interface PlayerAction extends ConsumerAction<Boolean,Player > {
 
     @Override
-    default void run(Player player) {
-        run(player, null);
-    }
+    void run(Player player, Consumer<Boolean> callback);
+
 }

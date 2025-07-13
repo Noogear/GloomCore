@@ -1,12 +1,11 @@
 package cn.gloomcore.action.impl;
 
-import cn.gloomcore.action.Action;
 import cn.gloomcore.action.PlayerAction;
 import cn.gloomcore.replacer.ReplacerUtil;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ConsoleAction implements PlayerAction {
@@ -16,7 +15,7 @@ public class ConsoleAction implements PlayerAction {
         this.command = command;
     }
 
-    public static Action initFromString(String s) {
+    public static PlayerAction initFromString(String s) {
         if (s.isEmpty()) {
             return null;
         }
@@ -28,8 +27,10 @@ public class ConsoleAction implements PlayerAction {
     }
 
     @Override
-    public void run(Player player, BooleanConsumer callback) {
+    public void run(Player player, Consumer<Boolean> callback) {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.apply(player));
-        callback.accept(true);
+        if (callback != null) {
+            callback.accept(true);
+        }
     }
 }

@@ -1,13 +1,12 @@
 package cn.gloomcore.action.impl;
 
-import cn.gloomcore.action.Action;
 import cn.gloomcore.action.PlayerAction;
 import cn.gloomcore.replacer.ReplacerUtil;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class TellAction implements PlayerAction {
@@ -17,7 +16,7 @@ public class TellAction implements PlayerAction {
         this.message = message;
     }
 
-    public static Action initFromString(String s) {
+    public static PlayerAction initFromString(String s) {
         if (s.isEmpty()) {
             return null;
         }
@@ -30,8 +29,10 @@ public class TellAction implements PlayerAction {
     }
 
     @Override
-    public void run(Player player, BooleanConsumer callback) {
+    public void run(Player player, Consumer<Boolean> callback) {
         player.sendMessage(message.apply(player));
-        callback.accept(true);
+        if (callback != null) {
+            callback.accept(true);
+        }
     }
 }

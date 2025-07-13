@@ -1,10 +1,8 @@
 package cn.gloomcore.action;
 
-import org.bukkit.entity.Player;
-
 @FunctionalInterface
-public interface Action {
+public interface Action<T> {
 
-    void run(Player player);
+    void run(T t);
 
 }
