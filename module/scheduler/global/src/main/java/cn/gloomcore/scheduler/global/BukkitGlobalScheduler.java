@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BooleanSupplier;
 
-public class BukkitGlobalScheduler implements GlobalScheduler{
+public class BukkitGlobalScheduler implements GlobalScheduler {
     private final Plugin plugin;
 
     BukkitGlobalScheduler(Plugin plugin) {

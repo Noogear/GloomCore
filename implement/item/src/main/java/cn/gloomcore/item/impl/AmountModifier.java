@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class AmountModifier implements ItemModifier {
-    private final String amount;
+    protected final String amount;
 
     protected AmountModifier(String amount) {
         this.amount = amount;

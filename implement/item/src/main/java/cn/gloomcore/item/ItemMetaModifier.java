@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface
-public interface ItemMetaModify extends ItemModifier {
+public interface ItemMetaModifier extends ItemModifier {
 
     @NotNull
     ItemMeta modifyMeta(@NotNull ItemMeta meta, @Nullable ReplacerCache replacerCache);

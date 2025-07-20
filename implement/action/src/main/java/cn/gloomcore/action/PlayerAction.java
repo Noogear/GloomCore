@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 
 import java.util.function.Consumer;
 
-public interface PlayerAction extends ConsumerAction<Boolean,Player > {
+public interface PlayerAction extends ConsumerAction<Boolean, Player> {
 
     @Override
     void run(Player player, Consumer<Boolean> callback);

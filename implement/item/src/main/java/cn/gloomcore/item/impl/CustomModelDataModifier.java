@@ -1,7 +1,7 @@
 package cn.gloomcore.item.impl;
 
 import cn.gloomcore.common.ObjectUtil;
-import cn.gloomcore.item.ItemMetaModify;
+import cn.gloomcore.item.ItemMetaModifier;
 import cn.gloomcore.item.ItemModifier;
 import cn.gloomcore.replacer.ReplacerCache;
 import cn.gloomcore.replacer.ReplacerUtil;
@@ -11,8 +11,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CustomModelDataModifier implements ItemMetaModify {
-    private final String customModelData;
+public class CustomModelDataModifier implements ItemMetaModifier {
+    protected final String customModelData;
 
     protected CustomModelDataModifier(String customModelData) {
         this.customModelData = customModelData;

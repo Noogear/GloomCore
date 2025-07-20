@@ -22,7 +22,7 @@ public interface Scheduler {
 
     void cancelTasks();
 
-    default void cancelTask(@NotNull Task task){
+    default void cancelTask(@NotNull Task task) {
         task.cancel();
     }
 

@@ -2,7 +2,6 @@ package cn.gloomcore.common;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
 import java.util.Base64;
@@ -10,7 +9,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class Validate {
-    private Validate () {}
+    private Validate() {
+    }
 
     public static Optional<Boolean> parseBoolean(@NotNull String input) {
         try {
