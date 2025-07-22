@@ -11,15 +11,10 @@ import java.util.EnumMap;
 
 public class BaseIcon implements Icon {
     protected final ItemStack item;
-    protected final EnumMap<ClickType, Action<Player>> clickActions;
+    protected final EnumMap<ClickType, Action<Player>> clickActions = new EnumMap<>(ClickType.class);
 
-    public BaseIcon(ItemStack item, EnumMap<ClickType, Action<Player>> clickActions) {
+    public BaseIcon(ItemStack item) {
         this.item = item;
-        this.clickActions = clickActions;
-    }
-
-    public BaseIcon() {
-        this(DEFAULT_ITEM.clone(), null);
     }
 
     public ItemStack getOriginalItem() {
@@ -33,7 +28,12 @@ public class BaseIcon implements Icon {
 
     @Override
     public Icon onClick(InventoryClickEvent event) {
-        event.setCancelled(true);
+        Action<Player> action = clickActions.get(event.getClick());
+        if (action != null) {
+            if (event.getWhoClicked() instanceof Player player) {
+                action.run(player);
+            }
+        }
         return this;
     }
 }

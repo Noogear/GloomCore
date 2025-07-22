@@ -84,4 +84,5 @@ public abstract class AbstractGui implements Menu {
     public void close() {
         getInventory().close();
     }
+
 }

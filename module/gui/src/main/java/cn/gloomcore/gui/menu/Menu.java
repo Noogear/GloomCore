@@ -7,10 +7,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-public interface Menu extends InventoryHolder {
+public interface Menu extends InventoryHolder{
 
     Component title();
 
@@ -27,6 +28,8 @@ public interface Menu extends InventoryHolder {
     void onOpen(InventoryOpenEvent event);
 
     void onClose(InventoryCloseEvent event);
+
+    void onQuit(PlayerQuitEvent event);
 
     Menu openMenu();
 

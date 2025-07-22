@@ -10,11 +10,10 @@ public class MultiIcon implements Icon {
     private List<BaseIcon> iconCache;
     private int index;
 
-    
 
     @Override
     public ItemStack item(ReplacerCache replacerCache) {
-        if(index >= iconCache.size()){
+        if (index >= iconCache.size()) {
             return null;
         }
         return iconCache.get(index++).item(replacerCache);

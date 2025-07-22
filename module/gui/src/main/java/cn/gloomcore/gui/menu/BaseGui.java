@@ -6,13 +6,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Function;
 
-public class BaseGui extends AbstractGui {
+public class BaseGui extends AbstractGui implements Cloneable {
 
     public BaseGui(Function<Player, Component> title, Map<Integer, Icon> slotMap) {
         super(title, slotMap);
@@ -21,7 +22,6 @@ public class BaseGui extends AbstractGui {
 
     @Override
     public void onDrag(InventoryDragEvent event) {
-
     }
 
     @Override
@@ -31,6 +31,11 @@ public class BaseGui extends AbstractGui {
 
     @Override
     public void onClose(InventoryCloseEvent event) {
+
+    }
+
+    @Override
+    public void onQuit(PlayerQuitEvent event) {
 
     }
 
@@ -53,4 +58,5 @@ public class BaseGui extends AbstractGui {
     public @NotNull Inventory getInventory() {
         return null;
     }
+
 }
