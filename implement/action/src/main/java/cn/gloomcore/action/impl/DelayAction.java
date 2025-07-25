@@ -1,7 +1,7 @@
 package cn.gloomcore.action.impl;
 
 import cn.gloomcore.action.PlayerAction;
-import cn.gloomcore.replacer.ReplacerUtil;
+import cn.gloomcore.replacer.PlaceholderUtil;
 import cn.gloomcore.scheduler.entity.EntityScheduler;
 import com.google.common.primitives.Longs;
 import org.bukkit.entity.Player;
@@ -23,8 +23,8 @@ public class DelayAction implements PlayerAction {
         if (s.isEmpty()) {
             return null;
         }
-        if (ReplacerUtil.checkPapi(s)) {
-            return new DelayAction((player -> Longs.tryParse(ReplacerUtil.parsePapi(s, player))));
+        if (PlaceholderUtil.checkPapi(s)) {
+            return new DelayAction((player -> Longs.tryParse(PlaceholderUtil.parsePapi(s, player))));
         } else {
             Long delayTick = Longs.tryParse(s);
             if (delayTick == null) {

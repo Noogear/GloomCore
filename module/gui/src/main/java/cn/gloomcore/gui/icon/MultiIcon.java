@@ -1,6 +1,6 @@
 package cn.gloomcore.gui.icon;
 
-import cn.gloomcore.replacer.ReplacerCache;
+import cn.gloomcore.replacer.StringReplacer;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,11 +12,11 @@ public class MultiIcon implements Icon {
 
 
     @Override
-    public ItemStack item(ReplacerCache replacerCache) {
+    public ItemStack item(StringReplacer replacer) {
         if (index >= iconCache.size()) {
             return null;
         }
-        return iconCache.get(index++).item(replacerCache);
+        return iconCache.get(index++).item(replacer);
     }
 
 

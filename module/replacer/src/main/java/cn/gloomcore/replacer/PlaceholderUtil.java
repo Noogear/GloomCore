@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public class ReplacerUtil {
+public class PlaceholderUtil {
     private static final Pattern PAPI_PATTERN = Pattern.compile("%[^%]+?%");
     private static boolean PAPI_ENABLED = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
 
@@ -29,8 +29,8 @@ public class ReplacerUtil {
         return PlaceholderAPI.setPlaceholders(player, string);
     }
 
-    public static String parsePapi(String string, ReplacerCache cache) {
-        return cache.get(string);
+    public static String parsePapi(String string, PlayerReplacer replacer) {
+        return replacer.apply(string);
     }
 
     public static Function<Player, String> parsePapiSupplier(String string) {

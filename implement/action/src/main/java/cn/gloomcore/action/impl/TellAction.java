@@ -1,7 +1,7 @@
 package cn.gloomcore.action.impl;
 
 import cn.gloomcore.action.PlayerAction;
-import cn.gloomcore.replacer.ReplacerUtil;
+import cn.gloomcore.replacer.PlaceholderUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -20,8 +20,8 @@ public class TellAction implements PlayerAction {
         if (s.isEmpty()) {
             return null;
         }
-        if (ReplacerUtil.checkPapi(s)) {
-            return new TellAction((player) -> MiniMessage.miniMessage().deserialize(ReplacerUtil.parsePapi(s, player)));
+        if (PlaceholderUtil.checkPapi(s)) {
+            return new TellAction((player) -> MiniMessage.miniMessage().deserialize(PlaceholderUtil.parsePapi(s, player)));
         } else {
             Component component = MiniMessage.miniMessage().deserialize(s);
             return new TellAction((player) -> component);

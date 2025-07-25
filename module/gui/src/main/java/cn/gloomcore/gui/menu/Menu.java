@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-public interface Menu extends InventoryHolder{
+public interface Menu extends InventoryHolder {
 
     Component title();
 

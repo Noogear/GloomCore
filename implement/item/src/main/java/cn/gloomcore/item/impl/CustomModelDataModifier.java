@@ -3,8 +3,8 @@ package cn.gloomcore.item.impl;
 import cn.gloomcore.common.ObjectUtil;
 import cn.gloomcore.item.ItemMetaModifier;
 import cn.gloomcore.item.ItemModifier;
-import cn.gloomcore.replacer.ReplacerCache;
-import cn.gloomcore.replacer.ReplacerUtil;
+import cn.gloomcore.replacer.PlaceholderUtil;
+import cn.gloomcore.replacer.StringReplacer;
 import com.google.common.primitives.Ints;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,7 +29,7 @@ public class CustomModelDataModifier implements ItemMetaModifier {
             return null;
         }
         String string = ObjectUtil.toString(value);
-        if (ReplacerUtil.checkPapi(string)) {
+        if (PlaceholderUtil.checkPapi(string)) {
             return new CustomModelDataModifier(string);
         } else {
             Integer integer = Ints.tryParse(string);
@@ -43,8 +43,8 @@ public class CustomModelDataModifier implements ItemMetaModifier {
     }
 
     @Override
-    public @NotNull ItemMeta modifyMeta(@NotNull ItemMeta meta, @Nullable ReplacerCache replacerCache) {
-        Integer integer = Ints.tryParse(replacerCache == null ? customModelData : replacerCache.get(customModelData));
+    public @NotNull ItemMeta modifyMeta(@NotNull ItemMeta meta, @Nullable StringReplacer replacer) {
+        Integer integer = Ints.tryParse(replacer == null ? customModelData : replacer.apply(customModelData));
         if (integer != null) {
             meta.setCustomModelData(integer);
         }

@@ -1,7 +1,7 @@
 package cn.gloomcore.action.impl;
 
 import cn.gloomcore.action.PlayerAction;
-import cn.gloomcore.replacer.ReplacerUtil;
+import cn.gloomcore.replacer.PlaceholderUtil;
 import org.bukkit.entity.Player;
 
 import java.util.function.Consumer;
@@ -18,8 +18,8 @@ public class CommandAction implements PlayerAction {
         if (s.isEmpty()) {
             return null;
         }
-        if (ReplacerUtil.checkPapi(s)) {
-            return new CommandAction((player) -> ReplacerUtil.parsePapi(s, player));
+        if (PlaceholderUtil.checkPapi(s)) {
+            return new CommandAction((player) -> PlaceholderUtil.parsePapi(s, player));
         } else {
             return new CommandAction((player) -> s);
         }

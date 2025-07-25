@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
 
-public class MenuHandler  implements Listener {
+public class MenuHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClickMenu(InventoryClickEvent event) {

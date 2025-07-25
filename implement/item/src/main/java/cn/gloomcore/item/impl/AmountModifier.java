@@ -2,8 +2,8 @@ package cn.gloomcore.item.impl;
 
 import cn.gloomcore.common.ObjectUtil;
 import cn.gloomcore.item.ItemModifier;
-import cn.gloomcore.replacer.ReplacerCache;
-import cn.gloomcore.replacer.ReplacerUtil;
+import cn.gloomcore.replacer.PlaceholderUtil;
+import cn.gloomcore.replacer.StringReplacer;
 import com.google.common.primitives.Ints;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,7 @@ public class AmountModifier implements ItemModifier {
             return null;
         }
         String string = ObjectUtil.toString(value);
-        if (ReplacerUtil.checkPapi(string)) {
+        if (PlaceholderUtil.checkPapi(string)) {
             return new AmountModifier(string);
         } else {
             Integer integer = Ints.tryParse(string);
@@ -37,8 +37,8 @@ public class AmountModifier implements ItemModifier {
     }
 
     @Override
-    public @NotNull ItemStack modify(@NotNull ItemStack original, @Nullable ReplacerCache replacerCache) {
-        Integer integer = Ints.tryParse(replacerCache == null ? amount : replacerCache.get(amount));
+    public @NotNull ItemStack modify(@NotNull ItemStack original, @Nullable StringReplacer replacer) {
+        Integer integer = Ints.tryParse(replacer == null ? amount : replacer.apply(amount));
         if (integer != null) {
             original.setAmount(integer);
         }

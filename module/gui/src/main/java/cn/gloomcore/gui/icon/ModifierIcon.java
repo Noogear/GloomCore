@@ -2,7 +2,7 @@ package cn.gloomcore.gui.icon;
 
 import cn.gloomcore.action.Action;
 import cn.gloomcore.item.ItemModifier;
-import cn.gloomcore.replacer.ReplacerCache;
+import cn.gloomcore.replacer.StringReplacer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -26,9 +26,9 @@ public class ModifierIcon extends BaseIcon {
     }
 
     @Override
-    public ItemStack item(ReplacerCache replacerCache) {
+    public ItemStack item(StringReplacer replacer) {
         if (itemModifier != null) {
-            return itemModifier.modify(item.clone(), replacerCache);
+            return itemModifier.modify(item.clone(), replacer);
         }
         return item.clone();
     }
