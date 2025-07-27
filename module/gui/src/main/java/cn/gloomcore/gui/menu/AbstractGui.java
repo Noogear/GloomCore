@@ -48,6 +48,7 @@ public abstract class AbstractGui implements Menu {
             event.setCancelled(true);
             return null;
         }
+        event.setCancelled(true);
         return icon.onClick(event);
     }
 

@@ -5,11 +5,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public interface Icon {
-    ItemStack item(StringReplacer replacer);
 
-    default ItemStack item() {
-        return item(null);
+    ItemStack item();
+
+    default ItemStack item(StringReplacer replacer) {
+        return item();
     }
 
-    Icon onClick(InventoryClickEvent event);
+    default Icon onClick(InventoryClickEvent event) {
+        event.setCancelled(true);
+        return this;
+    }
+
 }

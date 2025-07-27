@@ -29,7 +29,7 @@ public class PlaceholderUtil {
         return PlaceholderAPI.setPlaceholders(player, string);
     }
 
-    public static String parsePapi(String string, PlayerReplacer replacer) {
+    public static String parsePapi(String string, StringReplacer replacer) {
         return replacer.apply(string);
     }
 

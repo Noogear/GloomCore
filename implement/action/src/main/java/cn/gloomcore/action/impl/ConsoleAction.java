@@ -2,10 +2,12 @@ package cn.gloomcore.action.impl;
 
 import cn.gloomcore.action.PlayerAction;
 import cn.gloomcore.replacer.PlaceholderUtil;
+import cn.gloomcore.replacer.StringReplacer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ConsoleAction implements PlayerAction {
@@ -27,10 +29,9 @@ public class ConsoleAction implements PlayerAction {
     }
 
     @Override
-    public void run(Player player, Consumer<Boolean> callback) {
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.apply(player));
-        if (callback != null) {
-            callback.accept(true);
-        }
+    public boolean runByPlayer(@NotNull Player player, @Nullable StringReplacer replacer) {
+        String command = this.command.apply(player);
+        return Bukkit.dispatchCommand(Bukkit.getConsoleSender(), replacer != null ? replacer.apply(command, player.getUniqueId()) : command);
     }
+
 }

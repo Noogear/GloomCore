@@ -2,9 +2,11 @@ package cn.gloomcore.action.impl;
 
 import cn.gloomcore.action.PlayerAction;
 import cn.gloomcore.replacer.PlaceholderUtil;
+import cn.gloomcore.replacer.StringReplacer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class CommandAction implements PlayerAction {
@@ -26,10 +28,9 @@ public class CommandAction implements PlayerAction {
     }
 
     @Override
-    public void run(Player player, Consumer<Boolean> callback) {
-        player.performCommand(command.apply(player));
-        if (callback != null) {
-            callback.accept(true);
-        }
+    public boolean runByPlayer(@NotNull Player player, @Nullable StringReplacer replacer) {
+        String command = this.command.apply(player);
+        return player.performCommand(replacer != null ? replacer.apply(command, player.getUniqueId()) : command);
     }
+
 }

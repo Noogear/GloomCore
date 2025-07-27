@@ -22,18 +22,15 @@ public class BaseIcon implements Icon {
     }
 
     @Override
-    public ItemStack item(StringReplacer replacer) {
+    public ItemStack item() {
         return item.clone();
     }
 
     @Override
-    public Icon onClick(InventoryClickEvent event) {
-        Action<Player> action = clickActions.get(event.getClick());
-        if (action != null) {
-            if (event.getWhoClicked() instanceof Player player) {
-                action.run(player);
-            }
+    public Icon onClick(ClickType clickType, Player player) {
+        Action<Player> action = clickActions.get(clickType);
+        if(action != null){
+            action.run(player);
         }
         return this;
-    }
-}
+    }}
