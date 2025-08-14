@@ -1,4 +1,4 @@
-package cn.gloomcore.replacer;
+package cn.gloomcore.placeholder.util;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
@@ -27,10 +27,6 @@ public class PlaceholderUtil {
 
     public static String parsePapi(String string, OfflinePlayer player) {
         return PlaceholderAPI.setPlaceholders(player, string);
-    }
-
-    public static String parsePapi(String string, StringReplacer replacer) {
-        return replacer.apply(string);
     }
 
     public static Function<Player, String> parsePapiSupplier(String string) {
