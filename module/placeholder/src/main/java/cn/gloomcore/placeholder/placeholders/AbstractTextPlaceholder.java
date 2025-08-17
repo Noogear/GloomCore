@@ -5,14 +5,14 @@ import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 
-public abstract class AbstractPlaceholder implements Placeholder {
+public abstract class AbstractTextPlaceholder implements TextPlaceholder {
 
     protected final String original;
     protected final String identifier;
     protected final String params;
     protected PlaceholderExpansion expansion;
 
-    protected AbstractPlaceholder(String original) {
+    protected AbstractTextPlaceholder(String original) {
         this.original = original;
         String[] identifierAndParams = FormatUtil.splitIdentifierAndParams(original);
         this.identifier = identifierAndParams[0];
