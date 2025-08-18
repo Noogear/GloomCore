@@ -1,4 +1,4 @@
-package cn.gloomcore.placeholder.placeholders;
+package cn.gloomcore.placeholder;
 
 public class CacheText{
     private String text;
@@ -17,9 +17,10 @@ public class CacheText{
         return lastUpdate;
     }
 
-    public void update(String text, long lastUpdate) {
+    public String update(String text, long lastUpdate) {
         this.text = text;
         this.lastUpdate = lastUpdate;
+        return text;
     }
 
 }

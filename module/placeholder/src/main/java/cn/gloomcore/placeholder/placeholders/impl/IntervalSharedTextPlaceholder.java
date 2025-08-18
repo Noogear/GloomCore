@@ -1,6 +1,6 @@
 package cn.gloomcore.placeholder.placeholders.impl;
 
-import cn.gloomcore.placeholder.placeholders.CacheText;
+import cn.gloomcore.placeholder.CacheText;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,5 +1,6 @@
 package cn.gloomcore.placeholder.placeholders;
 
+import cn.gloomcore.placeholder.TextPlaceholder;
 import cn.gloomcore.placeholder.util.FormatUtil;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;

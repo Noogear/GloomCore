@@ -1,6 +1,6 @@
 package cn.gloomcore.placeholder.placeholders.impl;
 
-import cn.gloomcore.placeholder.placeholders.CacheText;
+import cn.gloomcore.placeholder.CacheText;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.UUID;

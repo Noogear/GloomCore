@@ -1,24 +1,30 @@
 package cn.gloomcore.placeholder;
 
-import cn.gloomcore.placeholder.placeholders.TextPlaceholder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PlaceholderManager extends PlaceholderExpansion implements Listener {
+    private final Plugin plugin;
     private final String identifier;
     private final String author;
     private final String version;
     private final Object2ObjectOpenHashMap<String, TextPlaceholder> string2Placeholder = new Object2ObjectOpenHashMap<>();
+    private final PlayerPlaceholderHandler playerPlaceholderHandler;
 
-    public PlaceholderManager(@NotNull String identifier, @NotNull String author, @NotNull String version) {
+    public PlaceholderManager(@NotNull JavaPlugin plugin, @NotNull String identifier, @NotNull String author, @NotNull String version) {
+        this.plugin = plugin;
         this.identifier = identifier;
         this.author = author;
         this.version = version;
+        this.playerPlaceholderHandler = new PlayerPlaceholderHandler();
+        plugin.getServer().getPluginManager().registerEvents(playerPlaceholderHandler, plugin);
     }
 
     @Override
@@ -34,6 +40,11 @@ public class PlaceholderManager extends PlaceholderExpansion implements Listener
     @Override
     public @NotNull String getVersion() {
         return version;
+    }
+
+    @Override
+    public @Nullable String getRequiredPlugin() {
+        return plugin.getName();
     }
 
     @Override
