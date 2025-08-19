@@ -1,5 +1,6 @@
-package cn.gloomcore.placeholder;
+package cn.gloomcore.placeholder.fixedPlaceholder;
 
+import cn.gloomcore.placeholder.CacheText;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,10 +10,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class PlayerPlaceholderHandler implements Listener {
+public class PlayerCacheHandler implements Listener {
     private final Object2ObjectOpenHashMap<UUID, Object2ObjectOpenHashMap<String, CacheText>> player2PlaceholdersCache;
 
-    public PlayerPlaceholderHandler() {
+    public PlayerCacheHandler() {
         this.player2PlaceholdersCache = new Object2ObjectOpenHashMap<>();
     }
 
@@ -20,7 +21,8 @@ public class PlayerPlaceholderHandler implements Listener {
         CacheText cacheText = this.player2PlaceholdersCache
                 .computeIfAbsent(uuid, k -> new Object2ObjectOpenHashMap<>())
                 .computeIfAbsent(params, k -> new CacheText(placeholderSupplier.get(), System.currentTimeMillis()));
-        if (System.currentTimeMillis() - cacheText.getLastUpdate() > intervalMillis) {
+        long interval = System.currentTimeMillis() - cacheText.getLastUpdate();
+        if (interval > intervalMillis || interval < 0) {
             return cacheText.update(placeholderSupplier.get(), System.currentTimeMillis());
         } else return cacheText.getText();
     }

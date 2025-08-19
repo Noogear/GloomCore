@@ -1,0 +1,18 @@
+package cn.gloomcore.placeholder.fixedPlaceholder;
+
+
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+
+public interface FixedPlaceholder {
+
+    @Nullable
+    String process(@Nullable Player player);
+
+    @Nullable
+    default String process() {
+        return process(null);
+    }
+
+
+}
