@@ -1,8 +1,8 @@
 package cn.gloomcore.ui.icon;
 
 import cn.gloomcore.item.ItemModifier;
-import cn.gloomcore.replacer.StringReplacer;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,21 +13,11 @@ public interface IconDisplay {
     ItemStack DEFAULT_ICON = new ItemStack(Material.STONE);
 
     static @NotNull IconDisplay of(@NotNull ItemStack itemStack, @Nullable ItemModifier itemModifier) {
-        return new IconDisplay() {
-            @Override
-            public @NotNull ItemStack item() {
-                return itemStack.clone();
-            }
-
-            @Override
-            public @NotNull ItemStack item(@Nullable StringReplacer replacer) {
-                if (itemModifier != null) {
-                    return itemModifier.modify(item(), replacer);
-                }
-                return item();
-            }
-
-        };
+        if (itemModifier != null) {
+            return () -> itemModifier.modify(itemStack.clone());
+        } else {
+            return of(itemStack);
+        }
     }
 
     static @NotNull IconDisplay of(@Nullable ItemModifier itemModifier) {
@@ -42,11 +32,14 @@ public interface IconDisplay {
         return DEFAULT_ICON::clone;
     }
 
-    @NotNull ItemStack item();
+    static @NotNull IconDisplay empty() {
+        return ItemStack::empty;
+    }
 
-    @NotNull
-    default ItemStack item(@Nullable StringReplacer replacer) {
-        return item();
+    @NotNull ItemStack parse();
+
+    default ItemStack parse(@Nullable Player player) {
+        return parse();
     }
 
 }

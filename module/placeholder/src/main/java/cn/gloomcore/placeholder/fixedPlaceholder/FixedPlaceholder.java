@@ -4,6 +4,7 @@ package cn.gloomcore.placeholder.fixedPlaceholder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
+@FunctionalInterface
 public interface FixedPlaceholder {
 
     @Nullable

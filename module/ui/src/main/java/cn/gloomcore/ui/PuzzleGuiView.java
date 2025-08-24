@@ -1,0 +1,169 @@
+package cn.gloomcore.ui;
+
+import cn.gloomcore.ui.puzzle.Puzzle;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * GUI视图类，代表一个可交互的GUI界面
+ * <p>
+ * 该类管理GUI中的所有拼图(Puzzle)组件，处理事件并渲染界面内容。
+ * 每个GUI视图都与特定的玩家相关联，并包含一个菜单布局定义
+ */
+public class PuzzleGuiView implements InventoryHolder {
+    private final Set<Puzzle> puzzles = new HashSet<>();
+    private final Puzzle[] slotPuzzleArray;
+    private final UUID playerId;
+    private final MenuLayout menuLayout;
+
+    private @Nullable Inventory inventory;
+
+    /**
+     * 构造一个新的GUI视图实例
+     *
+     * @param menuLayout 菜单布局定义
+     * @param player     关联的玩家
+     */
+    public PuzzleGuiView(MenuLayout menuLayout, Player player) {
+        this.menuLayout = menuLayout;
+        this.slotPuzzleArray = new Puzzle[menuLayout.getSize()];
+        this.playerId = player.getUniqueId();
+    }
+
+    /**
+     * 向GUI视图中添加一个拼图组件
+     * <p>
+     * 拼图组件会被添加到视图的拼图集合中，并根据其槽位分配到对应的槽位数组中。
+     * 如果指定槽位已被占用，则抛出异常
+     *
+     * @param puzzle 要添加的拼图组件
+     * @throws IllegalArgumentException 当槽位已被占用时抛出
+     */
+    protected void addPuzzle(Puzzle puzzle) {
+        this.puzzles.add(puzzle);
+        for (Integer slot : puzzle.getSlots()) {
+            if (slot >= 0 && slot < this.slotPuzzleArray.length) {
+                if (this.slotPuzzleArray[slot] != null) {
+                    throw new IllegalArgumentException("Slot " + slot + " is already occupied!");
+                }
+                this.slotPuzzleArray[slot] = puzzle;
+            }
+        }
+    }
+
+    /**
+     * 渲染所有拼图组件到玩家的库存中
+     *
+     * @param player 目标玩家
+     */
+    private void renderAll(Player player) {
+        if (inventory != null) {
+            puzzles.forEach(puzzle -> puzzle.render(player, this.inventory));
+        }
+    }
+
+    /**
+     * 处理库存点击事件
+     * <p>
+     * 取消所有默认事件处理，然后将事件转发给对应槽位的拼图组件处理
+     *
+     * @param event 库存点击事件
+     */
+    public void handleClick(InventoryClickEvent event) {
+        event.setCancelled(true);
+        findPuzzleBySlot(event.getRawSlot()).ifPresent(puzzle -> puzzle.onClick(event));
+    }
+
+    /**
+     * 处理库存拖拽事件
+     * <p>
+     * 当前实现为空，可由子类重写以提供具体功能
+     *
+     * @param event 库存拖拽事件
+     */
+    public void handleDrag(InventoryDragEvent event) {
+    }
+
+    /**
+     * 处理库存打开事件
+     * <p>
+     * 当前实现为空，可由子类重写以提供具体功能
+     *
+     * @param event 库存打开事件
+     */
+    public void handleOpen(InventoryOpenEvent event) {
+    }
+
+    /**
+     * 处理库存关闭事件
+     * <p>
+     * 当前实现为空，可由子类重写以提供具体功能
+     *
+     * @param event 库存关闭事件
+     */
+    public void handleClose(InventoryCloseEvent event) {
+    }
+
+    /**
+     * 解析菜单标题
+     *
+     * @return 菜单标题组件
+     */
+    public Component parsedMenuTitle() {
+        return menuLayout.getInventoryType().defaultTitle();
+    }
+
+
+    /**
+     * 根据槽位查找对应的拼图组件
+     *
+     * @param slot 槽位索引
+     * @return 包含拼图组件的Optional对象，如果未找到则为空
+     */
+    private Optional<Puzzle> findPuzzleBySlot(int slot) {
+        if (slot >= 0 && slot < this.slotPuzzleArray.length) {
+            return Optional.ofNullable(this.slotPuzzleArray[slot]);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * 为玩家打开此GUI视图
+     *
+     * @param player 目标玩家
+     */
+    public void open(Player player) {
+        if (inventory == null) {
+            this.inventory = Bukkit.createInventory(this, menuLayout.getSize(), parsedMenuTitle());
+        }
+        renderAll(player);
+        player.openInventory(inventory);
+    }
+
+    /**
+     * 获取与此视图关联的库存对象
+     *
+     * @return 库存对象
+     */
+    @Override
+    public @NotNull Inventory getInventory() {
+        if (inventory != null) {
+            return inventory;
+        }
+        return inventory = Bukkit.createInventory(this, menuLayout.getInventoryType());
+    }
+}

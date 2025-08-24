@@ -1,0 +1,96 @@
+package cn.gloomcore.ui.puzzle.impl;
+
+import cn.gloomcore.ui.puzzle.Puzzle;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
+
+/**
+ * 可放置槽位拼图类，提供一组可供玩家放置物品的空槽位
+ * <p>
+ * 该拼图在指定槽位中创建空位，允许玩家将物品放置在这些槽位中，
+ * 并能监听内容变化事件。主要用于制作需要玩家放置物品的界面，
+ * 如合成界面、物品选择界面等
+ */
+public class PlaceableSlotsPuzzle implements Puzzle {
+
+    private final JavaPlugin plugin;
+    private final List<Integer> slots;
+    private final Consumer<Player> onContentsChanged;
+
+    /**
+     * 构造一个新的可放置槽位拼图实例
+     *
+     * @param plugin            插件实例，用于调度任务
+     * @param slots             可放置物品的槽位列表
+     * @param onContentsChanged 当槽位内容发生变化时的回调函数，可以为null
+     */
+    public PlaceableSlotsPuzzle(@NotNull JavaPlugin plugin, @NotNull List<Integer> slots, @Nullable Consumer<Player> onContentsChanged) {
+        this.plugin = plugin;
+        this.slots = slots;
+        this.onContentsChanged = onContentsChanged;
+    }
+
+    /**
+     * 获取拼图占据的所有槽位
+     *
+     * @return 包含所有槽位索引的集合
+     */
+    @Override
+    public Collection<Integer> getSlots() {
+        return slots;
+    }
+
+    /**
+     * 渲染拼图内容到指定库存中
+     * <p>
+     * 将所有指定槽位清空，使其变为空槽位供玩家放置物品
+     *
+     * @param player    目标玩家
+     * @param inventory 目标库存
+     */
+    @Override
+    public void render(Player player, @NotNull Inventory inventory) {
+        slots.forEach(slot -> inventory.setItem(slot, null));
+    }
+
+    /**
+     * 处理槽位点击事件
+     * <p>
+     * 允许玩家放置或取出物品，并在内容变化后触发回调函数
+     *
+     * @param event 库存点击事件
+     */
+    @Override
+    public void onClick(InventoryClickEvent event) {
+        event.setCancelled(false);
+        if (onContentsChanged != null) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    onContentsChanged.accept((Player) event.getWhoClicked());
+                }
+            }.runTaskLater(plugin, 1L);
+        }
+    }
+
+    /**
+     * 更新拼图显示内容
+     * <p>
+     * 此拼图为静态类型，不需要更新操作
+     *
+     * @param player 目标玩家
+     */
+    @Override
+    public void update(Player player) {
+        // This puzzle itself is static
+    }
+}

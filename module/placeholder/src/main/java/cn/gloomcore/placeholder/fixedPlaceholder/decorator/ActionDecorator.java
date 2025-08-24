@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@FunctionalInterface
 public interface ActionDecorator extends FixedPlaceholder {
 
 

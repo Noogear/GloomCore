@@ -8,13 +8,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class PlayerCacheHandler implements Listener {
-    private final Object2ObjectOpenHashMap<UUID, Object2ObjectOpenHashMap<String, CacheText>> player2PlaceholdersCache;
+    private final ConcurrentHashMap<UUID, Object2ObjectOpenHashMap<String, CacheText>> player2PlaceholdersCache;
 
     public PlayerCacheHandler() {
-        this.player2PlaceholdersCache = new Object2ObjectOpenHashMap<>();
+        this.player2PlaceholdersCache = new ConcurrentHashMap<>();
     }
 
     public @Nullable String getOrUpdate(UUID uuid, String params, long intervalMillis, Supplier<String> placeholderSupplier) {

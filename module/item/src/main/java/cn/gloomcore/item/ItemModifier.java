@@ -8,10 +8,6 @@ import org.jetbrains.annotations.Nullable;
 @FunctionalInterface
 public interface ItemModifier extends BaseModify<ItemStack> {
 
-    @NotNull ItemStack modify(@NotNull ItemStack original, @Nullable StringReplacer replacer);
+    @NotNull ItemStack modify(@NotNull ItemStack original);
 
-    @Override
-    default @NotNull ItemStack modify(@NotNull ItemStack original) {
-        return modify(original, null);
-    }
 }
