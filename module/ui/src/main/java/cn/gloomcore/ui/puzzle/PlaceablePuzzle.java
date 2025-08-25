@@ -21,7 +21,9 @@ public interface PlaceablePuzzle {
     void cleanupOnClose(Player player, Inventory inventory);
 
 
-    void tryAcceptItem(ItemStack itemToAccept, Inventory guiInventory);
+    boolean tryAcceptItem(ItemStack itemToAccept, Inventory guiInventory);
 
-    Consumer<Player> onContentsChanged();
+    Consumer<Player> getChangedCallBack();
+
+    boolean hasChangedCallBack();
 }

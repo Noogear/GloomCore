@@ -93,19 +93,16 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
     @Override
     public void cleanupOnClose(Player player, Inventory inventory) {
         List<ItemStack> itemsToReturn = new ArrayList<>();
-
-        // 1. 从GUI的Inventory中收集所有需要退还的物品
         for (int slot : this.getSlots()) {
             ItemStack item = inventory.getItem(slot);
             if (item != null && !item.getType().isAir()) {
                 itemsToReturn.add(item);
-                // 2. 清空GUI中的槽位
                 inventory.setItem(slot, null);
             }
         }
 
         if (itemsToReturn.isEmpty()) {
-            return; // 没有物品需要退还
+            return;
         }
 
         Location location = player.getLocation();
@@ -120,39 +117,52 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
     }
 
     @Override
-    public void tryAcceptItem(ItemStack itemToAccept, Inventory inventory) {
+    public boolean tryAcceptItem(ItemStack itemToAccept, Inventory inventory) {
+        if (itemToAccept == null || itemToAccept.getAmount() <= 0) {
+            return false;
+        }
+        int initialAmount = itemToAccept.getAmount();
+
+        // 阶段1: 尝试堆叠
         if (this.stackingEnabled) {
             for (int slot : this.slots) {
-                if (itemToAccept.getAmount() <= 0) return;
-
                 ItemStack existingItem = inventory.getItem(slot);
-                if (existingItem != null && existingItem.isSimilar(itemToAccept)) {
+                if (existingItem != null && !existingItem.getType().isAir() && existingItem.isSimilar(itemToAccept)) {
                     int space = existingItem.getMaxStackSize() - existingItem.getAmount();
                     if (space > 0) {
                         int amountToMove = Math.min(space, itemToAccept.getAmount());
-                        existingItem.setAmount(existingItem.getAmount() + amountToMove);
-                        itemToAccept.setAmount(itemToAccept.getAmount() - amountToMove);
-                        inventory.setItem(slot, existingItem);
+                        existingItem.add(amountToMove);
+                        itemToAccept.subtract(amountToMove);
                     }
+                }
+                if (itemToAccept.getAmount() <= 0) {
+                    return true;
                 }
             }
         }
 
-        for (int slot : this.slots) {
-            if (itemToAccept.getAmount() <= 0) return;
-
-            if (inventory.getItem(slot) == null) {
-                inventory.setItem(slot, itemToAccept.clone());
-                itemToAccept.setAmount(0);
-                return;
+        if (itemToAccept.getAmount() > 0) {
+            for (int slot : this.slots) {
+                ItemStack slotItem = inventory.getItem(slot);
+                if (slotItem == null || slotItem.getType().isAir()) {
+                    inventory.setItem(slot, itemToAccept.clone());
+                    itemToAccept.setAmount(0);
+                    return true;
+                }
             }
         }
 
+        return itemToAccept.getAmount() < initialAmount;
     }
 
     @Override
-    public Consumer<Player> onContentsChanged() {
+    public Consumer<Player> getChangedCallBack() {
         return this.onContentsChanged;
+    }
+
+    @Override
+    public boolean hasChangedCallBack() {
+        return this.onContentsChanged != null;
     }
 
 

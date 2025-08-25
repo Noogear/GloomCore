@@ -100,12 +100,26 @@ public class PuzzleGuiView implements InventoryHolder {
                 if (itemToMove == null || itemToMove.isEmpty()) {
                     return;
                 }
+                Set<PlaceablePuzzle> puzzlesToUpdate = new ObjectOpenHashSet<>();
                 for (PlaceablePuzzle puzzle : this.placeablePuzzles) {
-                    puzzle.tryAcceptItem(itemToMove, this.getInventory());
+                    if(puzzle.tryAcceptItem(itemToMove, this.getInventory())){
+                        if (puzzle.hasChangedCallBack()) {
+                            puzzlesToUpdate.add(puzzle);
+                        }
+                    }
                     if (itemToMove.getAmount() <= 0) {
                         event.setCurrentItem(null);
                         break;
                     }
+                }
+                if(!puzzlesToUpdate.isEmpty()){
+                    Player player = (Player) event.getWhoClicked();
+                    player.getScheduler().runDelayed(plugin, (task) -> {
+                        for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
+                            puzzle.getChangedCallBack().accept(player);
+                        }
+                    },null,1L);
+
                 }
             } else if (action == InventoryAction.COLLECT_TO_CURSOR) {
                 event.setCancelled(true);
@@ -128,14 +142,17 @@ public class PuzzleGuiView implements InventoryHolder {
             Set<PlaceablePuzzle> puzzlesToUpdate = new ObjectOpenHashSet<>();
             for (int slot : event.getRawSlots()) {
                 if (slot < size) {
-                    puzzlesToUpdate.add((PlaceablePuzzle) slotPuzzleArray[slot]);
+                    PlaceablePuzzle puzzle = (PlaceablePuzzle) slotPuzzleArray[slot];
+                    if(puzzle.hasChangedCallBack()){
+                        puzzlesToUpdate.add(puzzle);
+                    }
                 }
                 if (puzzlesToUpdate.isEmpty()) {
                     task.cancel();
                     return;
                 }
                 for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
-                    puzzle.onContentsChanged().accept(player);
+                    puzzle.getChangedCallBack().accept(player);
                 }
             }
 
