@@ -114,7 +114,7 @@ public class PuzzleGuiView implements InventoryHolder {
     }
 
     public void handleDrag(InventoryDragEvent event) {
-        int size = getInventory().getSize();
+        int size = menuLayout.getSize();
         for (int slot : event.getRawSlots()) {
             if (slot < size) {
                 if (!(this.slotPuzzleArray[slot] instanceof PlaceablePuzzle)) {

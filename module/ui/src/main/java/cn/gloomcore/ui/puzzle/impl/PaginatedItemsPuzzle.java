@@ -129,4 +129,50 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
 
     }
 
+    /**
+     * 直接跳转到指定页码。
+     *
+     * @param pageNumber 用户输入的页码 (1-based, 即第一页是1)。
+     * @param player     目标玩家。
+     * @return 如果页面成功跳转则返回true，如果目标页码与当前页码相同则返回false。
+     */
+    public boolean jumpToPage(int pageNumber, Player player) {
+        int totalPages = getTotalPages();
+        int targetPageIndex = pageNumber - 1;
+
+        if (targetPageIndex < 0) {
+            targetPageIndex = 0;
+        } else if (targetPageIndex >= totalPages) {
+            targetPageIndex = totalPages - 1;
+        }
+        if (this.currentPage == targetPageIndex) {
+            return false;
+        }
+
+        this.currentPage = targetPageIndex;
+        update(player);
+        return true;
+    }
+
+    /**
+     * 获取当前页码 (1-based, 用于显示)。
+     *
+     * @return 当前页码，从1开始。
+     */
+    public int getCurrentPage() {
+        return this.currentPage + 1;
+    }
+
+    /**
+     * 获取总页数。
+     *
+     * @return 总页数，至少为1。
+     */
+    public int getTotalPages() {
+        if (allItems.isEmpty()) {
+            return 1;
+        }
+        return (int) Math.ceil((double) allItems.size() / slots.size());
+    }
+
 }
