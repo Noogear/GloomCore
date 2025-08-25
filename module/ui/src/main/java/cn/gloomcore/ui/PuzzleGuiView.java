@@ -102,7 +102,7 @@ public class PuzzleGuiView implements InventoryHolder {
                 }
                 Set<PlaceablePuzzle> puzzlesToUpdate = new ObjectOpenHashSet<>();
                 for (PlaceablePuzzle puzzle : this.placeablePuzzles) {
-                    if(puzzle.tryAcceptItem(itemToMove, this.getInventory())){
+                    if (puzzle.tryAcceptItem(itemToMove, this.getInventory())) {
                         if (puzzle.hasChangedCallBack()) {
                             puzzlesToUpdate.add(puzzle);
                         }
@@ -112,13 +112,13 @@ public class PuzzleGuiView implements InventoryHolder {
                         break;
                     }
                 }
-                if(!puzzlesToUpdate.isEmpty()){
+                if (!puzzlesToUpdate.isEmpty()) {
                     Player player = (Player) event.getWhoClicked();
                     player.getScheduler().runDelayed(plugin, (task) -> {
                         for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
                             puzzle.getChangedCallBack().accept(player);
                         }
-                    },null,1L);
+                    }, null, 1L);
 
                 }
             } else if (action == InventoryAction.COLLECT_TO_CURSOR) {
@@ -143,7 +143,7 @@ public class PuzzleGuiView implements InventoryHolder {
             for (int slot : event.getRawSlots()) {
                 if (slot < size) {
                     PlaceablePuzzle puzzle = (PlaceablePuzzle) slotPuzzleArray[slot];
-                    if(puzzle.hasChangedCallBack()){
+                    if (puzzle.hasChangedCallBack()) {
                         puzzlesToUpdate.add(puzzle);
                     }
                 }

@@ -36,7 +36,7 @@ public class PuzzleGuiManager implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    public void disable(){
+    public void disable() {
         HandlerList.unregisterAll(this);
     }
 

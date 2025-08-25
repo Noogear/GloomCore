@@ -122,12 +122,11 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
             return false;
         }
         int initialAmount = itemToAccept.getAmount();
-
-        // 阶段1: 尝试堆叠
+        
         if (this.stackingEnabled) {
             for (int slot : this.slots) {
                 ItemStack existingItem = inventory.getItem(slot);
-                if (existingItem != null && !existingItem.getType().isAir() && existingItem.isSimilar(itemToAccept)) {
+                if (existingItem != null && existingItem.isSimilar(itemToAccept)) {
                     int space = existingItem.getMaxStackSize() - existingItem.getAmount();
                     if (space > 0) {
                         int amountToMove = Math.min(space, itemToAccept.getAmount());
