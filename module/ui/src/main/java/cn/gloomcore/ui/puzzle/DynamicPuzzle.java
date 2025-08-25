@@ -2,23 +2,22 @@ package cn.gloomcore.ui.puzzle;
 
 import cn.gloomcore.ui.PuzzleGuiView;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 /**
- * ¶¯Ì¬Æ´Í¼³éÏóÀà£¬ÊµÏÖ¿É¸üĞÂµÄÆ´Í¼×é¼ş
+ * åŠ¨æ€æ‹¼å›¾æŠ½è±¡ç±»ï¼Œå®ç°å¯æ›´æ–°çš„æ‹¼å›¾ç»„ä»¶
  * <p>
- * ¸ÃÀàÌá¹©ÁËÒ»¸ö¸üĞÂ·½·¨£¬µ±Æ´Í¼ĞèÒªË¢ĞÂÏÔÊ¾ÄÚÈİÊ±µ÷ÓÃ¡£
- * ¶¯Ì¬Æ´Í¼¿ÉÒÔÏìÓ¦ÓÎÏ·×´Ì¬±ä»¯²¢ÊµÊ±¸üĞÂÆäÔÚGUIÖĞµÄÏÔÊ¾
+ * è¯¥ç±»æä¾›äº†ä¸€ä¸ªæ›´æ–°æ–¹æ³•ï¼Œå½“æ‹¼å›¾éœ€è¦åˆ·æ–°æ˜¾ç¤ºå†…å®¹æ—¶è°ƒç”¨ã€‚
+ * åŠ¨æ€æ‹¼å›¾å¯ä»¥å“åº”æ¸¸æˆçŠ¶æ€å˜åŒ–å¹¶å®æ—¶æ›´æ–°å…¶åœ¨GUIä¸­çš„æ˜¾ç¤º
  */
 public abstract class DynamicPuzzle implements Puzzle {
     /**
-     * ¸üĞÂÆ´Í¼ÏÔÊ¾ÄÚÈİ
+     * æ›´æ–°æ‹¼å›¾æ˜¾ç¤ºå†…å®¹
      * <p>
-     * ¸Ã·½·¨»á¼ì²éÍæ¼Òµ±Ç°´ò¿ªµÄ¿â´æÊÇ·ñÎªPuzzleGuiViewÀàĞÍ£¬
-     * Èç¹ûÊÇÔòÖØĞÂäÖÈ¾Æ´Í¼ÄÚÈİµ½¸Ã¿â´æÖĞ
+     * è¯¥æ–¹æ³•ä¼šæ£€æŸ¥ç©å®¶å½“å‰æ‰“å¼€çš„åº“å­˜æ˜¯å¦ä¸ºPuzzleGuiViewç±»å‹ï¼Œ
+     * å¦‚æœæ˜¯åˆ™é‡æ–°æ¸²æŸ“æ‹¼å›¾å†…å®¹åˆ°è¯¥åº“å­˜ä¸­
      *
-     * @param player ĞèÒª¸üĞÂÆ´Í¼ÏÔÊ¾µÄÍæ¼Ò
+     * @param player éœ€è¦æ›´æ–°æ‹¼å›¾æ˜¾ç¤ºçš„ç©å®¶
      */
     @Override
     public void update(Player player) {

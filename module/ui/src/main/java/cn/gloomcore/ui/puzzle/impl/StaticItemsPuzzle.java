@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 public class StaticItemsPuzzle extends StaticPuzzle {
 
@@ -18,7 +18,7 @@ public class StaticItemsPuzzle extends StaticPuzzle {
     }
 
     @Override
-    public Set<Integer> getSlots() {
+    public Collection<Integer> getSlots() {
         return items.keySet();
     }
 

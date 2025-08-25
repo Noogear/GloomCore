@@ -9,30 +9,30 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * ¿É·ÅÖÃ²ÛÎ»Æ´Í¼Àà£¬Ìá¹©Ò»×é¿É¹©Íæ¼Ò·ÅÖÃÎïÆ·µÄ¿Õ²ÛÎ»
+ * å¯æ”¾ç½®æ§½ä½æ‹¼å›¾ç±»ï¼Œæä¾›ä¸€ç»„å¯ä¾›ç©å®¶æ”¾ç½®ç‰©å“çš„ç©ºæ§½ä½
  * <p>
- * ¸ÃÆ´Í¼ÔÚÖ¸¶¨²ÛÎ»ÖĞ´´½¨¿ÕÎ»£¬ÔÊĞíÍæ¼Ò½«ÎïÆ··ÅÖÃÔÚÕâĞ©²ÛÎ»ÖĞ£¬
- * ²¢ÄÜ¼àÌıÄÚÈİ±ä»¯ÊÂ¼ş¡£Ö÷ÒªÓÃÓÚÖÆ×÷ĞèÒªÍæ¼Ò·ÅÖÃÎïÆ·µÄ½çÃæ£¬
- * ÈçºÏ³É½çÃæ¡¢ÎïÆ·Ñ¡Ôñ½çÃæµÈ
+ * è¯¥æ‹¼å›¾åœ¨æŒ‡å®šæ§½ä½ä¸­åˆ›å»ºç©ºä½ï¼Œå…è®¸ç©å®¶å°†ç‰©å“æ”¾ç½®åœ¨è¿™äº›æ§½ä½ä¸­ï¼Œ
+ * å¹¶èƒ½ç›‘å¬å†…å®¹å˜åŒ–äº‹ä»¶ã€‚ä¸»è¦ç”¨äºåˆ¶ä½œéœ€è¦ç©å®¶æ”¾ç½®ç‰©å“çš„ç•Œé¢ï¼Œ
+ * å¦‚åˆæˆç•Œé¢ã€ç‰©å“é€‰æ‹©ç•Œé¢ç­‰
  */
 public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
     private final JavaPlugin plugin;
-    private final List<Integer> slots;
+    private final Set<Integer> slots;
     private final Consumer<Player> onContentsChanged;
     private final boolean stackingEnabled;
 
 
-    public PlaceableSlotsPuzzle(@NotNull JavaPlugin plugin, @NotNull List<Integer> slots, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
+    public PlaceableSlotsPuzzle(@NotNull JavaPlugin plugin, @NotNull Set<Integer> slots, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
         this.plugin = plugin;
         this.slots = slots;
         this.onContentsChanged = onContentsChanged;
@@ -40,9 +40,9 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
     }
 
     /**
-     * »ñÈ¡Æ´Í¼Õ¼¾İµÄËùÓĞ²ÛÎ»
+     * è·å–æ‹¼å›¾å æ®çš„æ‰€æœ‰æ§½ä½
      *
-     * @return °üº¬ËùÓĞ²ÛÎ»Ë÷ÒıµÄ¼¯ºÏ
+     * @return åŒ…å«æ‰€æœ‰æ§½ä½ç´¢å¼•çš„é›†åˆ
      */
     @Override
     public Collection<Integer> getSlots() {
@@ -50,12 +50,12 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
     }
 
     /**
-     * äÖÈ¾Æ´Í¼ÄÚÈİµ½Ö¸¶¨¿â´æÖĞ
+     * æ¸²æŸ“æ‹¼å›¾å†…å®¹åˆ°æŒ‡å®šåº“å­˜ä¸­
      * <p>
-     * ½«ËùÓĞÖ¸¶¨²ÛÎ»Çå¿Õ£¬Ê¹Æä±äÎª¿Õ²ÛÎ»¹©Íæ¼Ò·ÅÖÃÎïÆ·
+     * å°†æ‰€æœ‰æŒ‡å®šæ§½ä½æ¸…ç©ºï¼Œä½¿å…¶å˜ä¸ºç©ºæ§½ä½ä¾›ç©å®¶æ”¾ç½®ç‰©å“
      *
-     * @param player    Ä¿±êÍæ¼Ò
-     * @param inventory Ä¿±ê¿â´æ
+     * @param player    ç›®æ ‡ç©å®¶
+     * @param inventory ç›®æ ‡åº“å­˜
      */
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
@@ -63,31 +63,28 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
     }
 
     /**
-     * ´¦Àí²ÛÎ»µã»÷ÊÂ¼ş
+     * å¤„ç†æ§½ä½ç‚¹å‡»äº‹ä»¶
      * <p>
-     * ÔÊĞíÍæ¼Ò·ÅÖÃ»òÈ¡³öÎïÆ·£¬²¢ÔÚÄÚÈİ±ä»¯ºó´¥·¢»Øµ÷º¯Êı
+     * å…è®¸ç©å®¶æ”¾ç½®æˆ–å–å‡ºç‰©å“ï¼Œå¹¶åœ¨å†…å®¹å˜åŒ–åè§¦å‘å›è°ƒå‡½æ•°
      *
-     * @param event ¿â´æµã»÷ÊÂ¼ş
+     * @param event åº“å­˜ç‚¹å‡»äº‹ä»¶
      */
     @Override
     public void onClick(InventoryClickEvent event) {
         event.setCancelled(false);
         if (onContentsChanged != null) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    onContentsChanged.accept((Player) event.getWhoClicked());
-                }
-            }.runTaskLater(plugin, 1L);
+            Player player = (Player) event.getWhoClicked();
+            player.getScheduler().runDelayed(plugin, (task) -> onContentsChanged.accept(player), null, 1L);
         }
+
     }
 
     /**
-     * ¸üĞÂÆ´Í¼ÏÔÊ¾ÄÚÈİ
+     * æ›´æ–°æ‹¼å›¾æ˜¾ç¤ºå†…å®¹
      * <p>
-     * ´ËÆ´Í¼Îª¾²Ì¬ÀàĞÍ£¬²»ĞèÒª¸üĞÂ²Ù×÷
+     * æ­¤æ‹¼å›¾ä¸ºé™æ€ç±»å‹ï¼Œä¸éœ€è¦æ›´æ–°æ“ä½œ
      *
-     * @param player Ä¿±êÍæ¼Ò
+     * @param player ç›®æ ‡ç©å®¶
      */
     @Override
     public void update(Player player) {
@@ -97,18 +94,18 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
     public void cleanupOnClose(Player player, Inventory inventory) {
         List<ItemStack> itemsToReturn = new ArrayList<>();
 
-        // 1. ´ÓGUIµÄInventoryÖĞÊÕ¼¯ËùÓĞĞèÒªÍË»¹µÄÎïÆ·
+        // 1. ä»GUIçš„Inventoryä¸­æ”¶é›†æ‰€æœ‰éœ€è¦é€€è¿˜çš„ç‰©å“
         for (int slot : this.getSlots()) {
             ItemStack item = inventory.getItem(slot);
             if (item != null && !item.getType().isAir()) {
                 itemsToReturn.add(item);
-                // 2. Çå¿ÕGUIÖĞµÄ²ÛÎ»
+                // 2. æ¸…ç©ºGUIä¸­çš„æ§½ä½
                 inventory.setItem(slot, null);
             }
         }
 
         if (itemsToReturn.isEmpty()) {
-            return; // Ã»ÓĞÎïÆ·ĞèÒªÍË»¹
+            return; // æ²¡æœ‰ç‰©å“éœ€è¦é€€è¿˜
         }
 
         Location location = player.getLocation();
@@ -135,6 +132,7 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
                         int amountToMove = Math.min(space, itemToAccept.getAmount());
                         existingItem.setAmount(existingItem.getAmount() + amountToMove);
                         itemToAccept.setAmount(itemToAccept.getAmount() - amountToMove);
+                        inventory.setItem(slot, existingItem);
                     }
                 }
             }
@@ -150,6 +148,11 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
             }
         }
 
+    }
+
+    @Override
+    public Consumer<Player> onContentsChanged() {
+        return this.onContentsChanged;
     }
 
 

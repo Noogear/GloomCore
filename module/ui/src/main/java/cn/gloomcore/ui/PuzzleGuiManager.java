@@ -6,6 +6,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,19 +18,19 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * GUI¹ÜÀíÆ÷Àà£¬ÓÃÓÚ¹ÜÀíÍæ¼ÒµÄGUI½çÃæµ¼º½ºÍÀúÊ·¼ÇÂ¼
+ * GUIç®¡ç†å™¨ç±»ï¼Œç”¨äºç®¡ç†ç©å®¶çš„GUIç•Œé¢å¯¼èˆªå’Œå†å²è®°å½•
  * <p>
- * ¸ÃÀà¸ºÔğ´¦ÀíÍæ¼Ò´ò¿ªGUI¡¢·µ»ØÉÏÒ»¼¶GUI¡¢ÒÔ¼°ÇåÀíÍæ¼ÒÊı¾İµÈ²Ù×÷£¬
- * Í¬Ê±¼àÌıÏà¹ØÊÂ¼ş²¢×ª·¢¸ø¶ÔÓ¦µÄGUIÊÓÍ¼´¦Àí
+ * è¯¥ç±»è´Ÿè´£å¤„ç†ç©å®¶æ‰“å¼€GUIã€è¿”å›ä¸Šä¸€çº§GUIã€ä»¥åŠæ¸…ç†ç©å®¶æ•°æ®ç­‰æ“ä½œï¼Œ
+ * åŒæ—¶ç›‘å¬ç›¸å…³äº‹ä»¶å¹¶è½¬å‘ç»™å¯¹åº”çš„GUIè§†å›¾å¤„ç†
  */
 public class PuzzleGuiManager implements Listener {
     private final ConcurrentHashMap<UUID, Deque<PuzzleGuiView>> history = new ConcurrentHashMap<>();
     private final Set<UUID> navigatingPlayers = ConcurrentHashMap.newKeySet();
 
     /**
-     * ¹¹ÔìÒ»¸öĞÂµÄGUI¹ÜÀíÆ÷ÊµÀı£¬²¢×¢²áÊÂ¼ş¼àÌıÆ÷
+     * æ„é€ ä¸€ä¸ªæ–°çš„GUIç®¡ç†å™¨å®ä¾‹ï¼Œå¹¶æ³¨å†Œäº‹ä»¶ç›‘å¬å™¨
      *
-     * @param plugin ²å¼şÊµÀı£¬ÓÃÓÚ×¢²áÊÂ¼ş¼àÌıÆ÷
+     * @param plugin æ’ä»¶å®ä¾‹ï¼Œç”¨äºæ³¨å†Œäº‹ä»¶ç›‘å¬å™¨
      */
     public PuzzleGuiManager(JavaPlugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -40,11 +41,11 @@ public class PuzzleGuiManager implements Listener {
     }
 
     /**
-     * ÎªÍæ¼Ò´ò¿ªÒ»¸öĞÂµÄGUI£¬²¢½«µ±Ç°GUI£¨Èç¹ûÓĞ£©´æÈëÀúÊ·¼ÇÂ¼¡£
+     * ä¸ºç©å®¶æ‰“å¼€ä¸€ä¸ªæ–°çš„GUIï¼Œå¹¶å°†å½“å‰GUIï¼ˆå¦‚æœæœ‰ï¼‰å­˜å…¥å†å²è®°å½•ã€‚
      *
-     * @param player       Íæ¼Ò
-     * @param view         Òª´ò¿ªµÄGUI
-     * @param storeHistory ÊÇ·ñ½«µ±Ç°´ò¿ªµÄGUI´æÈëÀúÊ·
+     * @param player       ç©å®¶
+     * @param view         è¦æ‰“å¼€çš„GUI
+     * @param storeHistory æ˜¯å¦å°†å½“å‰æ‰“å¼€çš„GUIå­˜å…¥å†å²
      */
     public void open(Player player, PuzzleGuiView view, boolean storeHistory) {
         if (storeHistory && player.getOpenInventory().getTopInventory().getHolder(false) instanceof PuzzleGuiView currentHolder) {
@@ -55,10 +56,10 @@ public class PuzzleGuiManager implements Listener {
     }
 
     /**
-     * ÎªÍæ¼Ò´ò¿ªÒ»¸öĞÂGUI£¬Ä¬ÈÏ²»´æ´¢ÀúÊ·£¨ÊÊÓÃÓÚ´ò¿ªÖ÷²Ëµ¥µÈ³¡¾°£©¡£
+     * ä¸ºç©å®¶æ‰“å¼€ä¸€ä¸ªæ–°GUIï¼Œé»˜è®¤ä¸å­˜å‚¨å†å²ï¼ˆé€‚ç”¨äºæ‰“å¼€ä¸»èœå•ç­‰åœºæ™¯ï¼‰ã€‚
      *
-     * @param player Íæ¼Ò
-     * @param view   Òª´ò¿ªµÄGUIÊÓÍ¼
+     * @param player ç©å®¶
+     * @param view   è¦æ‰“å¼€çš„GUIè§†å›¾
      */
     public void open(Player player, PuzzleGuiView view) {
         history.remove(player.getUniqueId());
@@ -67,10 +68,10 @@ public class PuzzleGuiManager implements Listener {
     }
 
     /**
-     * ·µ»ØÉÏÒ»Ò³¡£
+     * è¿”å›ä¸Šä¸€é¡µã€‚
      *
-     * @param player Íæ¼Ò
-     * @return Èç¹û³É¹¦·µ»Ø£¬·µ»Øtrue
+     * @param player ç©å®¶
+     * @return å¦‚æœæˆåŠŸè¿”å›ï¼Œè¿”å›true
      */
     public boolean back(Player player) {
         Deque<PuzzleGuiView> playerHistory = history.get(player.getUniqueId());
@@ -83,11 +84,11 @@ public class PuzzleGuiManager implements Listener {
     }
 
     /**
-     * ´¦Àí¿â´æµã»÷ÊÂ¼ş£¬½«ÊÂ¼ş×ª·¢¸ø¶ÔÓ¦µÄGUIÊÓÍ¼½øĞĞ´¦Àí
+     * å¤„ç†åº“å­˜ç‚¹å‡»äº‹ä»¶ï¼Œå°†äº‹ä»¶è½¬å‘ç»™å¯¹åº”çš„GUIè§†å›¾è¿›è¡Œå¤„ç†
      *
-     * @param event ¿â´æµã»÷ÊÂ¼ş
+     * @param event åº“å­˜ç‚¹å‡»äº‹ä»¶
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
         if (!(inventory.getHolder(false) instanceof PuzzleGuiView puzzleGuiView)) {
@@ -97,11 +98,11 @@ public class PuzzleGuiManager implements Listener {
     }
 
     /**
-     * ´¦ÀíÍæ¼ÒÍË³öÊÂ¼ş£¬ÇåÀí¸ÃÍæ¼ÒµÄÀúÊ·¼ÇÂ¼ºÍµ¼º½×´Ì¬
+     * å¤„ç†ç©å®¶é€€å‡ºäº‹ä»¶ï¼Œæ¸…ç†è¯¥ç©å®¶çš„å†å²è®°å½•å’Œå¯¼èˆªçŠ¶æ€
      *
-     * @param event Íæ¼ÒÍË³öÊÂ¼ş
+     * @param event ç©å®¶é€€å‡ºäº‹ä»¶
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID playerUuid = player.getUniqueId();
@@ -117,13 +118,13 @@ public class PuzzleGuiManager implements Listener {
     }
 
     /**
-     * ´¦Àí¿â´æ¹Ø±ÕÊÂ¼ş£¬¸ù¾İ¹Ø±ÕÔ­Òò¾ö¶¨ÊÇ·ñÇåÀíÍæ¼ÒµÄÀúÊ·¼ÇÂ¼
+     * å¤„ç†åº“å­˜å…³é—­äº‹ä»¶ï¼Œæ ¹æ®å…³é—­åŸå› å†³å®šæ˜¯å¦æ¸…ç†ç©å®¶çš„å†å²è®°å½•
      *
-     * @param event ¿â´æ¹Ø±ÕÊÂ¼ş
+     * @param event åº“å­˜å…³é—­äº‹ä»¶
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (!(event.getInventory().getHolder() instanceof PuzzleGuiView closedView)) {
+        if (!(event.getInventory().getHolder(false) instanceof PuzzleGuiView closedView)) {
             return;
         }
         Player player = (Player) event.getPlayer();
@@ -133,6 +134,15 @@ public class PuzzleGuiManager implements Listener {
         }
         closedView.handleClose(player);
         history.remove(playerUuid);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryDrag(InventoryDragEvent event) {
+        Inventory inventory = event.getInventory();
+        if (!(inventory.getHolder(false) instanceof PuzzleGuiView puzzleGuiView)) {
+            return;
+        }
+        puzzleGuiView.handleDrag(event);
     }
 
 

@@ -7,13 +7,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * ·ÖÒ³ÎïÆ·Æ´Í¼Àà£¬ÓÃÓÚÔÚGUIÖĞÏÔÊ¾¿É·ÖÒ³µÄÎïÆ·ÁĞ±í
+ * åˆ†é¡µç‰©å“æ‹¼å›¾ç±»ï¼Œç”¨äºåœ¨GUIä¸­æ˜¾ç¤ºå¯åˆ†é¡µçš„ç‰©å“åˆ—è¡¨
  * <p>
- * ¸ÃÆ´Í¼½«Ò»×éÎïÆ··ÖÒ³ÏÔÊ¾ÔÚÖ¸¶¨µÄ²ÛÎ»ÖĞ£¬Ö§³Ö·­Ò³¹¦ÄÜ£¬
- * ²¢ÄÜ´¦ÀíÎïÆ·µÄµã»÷ÊÂ¼ş¡£Ã¿Ò³ÏÔÊ¾µÄÎïÆ·ÊıÁ¿È¡¾öÓÚÌá¹©µÄ²ÛÎ»ÊıÁ¿
+ * è¯¥æ‹¼å›¾å°†ä¸€ç»„ç‰©å“åˆ†é¡µæ˜¾ç¤ºåœ¨æŒ‡å®šçš„æ§½ä½ä¸­ï¼Œæ”¯æŒç¿»é¡µåŠŸèƒ½ï¼Œ
+ * å¹¶èƒ½å¤„ç†ç‰©å“çš„ç‚¹å‡»äº‹ä»¶ã€‚æ¯é¡µæ˜¾ç¤ºçš„ç‰©å“æ•°é‡å–å†³äºæä¾›çš„æ§½ä½æ•°é‡
  */
 public class PaginatedItemsPuzzle extends DynamicPuzzle {
     private final List<Integer> slots;
@@ -21,38 +23,40 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
     private int currentPage = 0;
 
     /**
-     * ¹¹ÔìÒ»¸öĞÂµÄ·ÖÒ³ÎïÆ·Æ´Í¼ÊµÀı
+     * æ„é€ ä¸€ä¸ªæ–°çš„åˆ†é¡µç‰©å“æ‹¼å›¾å®ä¾‹
      *
-     * @param slots    ÓÃÓÚÏÔÊ¾ÎïÆ·µÄ²ÛÎ»ÁĞ±í
-     * @param allItems ËùÓĞĞèÒª·ÖÒ³ÏÔÊ¾µÄÎïÆ·Í¼±êÁĞ±í
+     * @param slots    ç”¨äºæ˜¾ç¤ºç‰©å“çš„æ§½ä½åˆ—è¡¨
+     * @param allItems æ‰€æœ‰éœ€è¦åˆ†é¡µæ˜¾ç¤ºçš„ç‰©å“å›¾æ ‡åˆ—è¡¨
      */
     public PaginatedItemsPuzzle(List<Integer> slots, List<Icon> allItems) {
-        this.slots = slots;
+        this.slots = slots.stream()
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
         this.allItems = allItems;
     }
 
     /**
-     * »ñÈ¡Æ´Í¼Õ¼¾İµÄËùÓĞ²ÛÎ»
+     * è·å–æ‹¼å›¾å æ®çš„æ‰€æœ‰æ§½ä½
      *
-     * @return °üº¬ËùÓĞ²ÛÎ»Ë÷ÒıµÄÁĞ±í
+     * @return åŒ…å«æ‰€æœ‰æ§½ä½ç´¢å¼•çš„åˆ—è¡¨
      */
     @Override
-    public List<Integer> getSlots() {
+    public Collection<Integer> getSlots() {
         return slots;
     }
 
     /**
-     * äÖÈ¾µ±Ç°Ò³µÄÎïÆ·µ½Ö¸¶¨¿â´æÖĞ
+     * æ¸²æŸ“å½“å‰é¡µçš„ç‰©å“åˆ°æŒ‡å®šåº“å­˜ä¸­
      * <p>
-     * Ê×ÏÈÇå¿ÕËùÓĞ²ÛÎ»£¬È»ºó¼ÆËãµ±Ç°Ò³Ó¦ÏÔÊ¾µÄÎïÆ··¶Î§£¬
-     * ½«¶ÔÓ¦ÎïÆ·ÉèÖÃµ½²ÛÎ»ÖĞ
+     * é¦–å…ˆæ¸…ç©ºæ‰€æœ‰æ§½ä½ï¼Œç„¶åè®¡ç®—å½“å‰é¡µåº”æ˜¾ç¤ºçš„ç‰©å“èŒƒå›´ï¼Œ
+     * å°†å¯¹åº”ç‰©å“è®¾ç½®åˆ°æ§½ä½ä¸­
      *
-     * @param player    Ä¿±êÍæ¼Ò
-     * @param inventory Ä¿±ê¿â´æ
+     * @param player    ç›®æ ‡ç©å®¶
+     * @param inventory ç›®æ ‡åº“å­˜
      */
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
-        // Çå¿ÕËùÓĞ²ÛÎ»
         slots.forEach(slot -> inventory.setItem(slot, null));
 
         int itemsPerPage = slots.size();
@@ -63,18 +67,18 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
             if (itemIndex < allItems.size()) {
                 inventory.setItem(slots.get(i), allItems.get(itemIndex).display());
             } else {
-                break; // Ã»ÓĞ¸ü¶àÎïÆ·ÁË
+                break; // æ²¡æœ‰æ›´å¤šç‰©å“äº†
             }
         }
     }
 
     /**
-     * ÇĞ»»µ½ÏÂÒ»Ò³
+     * åˆ‡æ¢åˆ°ä¸‹ä¸€é¡µ
      * <p>
-     * Èç¹û´æÔÚÏÂÒ»Ò³£¬ÔòÔö¼Óµ±Ç°Ò³Âë²¢¸üĞÂÏÔÊ¾
+     * å¦‚æœå­˜åœ¨ä¸‹ä¸€é¡µï¼Œåˆ™å¢åŠ å½“å‰é¡µç å¹¶æ›´æ–°æ˜¾ç¤º
      *
-     * @param player Ä¿±êÍæ¼Ò
-     * @return Èç¹û³É¹¦ÇĞ»»µ½ÏÂÒ»Ò³·µ»Øtrue£¬·ñÔò·µ»Øfalse
+     * @param player ç›®æ ‡ç©å®¶
+     * @return å¦‚æœæˆåŠŸåˆ‡æ¢åˆ°ä¸‹ä¸€é¡µè¿”å›trueï¼Œå¦åˆ™è¿”å›false
      */
     public boolean nextPage(Player player) {
         if ((currentPage + 1) * slots.size() < allItems.size()) {
@@ -86,12 +90,12 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
     }
 
     /**
-     * ÇĞ»»µ½ÉÏÒ»Ò³
+     * åˆ‡æ¢åˆ°ä¸Šä¸€é¡µ
      * <p>
-     * Èç¹û´æÔÚÉÏÒ»Ò³£¬Ôò¼õÉÙµ±Ç°Ò³Âë²¢¸üĞÂÏÔÊ¾
+     * å¦‚æœå­˜åœ¨ä¸Šä¸€é¡µï¼Œåˆ™å‡å°‘å½“å‰é¡µç å¹¶æ›´æ–°æ˜¾ç¤º
      *
-     * @param player Ä¿±êÍæ¼Ò
-     * @return Èç¹û³É¹¦ÇĞ»»µ½ÉÏÒ»Ò³·µ»Øtrue£¬·ñÔò·µ»Øfalse
+     * @param player ç›®æ ‡ç©å®¶
+     * @return å¦‚æœæˆåŠŸåˆ‡æ¢åˆ°ä¸Šä¸€é¡µè¿”å›trueï¼Œå¦åˆ™è¿”å›false
      */
     public boolean previousPage(Player player) {
         if (currentPage > 0) {
@@ -103,11 +107,11 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
     }
 
     /**
-     * ´¦ÀíÎïÆ·µã»÷ÊÂ¼ş
+     * å¤„ç†ç‰©å“ç‚¹å‡»äº‹ä»¶
      * <p>
-     * ¸ù¾İµã»÷µÄ²ÛÎ»È·¶¨¶ÔÓ¦µÄÎïÆ·£¬È»ºó½«ÊÂ¼ş×ª·¢¸ø¸ÃÎïÆ·´¦Àí
+     * æ ¹æ®ç‚¹å‡»çš„æ§½ä½ç¡®å®šå¯¹åº”çš„ç‰©å“ï¼Œç„¶åå°†äº‹ä»¶è½¬å‘ç»™è¯¥ç‰©å“å¤„ç†
      *
-     * @param event ¿â´æµã»÷ÊÂ¼ş
+     * @param event åº“å­˜ç‚¹å‡»äº‹ä»¶
      */
     @Override
     public void onClick(InventoryClickEvent event) {

@@ -2,6 +2,7 @@ package cn.gloomcore.ui;
 
 import cn.gloomcore.ui.puzzle.PlaceablePuzzle;
 import cn.gloomcore.ui.puzzle.Puzzle;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,49 +13,53 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
- * GUIÊÓÍ¼Àà£¬´ú±íÒ»¸ö¿É½»»¥µÄGUI½çÃæ
+ * GUIè§†å›¾ç±»ï¼Œä»£è¡¨ä¸€ä¸ªå¯äº¤äº’çš„GUIç•Œé¢
  * <p>
- * ¸ÃÀà¹ÜÀíGUIÖĞµÄËùÓĞÆ´Í¼(Puzzle)×é¼ş£¬´¦ÀíÊÂ¼ş²¢äÖÈ¾½çÃæÄÚÈİ¡£
- * Ã¿¸öGUIÊÓÍ¼¶¼ÓëÌØ¶¨µÄÍæ¼ÒÏà¹ØÁª£¬²¢°üº¬Ò»¸ö²Ëµ¥²¼¾Ö¶¨Òå
+ * è¯¥ç±»ç®¡ç†GUIä¸­çš„æ‰€æœ‰æ‹¼å›¾(Puzzle)ç»„ä»¶ï¼Œå¤„ç†äº‹ä»¶å¹¶æ¸²æŸ“ç•Œé¢å†…å®¹ã€‚
+ * æ¯ä¸ªGUIè§†å›¾éƒ½ä¸ç‰¹å®šçš„ç©å®¶ç›¸å…³è”ï¼Œå¹¶åŒ…å«ä¸€ä¸ªèœå•å¸ƒå±€å®šä¹‰
  */
 public class PuzzleGuiView implements InventoryHolder {
     private final List<Puzzle> puzzles = new ArrayList<>();
     private final List<PlaceablePuzzle> placeablePuzzles = new ArrayList<>();
     private final Puzzle[] slotPuzzleArray;
     private final MenuLayout menuLayout;
+    private final JavaPlugin plugin;
 
     private @Nullable Inventory inventory;
 
     /**
-     * ¹¹ÔìÒ»¸öĞÂµÄGUIÊÓÍ¼ÊµÀı
+     * æ„é€ ä¸€ä¸ªæ–°çš„GUIè§†å›¾å®ä¾‹
      *
-     * @param menuLayout ²Ëµ¥²¼¾Ö¶¨Òå
+     * @param menuLayout èœå•å¸ƒå±€å®šä¹‰
      */
-    public PuzzleGuiView(MenuLayout menuLayout) {
+    public PuzzleGuiView(MenuLayout menuLayout, @NotNull JavaPlugin plugin) {
         this.menuLayout = menuLayout;
         this.slotPuzzleArray = new Puzzle[menuLayout.getSize()];
+        this.plugin = plugin;
     }
 
     /**
-     * ÏòGUIÊÓÍ¼ÖĞÌí¼ÓÒ»¸öÆ´Í¼×é¼ş
+     * å‘GUIè§†å›¾ä¸­æ·»åŠ ä¸€ä¸ªæ‹¼å›¾ç»„ä»¶
      * <p>
-     * Æ´Í¼×é¼ş»á±»Ìí¼Óµ½ÊÓÍ¼µÄÆ´Í¼¼¯ºÏÖĞ£¬²¢¸ù¾İÆä²ÛÎ»·ÖÅäµ½¶ÔÓ¦µÄ²ÛÎ»Êı×éÖĞ¡£
-     * Èç¹ûÖ¸¶¨²ÛÎ»ÒÑ±»Õ¼ÓÃ£¬ÔòÅ×³öÒì³£
+     * æ‹¼å›¾ç»„ä»¶ä¼šè¢«æ·»åŠ åˆ°è§†å›¾çš„æ‹¼å›¾é›†åˆä¸­ï¼Œå¹¶æ ¹æ®å…¶æ§½ä½åˆ†é…åˆ°å¯¹åº”çš„æ§½ä½æ•°ç»„ä¸­ã€‚
+     * å¦‚æœæŒ‡å®šæ§½ä½å·²è¢«å ç”¨ï¼Œåˆ™æŠ›å‡ºå¼‚å¸¸
      *
-     * @param puzzle ÒªÌí¼ÓµÄÆ´Í¼×é¼ş
-     * @throws IllegalArgumentException µ±²ÛÎ»ÒÑ±»Õ¼ÓÃÊ±Å×³ö
+     * @param puzzle è¦æ·»åŠ çš„æ‹¼å›¾ç»„ä»¶
+     * @throws IllegalArgumentException å½“æ§½ä½å·²è¢«å ç”¨æ—¶æŠ›å‡º
      */
     protected void addPuzzle(Puzzle puzzle) {
         this.puzzles.add(puzzle);
-        for (Integer slot : puzzle.getSlots()) {
+        for (int slot : puzzle.getSlots()) {
             if (slot >= 0 && slot < this.slotPuzzleArray.length) {
                 if (this.slotPuzzleArray[slot] != null) {
                     throw new IllegalArgumentException("Slot " + slot + " is already occupied!");
@@ -69,9 +74,9 @@ public class PuzzleGuiView implements InventoryHolder {
     }
 
     /**
-     * äÖÈ¾ËùÓĞÆ´Í¼×é¼şµ½Íæ¼ÒµÄ¿â´æÖĞ
+     * æ¸²æŸ“æ‰€æœ‰æ‹¼å›¾ç»„ä»¶åˆ°ç©å®¶çš„åº“å­˜ä¸­
      *
-     * @param player Ä¿±êÍæ¼Ò
+     * @param player ç›®æ ‡ç©å®¶
      */
     private void renderAll(Player player) {
         puzzles.forEach(puzzle -> puzzle.render(player, getInventory()));
@@ -79,8 +84,9 @@ public class PuzzleGuiView implements InventoryHolder {
 
 
     public void handleClick(InventoryClickEvent event) {
+        if (inventory == null) return;
         Inventory clickedInventory = event.getClickedInventory();
-        if (this.getInventory().equals(clickedInventory)) {
+        if (inventory.equals(clickedInventory)) {
             event.setCancelled(true);
             findPuzzleBySlot(event.getRawSlot()).ifPresent(puzzle -> puzzle.onClick(event));
             return;
@@ -101,30 +107,49 @@ public class PuzzleGuiView implements InventoryHolder {
                         break;
                     }
                 }
-
             } else if (action == InventoryAction.COLLECT_TO_CURSOR) {
-                handleCollectToCursor(event);
+                event.setCancelled(true);
             }
-            // ¶ÔÓÚÆäËû±³°üÄÚ²Ù×÷ (ÈçPICKUP_ALL, SWAP_WITH_CURSOR)£¬ÎÒÃÇ²»¸ÉÉæ£¬±£³ÖÔ­°æĞĞÎª
         }
     }
 
-    /**
-     * ´¦Àí¿â´æÍÏ×§ÊÂ¼ş
-     * <p>
-     * µ±Ç°ÊµÏÖÎª¿Õ£¬¿ÉÓÉ×ÓÀàÖØĞ´ÒÔÌá¹©¾ßÌå¹¦ÄÜ
-     *
-     * @param event ¿â´æÍÏ×§ÊÂ¼ş
-     */
     public void handleDrag(InventoryDragEvent event) {
+        int size = getInventory().getSize();
+        for (int slot : event.getRawSlots()) {
+            if (slot < size) {
+                if (!(this.slotPuzzleArray[slot] instanceof PlaceablePuzzle)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+        Player player = (Player) event.getWhoClicked();
+        player.getScheduler().runDelayed(plugin, (task) -> {
+            Set<PlaceablePuzzle> puzzlesToUpdate = new ObjectOpenHashSet<>();
+            for (int slot : event.getRawSlots()) {
+                if (slot < size) {
+                    puzzlesToUpdate.add((PlaceablePuzzle) slotPuzzleArray[slot]);
+                }
+                if (puzzlesToUpdate.isEmpty()) {
+                    task.cancel();
+                    return;
+                }
+                for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
+                    puzzle.onContentsChanged().accept(player);
+                }
+            }
+
+        }, null, 1L);
+
+
     }
 
     /**
-     * ´¦Àí¿â´æ´ò¿ªÊÂ¼ş
+     * å¤„ç†åº“å­˜æ‰“å¼€äº‹ä»¶
      * <p>
-     * µ±Ç°ÊµÏÖÎª¿Õ£¬¿ÉÓÉ×ÓÀàÖØĞ´ÒÔÌá¹©¾ßÌå¹¦ÄÜ
+     * å½“å‰å®ç°ä¸ºç©ºï¼Œå¯ç”±å­ç±»é‡å†™ä»¥æä¾›å…·ä½“åŠŸèƒ½
      *
-     * @param event ¿â´æ´ò¿ªÊÂ¼ş
+     * @param event åº“å­˜æ‰“å¼€äº‹ä»¶
      */
     public void handleOpen(InventoryOpenEvent event) {
     }
@@ -140,9 +165,9 @@ public class PuzzleGuiView implements InventoryHolder {
     }
 
     /**
-     * ½âÎö²Ëµ¥±êÌâ
+     * è§£æèœå•æ ‡é¢˜
      *
-     * @return ²Ëµ¥±êÌâ×é¼ş
+     * @return èœå•æ ‡é¢˜ç»„ä»¶
      */
     public Component parsedMenuTitle() {
         return menuLayout.getInventoryType().defaultTitle();
@@ -150,10 +175,10 @@ public class PuzzleGuiView implements InventoryHolder {
 
 
     /**
-     * ¸ù¾İ²ÛÎ»²éÕÒ¶ÔÓ¦µÄÆ´Í¼×é¼ş
+     * æ ¹æ®æ§½ä½æŸ¥æ‰¾å¯¹åº”çš„æ‹¼å›¾ç»„ä»¶
      *
-     * @param slot ²ÛÎ»Ë÷Òı
-     * @return °üº¬Æ´Í¼×é¼şµÄOptional¶ÔÏó£¬Èç¹ûÎ´ÕÒµ½ÔòÎª¿Õ
+     * @param slot æ§½ä½ç´¢å¼•
+     * @return åŒ…å«æ‹¼å›¾ç»„ä»¶çš„Optionalå¯¹è±¡ï¼Œå¦‚æœæœªæ‰¾åˆ°åˆ™ä¸ºç©º
      */
     private Optional<Puzzle> findPuzzleBySlot(int slot) {
         if (slot >= 0 && slot < this.slotPuzzleArray.length) {
@@ -163,9 +188,9 @@ public class PuzzleGuiView implements InventoryHolder {
     }
 
     /**
-     * ÎªÍæ¼Ò´ò¿ª´ËGUIÊÓÍ¼
+     * ä¸ºç©å®¶æ‰“å¼€æ­¤GUIè§†å›¾
      *
-     * @param player Ä¿±êÍæ¼Ò
+     * @param player ç›®æ ‡ç©å®¶
      */
     public void open(Player player) {
         renderAll(player);
@@ -173,9 +198,9 @@ public class PuzzleGuiView implements InventoryHolder {
     }
 
     /**
-     * »ñÈ¡Óë´ËÊÓÍ¼¹ØÁªµÄ¿â´æ¶ÔÏó
+     * è·å–ä¸æ­¤è§†å›¾å…³è”çš„åº“å­˜å¯¹è±¡
      *
-     * @return ¿â´æ¶ÔÏó
+     * @return åº“å­˜å¯¹è±¡
      */
     @Override
     public @NotNull Inventory getInventory() {

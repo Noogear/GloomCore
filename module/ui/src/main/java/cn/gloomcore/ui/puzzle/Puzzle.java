@@ -2,49 +2,47 @@ package cn.gloomcore.ui.puzzle;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
 /**
- * Æ´Í¼½Ó¿Ú£¬¶¨ÒåÁËGUIÖĞ¿É½»»¥×é¼şµÄ»ù±¾ĞĞÎª
+ * æ‹¼å›¾æ¥å£ï¼Œå®šä¹‰äº†GUIä¸­å¯äº¤äº’ç»„ä»¶çš„åŸºæœ¬è¡Œä¸º
  * <p>
- * Æ´Í¼ÊÇGUI½çÃæµÄ»ù±¾×é³Éµ¥Ôª£¬Ã¿¸öÆ´Í¼¿ÉÒÔÕ¼¾İÒ»¸ö»ò¶à¸ö²ÛÎ»£¬
- * ²¢ÄÜ´¦Àíµã»÷ÊÂ¼ş¡¢äÖÈ¾ÄÚÈİºÍ¸üĞÂÏÔÊ¾
+ * æ‹¼å›¾æ˜¯GUIç•Œé¢çš„åŸºæœ¬ç»„æˆå•å…ƒï¼Œæ¯ä¸ªæ‹¼å›¾å¯ä»¥å æ®ä¸€ä¸ªæˆ–å¤šä¸ªæ§½ä½ï¼Œ
+ * å¹¶èƒ½å¤„ç†ç‚¹å‡»äº‹ä»¶ã€æ¸²æŸ“å†…å®¹å’Œæ›´æ–°æ˜¾ç¤º
  */
 public interface Puzzle {
 
     /**
-     * »ñÈ¡Æ´Í¼Õ¼¾İµÄËùÓĞ²ÛÎ»
+     * è·å–æ‹¼å›¾å æ®çš„æ‰€æœ‰æ§½ä½
      *
-     * @return °üº¬ËùÓĞ²ÛÎ»Ë÷ÒıµÄ¼¯ºÏ
+     * @return åŒ…å«æ‰€æœ‰æ§½ä½ç´¢å¼•çš„é›†åˆ
      */
     Collection<Integer> getSlots();
 
     /**
-     * äÖÈ¾Æ´Í¼ÄÚÈİµ½Ö¸¶¨¿â´æÖĞ
+     * æ¸²æŸ“æ‹¼å›¾å†…å®¹åˆ°æŒ‡å®šåº“å­˜ä¸­
      *
-     * @param player    Ä¿±êÍæ¼Ò
-     * @param inventory Ä¿±ê¿â´æ
+     * @param player    ç›®æ ‡ç©å®¶
+     * @param inventory ç›®æ ‡åº“å­˜
      */
     void render(Player player, @NotNull Inventory inventory);
 
     /**
-     * ´¦Àí¿â´æµã»÷ÊÂ¼ş
+     * å¤„ç†åº“å­˜ç‚¹å‡»äº‹ä»¶
      *
-     * @param event ¿â´æµã»÷ÊÂ¼ş
+     * @param event åº“å­˜ç‚¹å‡»äº‹ä»¶
      */
     void onClick(InventoryClickEvent event);
 
     /**
-     * ¸üĞÂÆ´Í¼ÏÔÊ¾ÄÚÈİ
+     * æ›´æ–°æ‹¼å›¾æ˜¾ç¤ºå†…å®¹
      *
-     * @param player Ä¿±êÍæ¼Ò
+     * @param player ç›®æ ‡ç©å®¶
      */
     void update(Player player);
-
 
 
 }

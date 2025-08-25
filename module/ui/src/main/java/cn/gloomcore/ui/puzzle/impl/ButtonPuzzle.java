@@ -8,76 +8,79 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 
 
 /**
- * °´Å¥Æ´Í¼Àà£¬ÊµÏÖÁËÒ»¸ö¿Éµã»÷µÄ°´Å¥×é¼ş
+ * æŒ‰é’®æ‹¼å›¾ç±»ï¼Œå®ç°äº†ä¸€ä¸ªå¯ç‚¹å‡»çš„æŒ‰é’®ç»„ä»¶
  * <p>
- * °´Å¥Æ´Í¼ÊÇ¶¯Ì¬Æ´Í¼µÄÒ»ÖÖ£¬Õ¼¾İÒ»¸öÌØ¶¨²ÛÎ»²¢ÏÔÊ¾Ò»¸öÍ¼±ê£¬
- * µ±Íæ¼Òµã»÷Ê±»á´¥·¢ÏàÓ¦µÄ¶¯×÷¡£°´Å¥µÄÍâ¹Û¿ÉÒÔÊÇ¾²Ì¬µÄ»ò»ùÓÚÍæ¼Ò×´Ì¬¶¯Ì¬Éú³ÉµÄ
+ * æŒ‰é’®æ‹¼å›¾æ˜¯åŠ¨æ€æ‹¼å›¾çš„ä¸€ç§ï¼Œå æ®ä¸€ä¸ªç‰¹å®šæ§½ä½å¹¶æ˜¾ç¤ºä¸€ä¸ªå›¾æ ‡ï¼Œ
+ * å½“ç©å®¶ç‚¹å‡»æ—¶ä¼šè§¦å‘ç›¸åº”çš„åŠ¨ä½œã€‚æŒ‰é’®çš„å¤–è§‚å¯ä»¥æ˜¯é™æ€çš„æˆ–åŸºäºç©å®¶çŠ¶æ€åŠ¨æ€ç”Ÿæˆçš„
  */
 public class ButtonPuzzle extends DynamicPuzzle {
-    private final int slot;
+    private final Set<Integer> slots;
     private final Function<Player, IconDisplay> appearanceFunction;
     private final IconAction action;
 
     /**
-     * ¹¹ÔìÒ»¸öĞÂµÄ°´Å¥Æ´Í¼ÊµÀı
+     * æ„é€ ä¸€ä¸ªæ–°çš„æŒ‰é’®æ‹¼å›¾å®ä¾‹
      *
-     * @param slot               °´Å¥ËùÔÚµÄ²ÛÎ»
-     * @param appearanceFunction ÓÃÓÚÉú³É°´Å¥Íâ¹ÛµÄº¯Êı£¬¸ù¾İÍæ¼Ò×´Ì¬·µ»ØÍ¼±êÏÔÊ¾ÄÚÈİ
-     * @param action             °´Å¥±»µã»÷Ê±Ö´ĞĞµÄ¶¯×÷
+     * @param slots              æŒ‰é’®æ‰€åœ¨çš„æ§½ä½
+     * @param appearanceFunction ç”¨äºç”ŸæˆæŒ‰é’®å¤–è§‚çš„å‡½æ•°ï¼Œæ ¹æ®ç©å®¶çŠ¶æ€è¿”å›å›¾æ ‡æ˜¾ç¤ºå†…å®¹
+     * @param action             æŒ‰é’®è¢«ç‚¹å‡»æ—¶æ‰§è¡Œçš„åŠ¨ä½œ
      */
-    public ButtonPuzzle(int slot, @NotNull Function<Player, IconDisplay> appearanceFunction, @NotNull IconAction action) {
-        this.slot = slot;
+    public ButtonPuzzle(Set<Integer> slots, @NotNull Function<Player, IconDisplay> appearanceFunction, @NotNull IconAction action) {
+        this.slots = slots;
         this.appearanceFunction = appearanceFunction;
         this.action = action;
     }
 
     /**
-     * ¹¹ÔìÒ»¸öĞÂµÄ¾²Ì¬°´Å¥Æ´Í¼ÊµÀı
+     * æ„é€ ä¸€ä¸ªæ–°çš„é™æ€æŒ‰é’®æ‹¼å›¾å®ä¾‹
      *
-     * @param slot       °´Å¥ËùÔÚµÄ²ÛÎ»
-     * @param staticItem ¾²Ì¬Í¼±êÏÔÊ¾ÄÚÈİ
-     * @param action     °´Å¥±»µã»÷Ê±Ö´ĞĞµÄ¶¯×÷
+     * @param slots      æŒ‰é’®æ‰€åœ¨çš„æ§½ä½
+     * @param staticItem é™æ€å›¾æ ‡æ˜¾ç¤ºå†…å®¹
+     * @param action     æŒ‰é’®è¢«ç‚¹å‡»æ—¶æ‰§è¡Œçš„åŠ¨ä½œ
      */
-    public ButtonPuzzle(int slot, @NotNull IconDisplay staticItem, @NotNull IconAction action) {
-        this(slot, player -> staticItem, action);
+    public ButtonPuzzle(Set<Integer> slots, @NotNull IconDisplay staticItem, @NotNull IconAction action) {
+        this(slots, player -> staticItem, action);
     }
 
     /**
-     * »ñÈ¡°´Å¥Æ´Í¼Õ¼¾İµÄ²ÛÎ»
+     * è·å–æŒ‰é’®æ‹¼å›¾å æ®çš„æ§½ä½
      *
-     * @return °üº¬µ¥¸ö²ÛÎ»Ë÷ÒıµÄ¼¯ºÏ
+     * @return åŒ…å«å•ä¸ªæ§½ä½ç´¢å¼•çš„é›†åˆ
      */
     @Override
-    public Set<Integer> getSlots() {
-        return Set.of(slot);
+    public Collection<Integer> getSlots() {
+        return slots;
     }
 
 
     /**
-     * äÖÈ¾°´Å¥Æ´Í¼µ½Ö¸¶¨¿â´æÖĞ
+     * æ¸²æŸ“æŒ‰é’®æ‹¼å›¾åˆ°æŒ‡å®šåº“å­˜ä¸­
      * <p>
-     * ¸ù¾İÍæ¼Ò×´Ì¬Éú³ÉÍ¼±êÏÔÊ¾ÄÚÈİ²¢ÉèÖÃµ½Ö¸¶¨²ÛÎ»
+     * æ ¹æ®ç©å®¶çŠ¶æ€ç”Ÿæˆå›¾æ ‡æ˜¾ç¤ºå†…å®¹å¹¶è®¾ç½®åˆ°æŒ‡å®šæ§½ä½
      *
-     * @param player    Ä¿±êÍæ¼Ò
-     * @param inventory Ä¿±ê¿â´æ
+     * @param player    ç›®æ ‡ç©å®¶
+     * @param inventory ç›®æ ‡åº“å­˜
      */
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
-        inventory.setItem(slot, appearanceFunction.apply(player).parse(player));
+        for (int slot : slots) {
+            inventory.setItem(slot, appearanceFunction.apply(player).parse(player));
+        }
     }
 
 
     /**
-     * ´¦Àí°´Å¥µã»÷ÊÂ¼ş
+     * å¤„ç†æŒ‰é’®ç‚¹å‡»äº‹ä»¶
      * <p>
-     * ½«µã»÷ÊÂ¼ş×ª·¢¸øÍ¼±ê¶¯×÷½øĞĞ´¦Àí
+     * å°†ç‚¹å‡»äº‹ä»¶è½¬å‘ç»™å›¾æ ‡åŠ¨ä½œè¿›è¡Œå¤„ç†
      *
-     * @param event ¿â´æµã»÷ÊÂ¼ş
+     * @param event åº“å­˜ç‚¹å‡»äº‹ä»¶
      */
     @Override
     public void onClick(InventoryClickEvent event) {
