@@ -1,14 +1,19 @@
 package cn.gloomcore.ui.puzzle.impl;
 
+import cn.gloomcore.ui.puzzle.PlaceablePuzzle;
 import cn.gloomcore.ui.puzzle.Puzzle;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,23 +25,18 @@ import java.util.function.Consumer;
  * 并能监听内容变化事件。主要用于制作需要玩家放置物品的界面，
  * 如合成界面、物品选择界面等
  */
-public class PlaceableSlotsPuzzle implements Puzzle {
-
+public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
     private final JavaPlugin plugin;
     private final List<Integer> slots;
     private final Consumer<Player> onContentsChanged;
+    private final boolean stackingEnabled;
 
-    /**
-     * 构造一个新的可放置槽位拼图实例
-     *
-     * @param plugin            插件实例，用于调度任务
-     * @param slots             可放置物品的槽位列表
-     * @param onContentsChanged 当槽位内容发生变化时的回调函数，可以为null
-     */
-    public PlaceableSlotsPuzzle(@NotNull JavaPlugin plugin, @NotNull List<Integer> slots, @Nullable Consumer<Player> onContentsChanged) {
+
+    public PlaceableSlotsPuzzle(@NotNull JavaPlugin plugin, @NotNull List<Integer> slots, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
         this.plugin = plugin;
         this.slots = slots;
         this.onContentsChanged = onContentsChanged;
+        this.stackingEnabled = stackingEnabled;
     }
 
     /**
@@ -91,6 +91,66 @@ public class PlaceableSlotsPuzzle implements Puzzle {
      */
     @Override
     public void update(Player player) {
-        // This puzzle itself is static
     }
+
+    @Override
+    public void cleanupOnClose(Player player, Inventory inventory) {
+        List<ItemStack> itemsToReturn = new ArrayList<>();
+
+        // 1. 从GUI的Inventory中收集所有需要退还的物品
+        for (int slot : this.getSlots()) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && !item.getType().isAir()) {
+                itemsToReturn.add(item);
+                // 2. 清空GUI中的槽位
+                inventory.setItem(slot, null);
+            }
+        }
+
+        if (itemsToReturn.isEmpty()) {
+            return; // 没有物品需要退还
+        }
+
+        Location location = player.getLocation();
+        World world = location.getWorld();
+        Inventory playerInventory = player.getInventory();
+        for (ItemStack item : itemsToReturn) {
+            if (!playerInventory.addItem(item).isEmpty()) {
+                world.dropItem(location, item);
+            }
+
+        }
+    }
+
+    @Override
+    public void tryAcceptItem(ItemStack itemToAccept, Inventory inventory) {
+        if (this.stackingEnabled) {
+            for (int slot : this.slots) {
+                if (itemToAccept.getAmount() <= 0) return;
+
+                ItemStack existingItem = inventory.getItem(slot);
+                if (existingItem != null && existingItem.isSimilar(itemToAccept)) {
+                    int space = existingItem.getMaxStackSize() - existingItem.getAmount();
+                    if (space > 0) {
+                        int amountToMove = Math.min(space, itemToAccept.getAmount());
+                        existingItem.setAmount(existingItem.getAmount() + amountToMove);
+                        itemToAccept.setAmount(itemToAccept.getAmount() - amountToMove);
+                    }
+                }
+            }
+        }
+
+        for (int slot : this.slots) {
+            if (itemToAccept.getAmount() <= 0) return;
+
+            if (inventory.getItem(slot) == null) {
+                inventory.setItem(slot, itemToAccept.clone());
+                itemToAccept.setAmount(0);
+                return;
+            }
+        }
+
+    }
+
+
 }

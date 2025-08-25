@@ -2,6 +2,7 @@ package cn.gloomcore.ui.puzzle;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 
 /**
  * 静态拼图抽象类，实现不可交互的拼图组件
@@ -33,5 +34,6 @@ public abstract class StaticPuzzle implements Puzzle {
     @Override
     public void update(Player player) {
     }
+
 
 }

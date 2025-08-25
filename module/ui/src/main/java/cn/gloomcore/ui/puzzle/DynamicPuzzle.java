@@ -2,6 +2,7 @@ package cn.gloomcore.ui.puzzle;
 
 import cn.gloomcore.ui.PuzzleGuiView;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 /**
@@ -26,5 +27,6 @@ public abstract class DynamicPuzzle implements Puzzle {
             render(player, topInventory);
         }
     }
+
 
 }
