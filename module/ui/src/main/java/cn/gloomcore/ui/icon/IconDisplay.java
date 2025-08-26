@@ -36,6 +36,10 @@ public interface IconDisplay {
         return ItemStack::empty;
     }
 
+    default IconDisplay snapshot() {
+        return IconDisplay.of(this.parse());
+    }
+
     @NotNull ItemStack parse();
 
     default ItemStack parse(@Nullable Player player) {

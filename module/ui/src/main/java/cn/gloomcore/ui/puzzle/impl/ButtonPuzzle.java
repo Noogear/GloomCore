@@ -2,14 +2,13 @@ package cn.gloomcore.ui.puzzle.impl;
 
 import cn.gloomcore.ui.icon.IconAction;
 import cn.gloomcore.ui.icon.IconDisplay;
-import cn.gloomcore.ui.puzzle.DynamicPuzzle;
+import cn.gloomcore.ui.puzzle.abstracts.DynamicPuzzle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.function.Function;
 
 
@@ -20,19 +19,18 @@ import java.util.function.Function;
  * 当玩家点击时会触发相应的动作。按钮的外观可以是静态的或基于玩家状态动态生成的
  */
 public class ButtonPuzzle extends DynamicPuzzle {
-    private final Set<Integer> slots;
     private final Function<Player, IconDisplay> appearanceFunction;
     private final IconAction action;
 
     /**
      * 构造一个新的按钮拼图实例
      *
-     * @param slots              按钮所在的槽位
+     * @param slotList           按钮所在的槽位
      * @param appearanceFunction 用于生成按钮外观的函数，根据玩家状态返回图标显示内容
      * @param action             按钮被点击时执行的动作
      */
-    public ButtonPuzzle(Set<Integer> slots, @NotNull Function<Player, IconDisplay> appearanceFunction, @NotNull IconAction action) {
-        this.slots = slots;
+    public ButtonPuzzle(Collection<Integer> slotList, @NotNull Function<Player, IconDisplay> appearanceFunction, @NotNull IconAction action) {
+        super(slotList);
         this.appearanceFunction = appearanceFunction;
         this.action = action;
     }
@@ -40,24 +38,13 @@ public class ButtonPuzzle extends DynamicPuzzle {
     /**
      * 构造一个新的静态按钮拼图实例
      *
-     * @param slots      按钮所在的槽位
+     * @param slotList   按钮所在的槽位
      * @param staticItem 静态图标显示内容
      * @param action     按钮被点击时执行的动作
      */
-    public ButtonPuzzle(Set<Integer> slots, @NotNull IconDisplay staticItem, @NotNull IconAction action) {
-        this(slots, player -> staticItem, action);
+    public ButtonPuzzle(Collection<Integer> slotList, @NotNull IconDisplay staticItem, @NotNull IconAction action) {
+        this(slotList, player -> staticItem, action);
     }
-
-    /**
-     * 获取按钮拼图占据的槽位
-     *
-     * @return 包含单个槽位索引的集合
-     */
-    @Override
-    public Collection<Integer> getSlots() {
-        return slots;
-    }
-
 
     /**
      * 渲染按钮拼图到指定库存中
@@ -73,7 +60,6 @@ public class ButtonPuzzle extends DynamicPuzzle {
             inventory.setItem(slot, appearanceFunction.apply(player).parse(player));
         }
     }
-
 
     /**
      * 处理按钮点击事件

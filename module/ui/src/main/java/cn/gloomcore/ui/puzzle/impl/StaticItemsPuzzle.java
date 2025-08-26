@@ -1,29 +1,27 @@
 package cn.gloomcore.ui.puzzle.impl;
 
 import cn.gloomcore.ui.icon.IconDisplay;
-import cn.gloomcore.ui.puzzle.StaticPuzzle;
+import cn.gloomcore.ui.puzzle.abstracts.StaticPuzzle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Map;
 
 public class StaticItemsPuzzle extends StaticPuzzle {
+    private final IconDisplay display;
 
-    private final Map<Integer, IconDisplay> items;
-
-    public StaticItemsPuzzle(Map<Integer, IconDisplay> items) {
-        this.items = items;
-    }
-
-    @Override
-    public Collection<Integer> getSlots() {
-        return items.keySet();
+    public StaticItemsPuzzle(Collection<Integer> slotList, IconDisplay display) {
+        super(slotList);
+        this.display = display;
     }
 
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
-        items.forEach((slot, display) -> inventory.setItem(slot, display.parse()));
+        ItemStack itemStack = display.parse();
+        for (int slot : slots) {
+            inventory.setItem(slot, itemStack);
+        }
     }
 }

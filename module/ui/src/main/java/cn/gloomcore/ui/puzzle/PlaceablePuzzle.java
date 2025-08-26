@@ -20,7 +20,6 @@ public interface PlaceablePuzzle {
      */
     void cleanupOnClose(Player player, Inventory inventory);
 
-
     boolean tryAcceptItem(ItemStack itemToAccept, Inventory guiInventory);
 
     Consumer<Player> getChangedCallBack();

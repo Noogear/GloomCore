@@ -1,7 +1,7 @@
 package cn.gloomcore.ui.puzzle.impl;
 
 import cn.gloomcore.ui.puzzle.PlaceablePuzzle;
-import cn.gloomcore.ui.puzzle.Puzzle;
+import cn.gloomcore.ui.puzzle.abstracts.AbstractPuzzle;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -25,29 +24,19 @@ import java.util.function.Consumer;
  * 并能监听内容变化事件。主要用于制作需要玩家放置物品的界面，
  * 如合成界面、物品选择界面等
  */
-public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
+public class PlaceableSlotsPuzzle extends AbstractPuzzle implements PlaceablePuzzle {
     private final JavaPlugin plugin;
-    private final Set<Integer> slots;
     private final Consumer<Player> onContentsChanged;
     private final boolean stackingEnabled;
 
 
-    public PlaceableSlotsPuzzle(@NotNull JavaPlugin plugin, @NotNull Set<Integer> slots, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
+    public PlaceableSlotsPuzzle(@NotNull JavaPlugin plugin, @NotNull Collection<Integer> slotList, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
+        super(slotList);
         this.plugin = plugin;
-        this.slots = slots;
         this.onContentsChanged = onContentsChanged;
         this.stackingEnabled = stackingEnabled;
     }
 
-    /**
-     * 获取拼图占据的所有槽位
-     *
-     * @return 包含所有槽位索引的集合
-     */
-    @Override
-    public Collection<Integer> getSlots() {
-        return slots;
-    }
 
     /**
      * 渲染拼图内容到指定库存中
@@ -59,7 +48,9 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
      */
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
-        slots.forEach(slot -> inventory.setItem(slot, null));
+        for (int slot : slots) {
+            inventory.setItem(slot, null);
+        }
     }
 
     /**
@@ -122,7 +113,7 @@ public class PlaceableSlotsPuzzle implements Puzzle, PlaceablePuzzle {
             return false;
         }
         int initialAmount = itemToAccept.getAmount();
-        
+
         if (this.stackingEnabled) {
             for (int slot : this.slots) {
                 ItemStack existingItem = inventory.getItem(slot);

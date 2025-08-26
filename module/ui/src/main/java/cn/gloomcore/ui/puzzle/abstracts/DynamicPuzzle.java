@@ -1,8 +1,10 @@
-package cn.gloomcore.ui.puzzle;
+package cn.gloomcore.ui.puzzle.abstracts;
 
 import cn.gloomcore.ui.PuzzleGuiView;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+
+import java.util.Collection;
 
 /**
  * 动态拼图抽象类，实现可更新的拼图组件
@@ -10,7 +12,12 @@ import org.bukkit.inventory.Inventory;
  * 该类提供了一个更新方法，当拼图需要刷新显示内容时调用。
  * 动态拼图可以响应游戏状态变化并实时更新其在GUI中的显示
  */
-public abstract class DynamicPuzzle implements Puzzle {
+public abstract class DynamicPuzzle extends AbstractPuzzle {
+
+    protected DynamicPuzzle(Collection<Integer> slotList) {
+        super(slotList);
+    }
+
     /**
      * 更新拼图显示内容
      * <p>

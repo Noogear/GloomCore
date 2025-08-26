@@ -5,8 +5,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-
 /**
  * 拼图接口，定义了GUI中可交互组件的基本行为
  * <p>
@@ -20,7 +18,7 @@ public interface Puzzle {
      *
      * @return 包含所有槽位索引的集合
      */
-    Collection<Integer> getSlots();
+    int[] getSlots();
 
     /**
      * 渲染拼图内容到指定库存中

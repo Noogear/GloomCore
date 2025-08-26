@@ -1,15 +1,15 @@
 package cn.gloomcore.ui.puzzle.impl;
 
 import cn.gloomcore.ui.icon.Icon;
-import cn.gloomcore.ui.puzzle.DynamicPuzzle;
+import cn.gloomcore.ui.puzzle.abstracts.DynamicPuzzle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 分页物品拼图类，用于在GUI中显示可分页的物品列表
@@ -18,32 +18,18 @@ import java.util.stream.Collectors;
  * 并能处理物品的点击事件。每页显示的物品数量取决于提供的槽位数量
  */
 public class PaginatedItemsPuzzle extends DynamicPuzzle {
-    private final List<Integer> slots;
     private final List<Icon> allItems;
     private int currentPage = 0;
 
     /**
      * 构造一个新的分页物品拼图实例
      *
-     * @param slots    用于显示物品的槽位列表
+     * @param slotList 用于显示物品的槽位列表
      * @param allItems 所有需要分页显示的物品图标列表
      */
-    public PaginatedItemsPuzzle(List<Integer> slots, List<Icon> allItems) {
-        this.slots = slots.stream()
-                .distinct()
-                .sorted()
-                .collect(Collectors.toList());
+    public PaginatedItemsPuzzle(Collection<Integer> slotList, List<Icon> allItems) {
+        super(slotList);
         this.allItems = allItems;
-    }
-
-    /**
-     * 获取拼图占据的所有槽位
-     *
-     * @return 包含所有槽位索引的列表
-     */
-    @Override
-    public Collection<Integer> getSlots() {
-        return slots;
     }
 
     /**
@@ -57,17 +43,19 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
      */
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
-        slots.forEach(slot -> inventory.setItem(slot, null));
+        for (int slot : slots) {
+            inventory.setItem(slot, null);
+        }
 
-        int itemsPerPage = slots.size();
+        int itemsPerPage = slots.length;
         int startIndex = currentPage * itemsPerPage;
 
         for (int i = 0; i < itemsPerPage; i++) {
             int itemIndex = startIndex + i;
             if (itemIndex < allItems.size()) {
-                inventory.setItem(slots.get(i), allItems.get(itemIndex).display());
+                inventory.setItem(slots[i], allItems.get(itemIndex).display());
             } else {
-                break; // 没有更多物品了
+                break;
             }
         }
     }
@@ -81,7 +69,7 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
      * @return 如果成功切换到下一页返回true，否则返回false
      */
     public boolean nextPage(Player player) {
-        if ((currentPage + 1) * slots.size() < allItems.size()) {
+        if ((currentPage + 1) * slots.length < allItems.size()) {
             currentPage++;
             update(player);
             return true;
@@ -116,17 +104,15 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
     @Override
     public void onClick(InventoryClickEvent event) {
         int clickedRawSlot = event.getRawSlot();
-        int slotIndexInPage = this.slots.indexOf(clickedRawSlot);
-        if (slotIndexInPage == -1) {
-            return;
+        int slotIndexInPage = Arrays.binarySearch(slots, clickedRawSlot);
+        if (slotIndexInPage >= 0) {
+            int itemsPerPage = this.slots.length;
+            int globalItemIndex = (currentPage * itemsPerPage) + slotIndexInPage;
+            if (globalItemIndex < allItems.size()) {
+                Icon clickedItem = allItems.get(globalItemIndex);
+                clickedItem.onClick(event);
+            }
         }
-        int itemsPerPage = this.slots.size();
-        int globalItemIndex = (currentPage * itemsPerPage) + slotIndexInPage;
-        if (globalItemIndex < allItems.size()) {
-            Icon clickedItem = allItems.get(globalItemIndex);
-            clickedItem.onClick(event);
-        }
-
     }
 
     /**
@@ -172,7 +158,7 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
         if (allItems.isEmpty()) {
             return 1;
         }
-        return (int) Math.ceil((double) allItems.size() / slots.size());
+        return (int) Math.ceil((double) allItems.size() / slots.length);
     }
 
 }

@@ -9,16 +9,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumMap;
 
 /**
- * µã»÷ÊÂ¼ş½Ó¿Ú£¬ÓÃÓÚ´¦ÀíÓÃ»§UI½çÃæµÄµã»÷ÊÂ¼ş
+ * ç‚¹å‡»äº‹ä»¶æ¥å£ï¼Œç”¨äºå¤„ç†ç”¨æˆ·UIç•Œé¢çš„ç‚¹å‡»äº‹ä»¶
  */
 @FunctionalInterface
 public interface IconAction {
 
     /**
-     * ´´½¨Ò»¸öClickActionÊµÀı£¬µ±µã»÷ÀàĞÍÓëÖ¸¶¨ÀàĞÍÆ¥ÅäÊ±Ö´ĞĞÏàÓ¦²Ù×÷
+     * åˆ›å»ºä¸€ä¸ªClickActionå®ä¾‹ï¼Œå½“ç‚¹å‡»ç±»å‹ä¸æŒ‡å®šç±»å‹åŒ¹é…æ—¶æ‰§è¡Œç›¸åº”æ“ä½œ
      *
-     * @param clickMap Ö¸¶¨µÄµã»÷ÀàĞÍÓë²Ù×÷µÄÓ³Éä
-     * @return ClickActionÊµÀı
+     * @param clickMap æŒ‡å®šçš„ç‚¹å‡»ç±»å‹ä¸æ“ä½œçš„æ˜ å°„
+     * @return ClickActionå®ä¾‹
      */
     static @NotNull IconAction of(@NotNull EnumMap<ClickType, Action> clickMap) {
         return (type, player) -> {
@@ -29,11 +29,11 @@ public interface IconAction {
     }
 
     /**
-     * ´´½¨Ò»¸öClickActionÊµÀı£¬µ±µã»÷ÀàĞÍÓëÖ¸¶¨ÀàĞÍÆ¥ÅäÊ±Ö´ĞĞÏàÓ¦²Ù×÷
+     * åˆ›å»ºä¸€ä¸ªClickActionå®ä¾‹ï¼Œå½“ç‚¹å‡»ç±»å‹ä¸æŒ‡å®šç±»å‹åŒ¹é…æ—¶æ‰§è¡Œç›¸åº”æ“ä½œ
      *
-     * @param clickType Ö¸¶¨µÄµã»÷ÀàĞÍ
-     * @param action    ĞèÒªÖ´ĞĞµÄ²Ù×÷
-     * @return ClickActionÊµÀı
+     * @param clickType æŒ‡å®šçš„ç‚¹å‡»ç±»å‹
+     * @param action    éœ€è¦æ‰§è¡Œçš„æ“ä½œ
+     * @return ClickActionå®ä¾‹
      */
     static @NotNull IconAction of(@NotNull ClickType clickType, @NotNull Action action) {
         return (type, player) -> {
@@ -44,17 +44,17 @@ public interface IconAction {
     }
 
     /**
-     * ¸ù¾İµã»÷ÀàĞÍÖ´ĞĞÏàÓ¦²Ù×÷
+     * æ ¹æ®ç‚¹å‡»ç±»å‹æ‰§è¡Œç›¸åº”æ“ä½œ
      *
-     * @param type   µã»÷ÀàĞÍ
-     * @param player Ö´ĞĞ²Ù×÷µÄÍæ¼Ò£¬¿ÉÒÔÎªnull
+     * @param type   ç‚¹å‡»ç±»å‹
+     * @param player æ‰§è¡Œæ“ä½œçš„ç©å®¶ï¼Œå¯ä»¥ä¸ºnull
      */
     void onClick(@NotNull ClickType type, @Nullable Player player);
 
     /**
-     * ´¦Àíµã»÷ÊÂ¼ş
+     * å¤„ç†ç‚¹å‡»äº‹ä»¶
      *
-     * @param event µã»÷ÊÂ¼ş
+     * @param event ç‚¹å‡»äº‹ä»¶
      */
     default void onClick(@NotNull InventoryClickEvent event) {
         onClick(event.getClick(), (Player) event.getWhoClicked());

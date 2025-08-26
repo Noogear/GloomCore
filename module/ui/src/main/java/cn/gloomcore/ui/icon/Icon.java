@@ -8,28 +8,28 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Í¼±êÀà£¬ÓÃÓÚ±íÊ¾UIÖĞµÄÍ¼±êÔªËØ
+ * å›¾æ ‡ç±»ï¼Œç”¨äºè¡¨ç¤ºUIä¸­çš„å›¾æ ‡å…ƒç´ 
  * <p>
- * °üº¬Í¼±êµÄÏÔÊ¾ÄÚÈİºÍµã»÷Ê±µÄÏìÓ¦¶¯×÷
+ * åŒ…å«å›¾æ ‡çš„æ˜¾ç¤ºå†…å®¹å’Œç‚¹å‡»æ—¶çš„å“åº”åŠ¨ä½œ
  */
-public class Icon {
+public class Icon implements Cloneable {
     protected IconDisplay display;
     protected IconAction iconAction;
 
     /**
-     * ¹¹Ôìº¯Êı£¬´´½¨Ò»¸öÖ»ÓĞÏÔÊ¾ÄÚÈİµÄÍ¼±ê
+     * æ„é€ å‡½æ•°ï¼Œåˆ›å»ºä¸€ä¸ªåªæœ‰æ˜¾ç¤ºå†…å®¹çš„å›¾æ ‡
      *
-     * @param display Í¼±êµÄÏÔÊ¾ÄÚÈİ
+     * @param display å›¾æ ‡çš„æ˜¾ç¤ºå†…å®¹
      */
     public Icon(@NotNull IconDisplay display) {
         this.display = display;
     }
 
     /**
-     * ¹¹Ôìº¯Êı£¬´´½¨Ò»¸ö°üº¬ÏÔÊ¾ÄÚÈİºÍµã»÷¶¯×÷µÄÍ¼±ê
+     * æ„é€ å‡½æ•°ï¼Œåˆ›å»ºä¸€ä¸ªåŒ…å«æ˜¾ç¤ºå†…å®¹å’Œç‚¹å‡»åŠ¨ä½œçš„å›¾æ ‡
      *
-     * @param display    Í¼±êµÄÏÔÊ¾ÄÚÈİ
-     * @param iconAction Í¼±êµÄµã»÷¶¯×÷
+     * @param display    å›¾æ ‡çš„æ˜¾ç¤ºå†…å®¹
+     * @param iconAction å›¾æ ‡çš„ç‚¹å‡»åŠ¨ä½œ
      */
     public Icon(@NotNull IconDisplay display, @Nullable IconAction iconAction) {
         this.display = display;
@@ -37,10 +37,10 @@ public class Icon {
     }
 
     /**
-     * ´¦ÀíÍ¼±êµÄµã»÷ÊÂ¼ş
+     * å¤„ç†å›¾æ ‡çš„ç‚¹å‡»äº‹ä»¶
      *
-     * @param event µã»÷ÊÂ¼ş
-     * @return µ±Ç°Í¼±êÊµÀı£¬Ö§³ÖÁ´Ê½µ÷ÓÃ
+     * @param event ç‚¹å‡»äº‹ä»¶
+     * @return å½“å‰å›¾æ ‡å®ä¾‹ï¼Œæ”¯æŒé“¾å¼è°ƒç”¨
      */
     public Icon onClick(InventoryClickEvent event) {
         if (iconAction != null) {
@@ -50,11 +50,11 @@ public class Icon {
     }
 
     /**
-     * ´¦ÀíÖ¸¶¨µã»÷ÀàĞÍµÄµã»÷ÊÂ¼ş
+     * å¤„ç†æŒ‡å®šç‚¹å‡»ç±»å‹çš„ç‚¹å‡»äº‹ä»¶
      *
-     * @param clickType µã»÷ÀàĞÍ
-     * @param player    µã»÷µÄÍæ¼Ò
-     * @return µ±Ç°Í¼±êÊµÀı£¬Ö§³ÖÁ´Ê½µ÷ÓÃ
+     * @param clickType ç‚¹å‡»ç±»å‹
+     * @param player    ç‚¹å‡»çš„ç©å®¶
+     * @return å½“å‰å›¾æ ‡å®ä¾‹ï¼Œæ”¯æŒé“¾å¼è°ƒç”¨
      */
     public Icon onClick(@NotNull ClickType clickType, @Nullable Player player) {
         if (iconAction != null) {
@@ -64,10 +64,10 @@ public class Icon {
     }
 
     /**
-     * ÉèÖÃÍ¼±êµÄµã»÷¶¯×÷
+     * è®¾ç½®å›¾æ ‡çš„ç‚¹å‡»åŠ¨ä½œ
      *
-     * @param iconAction µã»÷¶¯×÷
-     * @return µ±Ç°Í¼±êÊµÀı£¬Ö§³ÖÁ´Ê½µ÷ÓÃ
+     * @param iconAction ç‚¹å‡»åŠ¨ä½œ
+     * @return å½“å‰å›¾æ ‡å®ä¾‹ï¼Œæ”¯æŒé“¾å¼è°ƒç”¨
      */
     public Icon setClickAction(@Nullable IconAction iconAction) {
         this.iconAction = iconAction;
@@ -75,10 +75,10 @@ public class Icon {
     }
 
     /**
-     * ÉèÖÃÍ¼±êµÄÏÔÊ¾ÄÚÈİ
+     * è®¾ç½®å›¾æ ‡çš„æ˜¾ç¤ºå†…å®¹
      *
-     * @param display ÏÔÊ¾ÄÚÈİ
-     * @return µ±Ç°Í¼±êÊµÀı£¬Ö§³ÖÁ´Ê½µ÷ÓÃ
+     * @param display æ˜¾ç¤ºå†…å®¹
+     * @return å½“å‰å›¾æ ‡å®ä¾‹ï¼Œæ”¯æŒé“¾å¼è°ƒç”¨
      */
     public Icon setDisplay(@NotNull IconDisplay display) {
         this.display = display;
@@ -86,12 +86,17 @@ public class Icon {
     }
 
     /**
-     * »ñÈ¡Í¼±êµÄÏÔÊ¾ÎïÆ·
+     * è·å–å›¾æ ‡çš„æ˜¾ç¤ºç‰©å“
      *
-     * @return Í¼±êµÄÎïÆ·¶ÑÊµÀı
+     * @return å›¾æ ‡çš„ç‰©å“å †å®ä¾‹
      */
     public ItemStack display() {
         return display.parse();
+    }
+
+    @Override
+    public Icon clone() throws CloneNotSupportedException {
+        return (Icon) super.clone();
     }
 
 }

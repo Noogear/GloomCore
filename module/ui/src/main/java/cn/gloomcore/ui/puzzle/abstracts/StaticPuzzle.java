@@ -1,7 +1,9 @@
-package cn.gloomcore.ui.puzzle;
+package cn.gloomcore.ui.puzzle.abstracts;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+
+import java.util.Collection;
 
 /**
  * 静态拼图抽象类，实现不可交互的拼图组件
@@ -9,7 +11,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
  * 静态拼图通常用于显示静态内容，不响应点击事件或更新操作。
  * 该类默认取消所有点击事件并不执行任何更新操作
  */
-public abstract class StaticPuzzle implements Puzzle {
+public abstract class StaticPuzzle extends AbstractPuzzle {
+
+    protected StaticPuzzle(Collection<Integer> slotList) {
+        super(slotList);
+    }
 
     /**
      * 处理库存点击事件，默认取消所有点击操作
