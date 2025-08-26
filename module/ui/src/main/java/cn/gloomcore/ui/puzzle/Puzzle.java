@@ -42,5 +42,14 @@ public interface Puzzle {
      */
     void update(Player player);
 
+    PuzzleType getPuzzleType();
+
+
+    enum PuzzleType {
+        COMMON,
+        PAGINATED,
+        PLACEABLE
+    }
+
 
 }

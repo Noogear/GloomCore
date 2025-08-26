@@ -1,6 +1,7 @@
 package cn.gloomcore.ui.puzzle.impl;
 
 import cn.gloomcore.ui.icon.Icon;
+import cn.gloomcore.ui.puzzle.PaginatedPuzzle;
 import cn.gloomcore.ui.puzzle.abstracts.DynamicPuzzle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -17,7 +18,7 @@ import java.util.List;
  * 该拼图将一组物品分页显示在指定的槽位中，支持翻页功能，
  * 并能处理物品的点击事件。每页显示的物品数量取决于提供的槽位数量
  */
-public class PaginatedItemsPuzzle extends DynamicPuzzle {
+public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzle {
     private final List<Icon> allItems;
     private int currentPage = 0;
 
@@ -27,7 +28,7 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
      * @param slotList 用于显示物品的槽位列表
      * @param allItems 所有需要分页显示的物品图标列表
      */
-    public PaginatedItemsPuzzle(Collection<Integer> slotList, List<Icon> allItems) {
+    public PaginatedPuzzleImpl(Collection<Integer> slotList, List<Icon> allItems) {
         super(slotList);
         this.allItems = allItems;
     }
@@ -68,6 +69,7 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
      * @param player 目标玩家
      * @return 如果成功切换到下一页返回true，否则返回false
      */
+    @Override
     public boolean nextPage(Player player) {
         if ((currentPage + 1) * slots.length < allItems.size()) {
             currentPage++;
@@ -85,6 +87,7 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
      * @param player 目标玩家
      * @return 如果成功切换到上一页返回true，否则返回false
      */
+    @Override
     public boolean previousPage(Player player) {
         if (currentPage > 0) {
             currentPage--;
@@ -122,6 +125,7 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
      * @param player     目标玩家。
      * @return 如果页面成功跳转则返回true，如果目标页码与当前页码相同则返回false。
      */
+    @Override
     public boolean jumpToPage(int pageNumber, Player player) {
         int totalPages = getTotalPages();
         int targetPageIndex = pageNumber - 1;
@@ -145,6 +149,7 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
      *
      * @return 当前页码，从1开始。
      */
+    @Override
     public int getCurrentPage() {
         return this.currentPage + 1;
     }
@@ -154,6 +159,7 @@ public class PaginatedItemsPuzzle extends DynamicPuzzle {
      *
      * @return 总页数，至少为1。
      */
+    @Override
     public int getTotalPages() {
         if (allItems.isEmpty()) {
             return 1;

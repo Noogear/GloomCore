@@ -24,13 +24,13 @@ import java.util.function.Consumer;
  * 并能监听内容变化事件。主要用于制作需要玩家放置物品的界面，
  * 如合成界面、物品选择界面等
  */
-public class PlaceableSlotsPuzzle extends AbstractPuzzle implements PlaceablePuzzle {
+public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzzle {
     private final JavaPlugin plugin;
     private final Consumer<Player> onContentsChanged;
     private final boolean stackingEnabled;
 
 
-    public PlaceableSlotsPuzzle(@NotNull JavaPlugin plugin, @NotNull Collection<Integer> slotList, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
+    public PlaceablePuzzleImpl(@NotNull JavaPlugin plugin, @NotNull Collection<Integer> slotList, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
         super(slotList);
         this.plugin = plugin;
         this.onContentsChanged = onContentsChanged;
@@ -80,6 +80,7 @@ public class PlaceableSlotsPuzzle extends AbstractPuzzle implements PlaceablePuz
     @Override
     public void update(Player player) {
     }
+
 
     @Override
     public void cleanupOnClose(Player player, Inventory inventory) {

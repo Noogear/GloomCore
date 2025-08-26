@@ -14,7 +14,7 @@ public interface IconDisplay {
 
     static @NotNull IconDisplay of(@NotNull ItemStack itemStack, @Nullable ItemModifier itemModifier) {
         if (itemModifier != null) {
-            return () -> itemModifier.modify(itemStack.clone());
+            return (player) -> itemModifier.modify(itemStack.clone());
         } else {
             return of(itemStack);
         }
@@ -25,25 +25,25 @@ public interface IconDisplay {
     }
 
     static @NotNull IconDisplay of(@NotNull ItemStack itemStack) {
-        return itemStack::clone;
+        return (player) -> itemStack.clone();
     }
 
     static @NotNull IconDisplay of() {
-        return DEFAULT_ICON::clone;
+        return (player) -> DEFAULT_ICON.clone();
     }
 
     static @NotNull IconDisplay empty() {
-        return ItemStack::empty;
+        return (player) -> ItemStack.empty();
     }
 
     default IconDisplay snapshot() {
         return IconDisplay.of(this.parse());
     }
 
-    @NotNull ItemStack parse();
-
-    default ItemStack parse(@Nullable Player player) {
-        return parse();
+    default @NotNull ItemStack parse() {
+        return parse(null);
     }
+
+    @NotNull ItemStack parse(@Nullable Player player);
 
 }

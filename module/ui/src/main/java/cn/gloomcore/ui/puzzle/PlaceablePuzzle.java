@@ -10,7 +10,7 @@ import java.util.function.Consumer;
  * 一个接口，用于标识那些在GUI关闭时需要执行清理操作的拼图。
  * 例如，退还玩家放置在输入槽中的物品。
  */
-public interface PlaceablePuzzle {
+public interface PlaceablePuzzle extends Puzzle {
 
     /**
      * 当GUI被关闭时执行的清理逻辑。
@@ -25,4 +25,9 @@ public interface PlaceablePuzzle {
     Consumer<Player> getChangedCallBack();
 
     boolean hasChangedCallBack();
+
+    @Override
+    default PuzzleType getPuzzleType() {
+        return PuzzleType.PLACEABLE;
+    }
 }

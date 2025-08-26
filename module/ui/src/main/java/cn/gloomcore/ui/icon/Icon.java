@@ -94,6 +94,10 @@ public class Icon implements Cloneable {
         return display.parse();
     }
 
+    public ItemStack display(Player player) {
+        return display.parse(player);
+    }
+
     @Override
     public Icon clone() throws CloneNotSupportedException {
         return (Icon) super.clone();

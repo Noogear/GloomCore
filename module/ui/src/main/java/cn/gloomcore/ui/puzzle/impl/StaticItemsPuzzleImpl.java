@@ -9,19 +9,24 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public class StaticItemsPuzzle extends StaticPuzzle {
+public class StaticItemsPuzzleImpl extends StaticPuzzle {
     private final IconDisplay display;
 
-    public StaticItemsPuzzle(Collection<Integer> slotList, IconDisplay display) {
+    public StaticItemsPuzzleImpl(Collection<Integer> slotList, IconDisplay display) {
         super(slotList);
         this.display = display;
     }
 
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
-        ItemStack itemStack = display.parse();
+        ItemStack itemStack = display.parse(player);
         for (int slot : slots) {
             inventory.setItem(slot, itemStack);
         }
+    }
+
+    @Override
+    public PuzzleType getPuzzleType() {
+        return PuzzleType.COMMON;
     }
 }
