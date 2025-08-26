@@ -19,6 +19,15 @@ public abstract class DynamicPuzzle extends AbstractPuzzle {
     }
 
     /**
+     * 拷贝构造函数
+     *
+     * @param other 要拷贝的源 DynamicPuzzle 对象
+     */
+    protected DynamicPuzzle(DynamicPuzzle other) {
+        super(other);
+    }
+
+    /**
      * 更新拼图显示内容
      * <p>
      * 该方法会检查玩家当前打开的库存是否为PuzzleGuiView类型，

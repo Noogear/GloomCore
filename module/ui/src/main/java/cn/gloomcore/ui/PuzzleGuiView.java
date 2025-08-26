@@ -83,6 +83,13 @@ public class PuzzleGuiView implements InventoryHolder {
     }
 
 
+    /**
+     * 处理库存点击事件
+     * <p>
+     * 处理玩家在GUI中的点击操作，包括取消事件、处理拼图点击以及物品移动等操作
+     *
+     * @param event 库存点击事件
+     */
     public void handleClick(InventoryClickEvent event) {
         if (inventory == null) return;
         Inventory clickedInventory = event.getClickedInventory();
@@ -127,6 +134,13 @@ public class PuzzleGuiView implements InventoryHolder {
         }
     }
 
+    /**
+     * 处理库存拖拽事件
+     * <p>
+     * 处理玩家在GUI中的拖拽操作，验证拖拽目标槽位是否为可放置拼图，并在需要时更新相关拼图
+     *
+     * @param event 库存拖拽事件
+     */
     public void handleDrag(InventoryDragEvent event) {
         int size = menuLayout.getSize();
         for (int slot : event.getRawSlots()) {
@@ -147,18 +161,15 @@ public class PuzzleGuiView implements InventoryHolder {
                         puzzlesToUpdate.add(puzzle);
                     }
                 }
-                if (puzzlesToUpdate.isEmpty()) {
-                    task.cancel();
-                    return;
-                }
-                for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
-                    puzzle.getChangedCallBack().accept(player);
-                }
             }
-
+            if (puzzlesToUpdate.isEmpty()) {
+                task.cancel();
+                return;
+            }
+            for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
+                puzzle.getChangedCallBack().accept(player);
+            }
         }, null, 1L);
-
-
     }
 
     /**
@@ -172,6 +183,13 @@ public class PuzzleGuiView implements InventoryHolder {
     }
 
 
+    /**
+     * 处理库存关闭事件
+     * <p>
+     * 当玩家关闭GUI时调用，清理所有可放置拼图的状态
+     *
+     * @param player 关闭GUI的玩家
+     */
     public void handleClose(Player player) {
         if (placeablePuzzles.isEmpty()) {
             return;
@@ -222,7 +240,7 @@ public class PuzzleGuiView implements InventoryHolder {
     @Override
     public @NotNull Inventory getInventory() {
         if (inventory == null) {
-            return inventory = Bukkit.createInventory(this, menuLayout.getInventoryType());
+            inventory = Bukkit.createInventory(this, menuLayout.getInventoryType());
         }
         return inventory;
     }

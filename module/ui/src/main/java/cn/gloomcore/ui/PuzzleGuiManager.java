@@ -136,6 +136,11 @@ public class PuzzleGuiManager implements Listener {
         history.remove(playerUuid);
     }
 
+    /**
+     * 处理库存拖拽事件，将事件转发给对应的GUI视图进行处理
+     *
+     * @param event 库存拖拽事件
+     */
     @EventHandler(ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
         Inventory inventory = event.getInventory();

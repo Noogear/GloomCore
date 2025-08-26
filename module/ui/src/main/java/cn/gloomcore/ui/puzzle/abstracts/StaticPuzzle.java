@@ -18,6 +18,15 @@ public abstract class StaticPuzzle extends AbstractPuzzle {
     }
 
     /**
+     * 拷贝构造函数
+     *
+     * @param other 要拷贝的源 StaticPuzzle 对象
+     */
+    protected StaticPuzzle(StaticPuzzle other) {
+        super(other);
+    }
+
+    /**
      * 处理库存点击事件，默认取消所有点击操作
      * <p>
      * 静态拼图不响应点击事件，因此默认实现是取消所有点击事件

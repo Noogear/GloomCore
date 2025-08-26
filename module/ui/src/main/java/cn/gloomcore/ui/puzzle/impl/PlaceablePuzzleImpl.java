@@ -30,11 +30,34 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
     private final boolean stackingEnabled;
 
 
+    /**
+     * 构造函数，创建一个可放置物品的拼图实例
+     *
+     * @param plugin            Java插件实例
+     * @param slotList          拼图占据的槽位列表
+     * @param onContentsChanged 内容变更时的回调函数，可为null
+     * @param stackingEnabled   是否启用物品堆叠功能
+     */
     public PlaceablePuzzleImpl(@NotNull JavaPlugin plugin, @NotNull Collection<Integer> slotList, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
         super(slotList);
         this.plugin = plugin;
         this.onContentsChanged = onContentsChanged;
         this.stackingEnabled = stackingEnabled;
+    }
+
+    /**
+     * 拷贝构造函数，基于另一个PlaceablePuzzleImpl实例创建新实例
+     * <p>
+     * 该构造函数会复制插件引用、内容变更回调函数和堆叠功能设置，
+     * 所有引用都是浅拷贝
+     *
+     * @param other 需要拷贝的PlaceablePuzzleImpl实例
+     */
+    public PlaceablePuzzleImpl(@NotNull PlaceablePuzzleImpl other) {
+        super(other);
+        this.plugin = other.plugin;
+        this.onContentsChanged = other.onContentsChanged;
+        this.stackingEnabled = other.stackingEnabled;
     }
 
 
@@ -82,8 +105,17 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
     }
 
 
+    /**
+     * 当GUI关闭时执行清理操作，将放置在拼图槽位中的物品归还给玩家
+     * <p>
+     * 如果玩家背包已满，则将物品掉落在玩家位置
+     *
+     * @param player    关闭GUI的玩家
+     * @param inventory 被关闭的GUI的Inventory实例
+     */
     @Override
     public void cleanupOnClose(Player player, Inventory inventory) {
+        // 收集所有非空的物品
         List<ItemStack> itemsToReturn = new ArrayList<>();
         for (int slot : this.getSlots()) {
             ItemStack item = inventory.getItem(slot);
@@ -100,6 +132,7 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
         Location location = player.getLocation();
         World world = location.getWorld();
         Inventory playerInventory = player.getInventory();
+        // 将物品添加到玩家背包，如果背包满了则掉落在地上
         for (ItemStack item : itemsToReturn) {
             if (!playerInventory.addItem(item).isEmpty()) {
                 world.dropItem(location, item);
@@ -108,6 +141,16 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
         }
     }
 
+    /**
+     * 尝试接受物品到拼图中
+     * <p>
+     * 如果启用堆叠功能，会先尝试将物品堆叠到已有相同物品上，
+     * 然后将剩余物品放置到空槽位中
+     *
+     * @param itemToAccept 要接受的物品
+     * @param inventory    GUI库存实例
+     * @return 如果成功接受物品返回true，否则返回false
+     */
     @Override
     public boolean tryAcceptItem(ItemStack itemToAccept, Inventory inventory) {
         if (itemToAccept == null || itemToAccept.getAmount() <= 0) {
@@ -115,6 +158,7 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
         }
         int initialAmount = itemToAccept.getAmount();
 
+        // 如果启用堆叠功能，先尝试堆叠到相同物品上
         if (this.stackingEnabled) {
             for (int slot : this.slots) {
                 ItemStack existingItem = inventory.getItem(slot);
@@ -132,6 +176,7 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
             }
         }
 
+        // 将剩余物品放置到空槽位中
         if (itemToAccept.getAmount() > 0) {
             for (int slot : this.slots) {
                 ItemStack slotItem = inventory.getItem(slot);
@@ -146,11 +191,21 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
         return itemToAccept.getAmount() < initialAmount;
     }
 
+    /**
+     * 获取变更回调函数
+     *
+     * @return 玩家变更回调函数的Consumer实例
+     */
     @Override
     public Consumer<Player> getChangedCallBack() {
         return this.onContentsChanged;
     }
 
+    /**
+     * 检查是否有变更回调函数
+     *
+     * @return 如果有变更回调函数返回true，否则返回false
+     */
     @Override
     public boolean hasChangedCallBack() {
         return this.onContentsChanged != null;

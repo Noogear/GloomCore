@@ -20,10 +20,27 @@ public interface PlaceablePuzzle extends Puzzle {
      */
     void cleanupOnClose(Player player, Inventory inventory);
 
+    /**
+     * 尝试接受物品到拼图中
+     *
+     * @param itemToAccept 要接受的物品
+     * @param guiInventory GUI库存实例
+     * @return 如果成功接受物品返回true，否则返回false
+     */
     boolean tryAcceptItem(ItemStack itemToAccept, Inventory guiInventory);
 
+    /**
+     * 获取变更回调函数
+     *
+     * @return 玩家变更回调函数的Consumer实例
+     */
     Consumer<Player> getChangedCallBack();
 
+    /**
+     * 检查是否有变更回调函数
+     *
+     * @return 如果有变更回调函数返回true，否则返回false
+     */
     boolean hasChangedCallBack();
 
     @Override

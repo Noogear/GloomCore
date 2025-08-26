@@ -26,6 +26,16 @@ public class Icon implements Cloneable {
     }
 
     /**
+     * 拷贝构造函数
+     *
+     * @param other 要拷贝的源 Icon 对象
+     */
+    public Icon(@NotNull Icon other) {
+        this.display = other.display;
+        this.iconAction = other.iconAction;
+    }
+
+    /**
      * 构造函数，创建一个包含显示内容和点击动作的图标
      *
      * @param display    图标的显示内容
@@ -98,9 +108,5 @@ public class Icon implements Cloneable {
         return display.parse(player);
     }
 
-    @Override
-    public Icon clone() throws CloneNotSupportedException {
-        return (Icon) super.clone();
-    }
 
 }

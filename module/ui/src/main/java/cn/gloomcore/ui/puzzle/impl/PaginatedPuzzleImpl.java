@@ -8,9 +8,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 分页物品拼图类，用于在GUI中显示可分页的物品列表
@@ -31,6 +33,22 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
     public PaginatedPuzzleImpl(Collection<Integer> slotList, List<Icon> allItems) {
         super(slotList);
         this.allItems = allItems;
+    }
+
+    /**
+     * 拷贝构造函数，基于另一个PaginatedPuzzleImpl实例创建新实例
+     * <p>
+     * 该构造函数会深拷贝图标列表，为每个图标创建新的实例，
+     * 并复制当前页码
+     *
+     * @param other 需要拷贝的PaginatedPuzzleImpl实例
+     */
+    public PaginatedPuzzleImpl(@NotNull PaginatedPuzzleImpl other) {
+        super(other);
+        this.allItems = other.allItems.stream()
+                .map(Icon::new)
+                .collect(Collectors.toCollection(ArrayList::new));
+        this.currentPage = other.currentPage;
     }
 
     /**

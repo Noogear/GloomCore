@@ -42,9 +42,21 @@ public interface Puzzle {
      */
     void update(Player player);
 
+    /**
+     * 获取拼图类型
+     *
+     * @return 拼图类型枚举值
+     */
     PuzzleType getPuzzleType();
 
 
+    /**
+     * 拼图类型枚举，定义了不同类型的拼图
+     * <p>
+     * COMMON: 普通拼图
+     * PAGINATED: 分页拼图
+     * PLACEABLE: 可放置物品的拼图
+     */
     enum PuzzleType {
         COMMON,
         PAGINATED,
