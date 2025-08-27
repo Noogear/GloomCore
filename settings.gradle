@@ -1,15 +1,13 @@
 rootProject.name = 'GloomCore'
 
-include("module:common")
-include("module:item", "module:skull")
-include("module:menu")
-include("module:ui")
-include("module:condition")
-include("module:action")
-include("module:replacer")
-include("module:placeholder")
-include("module:scheduler:common", "module:scheduler:async", "module:scheduler:global", "module:scheduler:entity")
+include(
+        "paper:gui",
+        "paper:placeholder",
+        "paper:item",
+)
 
 
-include("implement:action")
-include("implement:item")
+
+include(
+        "common:random"
+)
