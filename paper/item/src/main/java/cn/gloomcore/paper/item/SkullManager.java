@@ -1,6 +1,5 @@
-package cn.gloomcore.skull;
+package cn.gloomcore.paper.item;
 
-import cn.gloomcore.common.Validate;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -13,8 +12,10 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-public class SkullTextureUtil {
+public class SkullManager {
     protected static final Cache<String, PlayerProfile> CACHE = CacheBuilder.newBuilder().expireAfterAccess(3, TimeUnit.HOURS).build();
     protected static final Executor EXECUTOR = CompletableFuture.completedFuture(null).defaultExecutor();
     private static final String TEXTURE_URL = "http://textures.minecraft.net/texture/";
@@ -30,7 +31,7 @@ public class SkullTextureUtil {
     private static final PlayerProfile EMPTY = Bukkit.createProfile(EMPTY_ID, "null");
     private static final Gson GSON = new Gson();
 
-    private SkullTextureUtil() {
+    private SkullManager() {
     }
 
     @NotNull
@@ -70,8 +71,8 @@ public class SkullTextureUtil {
 
     @NotNull
     private static PlayerProfile profileFromBase64(String value) {
-        Optional<byte[]> base64 = Validate.parseBase64(value);
-        return base64.map(SkullTextureUtil::profileFromBase64).orElse(EMPTY);
+        Optional<byte[]> base64 = parseBase64(value);
+        return base64.map(SkullManager::profileFromBase64).orElse(EMPTY);
     }
 
     @NotNull
@@ -84,8 +85,8 @@ public class SkullTextureUtil {
 
     @NotNull
     private static PlayerProfile profileFromUrl(String value) {
-        Optional<URL> url = Validate.parseURL(value);
-        return url.map(SkullTextureUtil::profileFromUrl).orElse(EMPTY);
+        Optional<URL> url = parseURL(value);
+        return url.map(SkullManager::profileFromUrl).orElse(EMPTY);
     }
 
     @NotNull
@@ -97,8 +98,8 @@ public class SkullTextureUtil {
 
     @NotNull
     private static PlayerProfile profileFromUUID(String value) {
-        Optional<UUID> uuid = Validate.parseUUID(value);
-        return uuid.map(SkullTextureUtil::profileFromUUID).orElse(EMPTY);
+        Optional<UUID> uuid = parseUUID(value);
+        return uuid.map(SkullManager::profileFromUUID).orElse(EMPTY);
     }
 
     @NotNull
@@ -157,6 +158,30 @@ public class SkullTextureUtil {
             return CompletableFuture.completedFuture(setProfile(stack, profile));
         }
         return CompletableFuture.supplyAsync(() -> setProfile(stack, getProfileByString(key)), executor);
+    }
+
+    public static Optional<URL> parseURL(@NotNull String input) {
+        try {
+            return Optional.of(URI.create(input).toURL());
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<UUID> parseUUID(@NotNull String input) {
+        try {
+            return Optional.of(UUID.fromString(input));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<byte[]> parseBase64(@NotNull String input) {
+        try {
+            return Optional.of(Base64.getDecoder().decode(input));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
 }

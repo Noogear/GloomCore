@@ -29,7 +29,7 @@ public class ItemBuilder {
     private final ItemStack itemStack;
     private final ItemMeta meta;
 
-    protected ItemBuilder(ItemStack itemStack) {
+    private ItemBuilder(ItemStack itemStack) {
         this.itemStack = itemStack.clone();
         this.meta = this.itemStack.getItemMeta();
     }
