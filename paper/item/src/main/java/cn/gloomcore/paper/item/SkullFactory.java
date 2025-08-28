@@ -87,29 +87,31 @@ public final class SkullFactory {
                 return createProfileFromUrlString(input);
             }
             int length = input.length();
-            if (length == 36) {
-                try {
-                    return createProfileFromUuid(UUID.fromString(input));
-                } catch (IllegalArgumentException ignored) {
-                }
-            }
-            if (length == 32) {
-                try {
-                    String formattedUuid = new StringBuilder(input)
-                            .insert(20, '-')
-                            .insert(16, '-')
-                            .insert(12, '-')
-                            .insert(8, '-')
-                            .toString();
-                    return createProfileFromUuid(UUID.fromString(formattedUuid));
-                } catch (IllegalArgumentException ignored) {
-                }
-            }
-            if (length == 64 && HEX_PATTERN.matcher(input).matches()) {
-                return createProfileFromUrlString(TEXTURE_URL_PREFIX + input);
-            }
-            if (input.length() > BASE64_HEURISTIC_LENGTH) {
-                return createProfileFromTextureValue(input);
+            switch (length) {
+                case 36:
+                    try {
+                        return createProfileFromUuid(UUID.fromString(input));
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                case 32:
+                    try {
+                        String formattedUuid = new StringBuilder(input)
+                                .insert(20, '-')
+                                .insert(16, '-')
+                                .insert(12, '-')
+                                .insert(8, '-')
+                                .toString();
+                        return createProfileFromUuid(UUID.fromString(formattedUuid));
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                case 64:
+                    if (HEX_PATTERN.matcher(input).matches()) {
+                        return createProfileFromUrlString(TEXTURE_URL_PREFIX + input);
+                    }
+                default:
+                    if (length > BASE64_HEURISTIC_LENGTH) {
+                        return createProfileFromTextureValue(input);
+                    }
             }
             return createProfileFromName(input);
         }));
