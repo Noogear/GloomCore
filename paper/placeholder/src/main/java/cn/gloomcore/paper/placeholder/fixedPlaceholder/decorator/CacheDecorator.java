@@ -1,8 +1,8 @@
 package cn.gloomcore.paper.placeholder.fixedPlaceholder.decorator;
 
 import cn.gloomcore.paper.placeholder.CacheText;
-import cn.gloomcore.paper.placeholder.fixedPlaceholder.PlayerCacheHandler;
 import cn.gloomcore.paper.placeholder.fixedPlaceholder.FixedPlaceholder;
+import cn.gloomcore.paper.placeholder.fixedPlaceholder.PlayerCacheHandler;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

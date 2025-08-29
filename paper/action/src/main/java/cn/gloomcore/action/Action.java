@@ -59,7 +59,7 @@ public interface Action {
     static Action of(Consumer<Player> action) {
         return (p, c, r) -> action.accept(p);
     }
-    
+
 //    void run();
 //
 //    default  void run(@Nullable Player player){

@@ -169,7 +169,8 @@ public final class SkullFactory {
      */
     @NotNull
     public static SkullRequestBuilder fromTextureHash(@NotNull String textureHash) {
-        return new SkullRequestBuilder(getCachedProfile(textureHash, () -> createProfileFromUrlString(TEXTURE_URL_PREFIX + textureHash)));
+        String textureUrl = TEXTURE_URL_PREFIX + textureHash;
+        return new SkullRequestBuilder(getCachedProfile(textureUrl, () -> createProfileFromUrlString(textureUrl)));
     }
 
 

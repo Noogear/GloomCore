@@ -4,6 +4,7 @@ include(
         "paper:gui",
         "paper:placeholder",
         "paper:item",
+        "paper:scheduler"
 )
 
 

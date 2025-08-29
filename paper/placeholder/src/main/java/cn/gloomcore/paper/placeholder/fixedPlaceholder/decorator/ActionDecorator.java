@@ -19,7 +19,7 @@ public interface ActionDecorator extends FixedPlaceholder {
 
     @NotNull
     static ActionDecorator of(@NotNull Supplier<String> supplier) {
-        return new ActionDecorator(){
+        return new ActionDecorator() {
 
             @Override
             public @Nullable String process(@Nullable Player player) {
@@ -34,8 +34,8 @@ public interface ActionDecorator extends FixedPlaceholder {
     }
 
     @NotNull
-    static ActionDecorator of(@NotNull Function<Player,String> function) {
-        return new ActionDecorator(){
+    static ActionDecorator of(@NotNull Function<Player, String> function) {
+        return new ActionDecorator() {
 
             @Override
             public @Nullable String process(@Nullable Player player) {

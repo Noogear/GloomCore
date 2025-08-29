@@ -3,7 +3,7 @@ package cn.gloomcore.common.random;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public final class AliasMethodRandom {
+public final class AliasMethodRandom{
     private final int[] alias;
     private final double[] probability;
 
@@ -75,9 +75,8 @@ public final class AliasMethodRandom {
     public int next() {
         final ThreadLocalRandom random = ThreadLocalRandom.current();
         final int column = random.nextInt(probability.length);
-        final boolean coinToss = random.nextDouble() < probability[column];
 
-        return coinToss ? column : alias[column];
+        return random.nextDouble() < probability[column] ? column : alias[column];
     }
 
 }

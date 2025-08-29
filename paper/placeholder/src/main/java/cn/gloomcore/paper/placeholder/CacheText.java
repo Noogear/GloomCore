@@ -1,6 +1,6 @@
 package cn.gloomcore.paper.placeholder;
 
-public class CacheText{
+public class CacheText {
     private String text;
     private long lastUpdate;
 
