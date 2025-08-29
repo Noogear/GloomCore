@@ -6,7 +6,9 @@ import cn.gloomcore.paper.gui.puzzle.abstracts.DynamicPuzzle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
  */
 public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzle {
     private final List<Icon> allItems;
+    private final ItemStack backgroundItem;
     private int currentPage = 0;
 
     /**
@@ -31,8 +34,20 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
      * @param allItems 所有需要分页显示的物品图标列表
      */
     public PaginatedPuzzleImpl(Collection<Integer> slotList, List<Icon> allItems) {
+        this(slotList, allItems, null);
+    }
+
+    /**
+     * 构造一个新的分页物品拼图实例
+     *
+     * @param slotList       用于显示物品的槽位列表
+     * @param allItems       所有需要分页显示的物品图标列表
+     * @param backgroundItem 背景物品，用于填充没有内容的槽位
+     */
+    public PaginatedPuzzleImpl(Collection<Integer> slotList, List<Icon> allItems, @Nullable ItemStack backgroundItem) {
         super(slotList);
         this.allItems = allItems;
+        this.backgroundItem = backgroundItem;
     }
 
     /**
@@ -49,12 +64,14 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
                 .map(Icon::new)
                 .collect(Collectors.toCollection(ArrayList::new));
         this.currentPage = other.currentPage;
+        this.backgroundItem = other.backgroundItem;
     }
+
 
     /**
      * 渲染当前页的物品到指定库存中
      * <p>
-     * 首先清空所有槽位，然后计算当前页应显示的物品范围，
+     * 首先清空所有槽位或设置背景物品，然后计算当前页应显示的物品范围，
      * 将对应物品设置到槽位中
      *
      * @param player    目标玩家
@@ -62,8 +79,9 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
      */
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
+        // 先为所有槽位设置背景物品或清空
         for (int slot : slots) {
-            inventory.setItem(slot, null);
+            inventory.setItem(slot, backgroundItem);
         }
 
         int itemsPerPage = slots.length;

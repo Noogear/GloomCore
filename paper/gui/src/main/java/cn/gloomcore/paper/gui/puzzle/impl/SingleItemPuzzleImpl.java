@@ -15,7 +15,7 @@ import java.util.Collection;
  * 该类表示一个静态物品拼图，用于在GUI中显示不可交互的静态图标
  * 图标可以在多个槽位中显示，但不处理用户的点击事件
  */
-public class StaticItemsPuzzleImpl extends StaticPuzzle {
+public class SingleItemPuzzleImpl extends StaticPuzzle {
     private final IconDisplay display;
 
     /**
@@ -24,7 +24,7 @@ public class StaticItemsPuzzleImpl extends StaticPuzzle {
      * @param slotList 拼图占据的槽位列表
      * @param display  需要显示的图标内容
      */
-    public StaticItemsPuzzleImpl(Collection<Integer> slotList, IconDisplay display) {
+    public SingleItemPuzzleImpl(Collection<Integer> slotList, IconDisplay display) {
         super(slotList);
         this.display = display;
     }
@@ -36,7 +36,7 @@ public class StaticItemsPuzzleImpl extends StaticPuzzle {
      *
      * @param other 需要拷贝的StaticItemsPuzzleImpl实例
      */
-    public StaticItemsPuzzleImpl(@NotNull StaticItemsPuzzleImpl other) {
+    public SingleItemPuzzleImpl(@NotNull SingleItemPuzzleImpl other) {
         super(other);
         this.display = other.display;
     }

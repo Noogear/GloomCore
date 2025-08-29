@@ -15,50 +15,42 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * 可放置槽位拼图类，提供一组可供玩家放置物品的空槽位
- * <p>
- * 该拼图在指定槽位中创建空位，允许玩家将物品放置在这些槽位中，
- * 并能监听内容变化事件。主要用于制作需要玩家放置物品的界面，
- * 如合成界面、物品选择界面等
- */
-public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzzle {
+public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzzle {
     private final Consumer<Player> onContentsChanged;
     private final boolean stackingEnabled;
-
+    private final ItemStack backgroundItem;
 
     /**
-     * 构造函数，创建一个可放置物品的拼图实例
+     * 构造函数，创建一个带背景板的可放置物品的拼图实例
      *
      * @param slotList          拼图占据的槽位列表
+     * @param backgroundItem    作为背景板的物品实例
      * @param onContentsChanged 内容变更时的回调函数，可为null
      * @param stackingEnabled   是否启用物品堆叠功能
      */
-    public PlaceablePuzzleImpl(@NotNull Collection<Integer> slotList, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
+    public BackgroundPlaceablePuzzleImpl(@NotNull Collection<Integer> slotList, @NotNull ItemStack backgroundItem, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
         super(slotList);
+        this.backgroundItem = backgroundItem;
         this.onContentsChanged = onContentsChanged;
         this.stackingEnabled = stackingEnabled;
     }
 
     /**
-     * 拷贝构造函数，基于另一个PlaceablePuzzleImpl实例创建新实例
-     * <p>
-     * 该构造函数会复制插件引用、内容变更回调函数和堆叠功能设置，
-     * 所有引用都是浅拷贝
+     * 拷贝构造函数
      *
-     * @param other 需要拷贝的PlaceablePuzzleImpl实例
+     * @param other 需要拷贝的 BackgroundPlaceablePuzzleImpl 实例
      */
-    public PlaceablePuzzleImpl(@NotNull PlaceablePuzzleImpl other) {
+    public BackgroundPlaceablePuzzleImpl(@NotNull BackgroundPlaceablePuzzleImpl other) {
         super(other);
         this.onContentsChanged = other.onContentsChanged;
         this.stackingEnabled = other.stackingEnabled;
+        this.backgroundItem = other.backgroundItem.clone();
     }
-
 
     /**
      * 渲染拼图内容到指定库存中
      * <p>
-     * 将所有指定槽位清空，使其变为空槽位供玩家放置物品
+     * 将所有指定槽位设置为背景物品
      *
      * @param player    目标玩家
      * @param inventory 目标库存
@@ -66,25 +58,45 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
         for (int slot : slots) {
-            inventory.setItem(slot, null);
+            inventory.setItem(slot, backgroundItem.clone());
         }
     }
 
     /**
      * 处理槽位点击事件
      * <p>
-     * 允许玩家放置或取出物品，并在内容变化后触发回调函数
+     * 核心逻辑：
+     * 1. 阻止玩家拾取背景物品。
+     * 2. 允许玩家用自己的物品替换背景物品。
+     * 3. 当玩家取走自己的物品后，自动恢复背景物品。
+     * 4. 在内容变化后触发回调。
      *
      * @param event 库存点击事件
      */
     @Override
     public void onClick(InventoryClickEvent event) {
-        event.setCancelled(false);
-        if (onContentsChanged != null) {
-            Player player = (Player) event.getWhoClicked();
-            PaperScheduler.INSTANCE.entity(player).runDelayed(() -> onContentsChanged.accept(player), 1L);
+        ItemStack currentItem = event.getCurrentItem();
+        ItemStack cursorItem = event.getCursor();
+
+        if (!cursorItem.isEmpty()) {
+            event.setCancelled(false);
+        } else if (currentItem != null && currentItem.isSimilar(backgroundItem)) {
+            event.setCancelled(true);
+            return;
+        } else {
+            event.setCancelled(false);
         }
 
+        Player player = (Player) event.getWhoClicked();
+        PaperScheduler.INSTANCE.entity(player).runDelayed(() -> {
+            ItemStack itemAfterClick = event.getInventory().getItem(event.getSlot());
+            if (itemAfterClick == null || itemAfterClick.getType().isAir()) {
+                event.getInventory().setItem(event.getSlot(), backgroundItem.clone());
+            }
+            if (onContentsChanged != null) {
+                onContentsChanged.accept(player);
+            }
+        }, 1L);
     }
 
     /**
@@ -98,11 +110,10 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
     public void update(Player player) {
     }
 
-
     /**
-     * 当GUI关闭时执行清理操作，将放置在拼图槽位中的物品归还给玩家
+     * GUI关闭时执行清理操作，将玩家放置的物品归还
      * <p>
-     * 如果玩家背包已满，则将物品掉落在玩家位置
+     * 核心逻辑：只归还非背景板的物品。
      *
      * @param player    关闭GUI的玩家
      * @param inventory 被关闭的GUI的Inventory实例
@@ -112,7 +123,7 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
         List<ItemStack> itemsToReturn = new ArrayList<>();
         for (int slot : this.getSlots()) {
             ItemStack item = inventory.getItem(slot);
-            if (item != null && !item.getType().isAir()) {
+            if (item != null && !item.getType().isAir() && !item.isSimilar(backgroundItem)) {
                 itemsToReturn.add(item);
                 inventory.setItem(slot, null);
             }
@@ -121,14 +132,13 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
     }
 
     /**
-     * 尝试接受物品到拼图中
+     * 尝试接受物品到拼图中 (例如：Shift + 点击)
      * <p>
-     * 如果启用堆叠功能，会先尝试将物品堆叠到已有相同物品上，
-     * 然后将剩余物品放置到空槽位中
+     * 核心逻辑：将持有背景板的槽位视为空槽位来接受物品。
      *
      * @param itemToAccept 要接受的物品
      * @param inventory    GUI库存实例
-     * @return 如果成功接受物品返回true，否则返回false
+     * @return 如果成功接受至少一部分物品，返回true
      */
     @Override
     public boolean tryAcceptItem(ItemStack itemToAccept, Inventory inventory) {
@@ -137,11 +147,10 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
         }
         int initialAmount = itemToAccept.getAmount();
 
-        // 如果启用堆叠功能，先尝试堆叠到相同物品上
         if (this.stackingEnabled) {
             for (int slot : this.slots) {
                 ItemStack existingItem = inventory.getItem(slot);
-                if (existingItem != null && existingItem.isSimilar(itemToAccept)) {
+                if (existingItem != null && !existingItem.isSimilar(backgroundItem) && existingItem.isSimilar(itemToAccept)) {
                     int space = existingItem.getMaxStackSize() - existingItem.getAmount();
                     if (space > 0) {
                         int amountToMove = Math.min(space, itemToAccept.getAmount());
@@ -155,11 +164,10 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
             }
         }
 
-        // 将剩余物品放置到空槽位中
         if (itemToAccept.getAmount() > 0) {
             for (int slot : this.slots) {
                 ItemStack slotItem = inventory.getItem(slot);
-                if (slotItem == null || slotItem.getType().isAir()) {
+                if (slotItem == null || slotItem.getType().isAir() || slotItem.isSimilar(backgroundItem)) {
                     inventory.setItem(slot, itemToAccept.clone());
                     itemToAccept.setAmount(0);
                     return true;
@@ -170,25 +178,14 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
         return itemToAccept.getAmount() < initialAmount;
     }
 
-    /**
-     * 获取变更回调函数
-     *
-     * @return 玩家变更回调函数的Consumer实例
-     */
     @Override
     public Consumer<Player> getChangedCallBack() {
         return this.onContentsChanged;
     }
 
-    /**
-     * 检查是否有变更回调函数
-     *
-     * @return 如果有变更回调函数返回true，否则返回false
-     */
     @Override
     public boolean hasChangedCallBack() {
         return this.onContentsChanged != null;
     }
-
 
 }

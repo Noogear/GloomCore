@@ -1,9 +1,12 @@
 package cn.gloomcore.paper.gui.puzzle;
 
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -46,5 +49,22 @@ public interface PlaceablePuzzle extends Puzzle {
     @Override
     default PuzzleType getPuzzleType() {
         return PuzzleType.PLACEABLE;
+    }
+
+    /**
+     * 将物品归还给玩家
+     *
+     * @param player        玩家实例
+     * @param itemsToReturn 需要归还的物品列表
+     */
+    default void returnItemsToPlayer(Player player, List<ItemStack> itemsToReturn) {
+        Location location = player.getLocation();
+        World world = location.getWorld();
+        Inventory playerInventory = player.getInventory();
+        for (ItemStack item : itemsToReturn) {
+            if (!playerInventory.addItem(item).isEmpty()) {
+                world.dropItem(location, item);
+            }
+        }
     }
 }

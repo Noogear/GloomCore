@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 @NullMarked
 public class ItemBuilder {
-    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
+    private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
     private final ItemStack itemStack;
     private final ItemMeta meta;
@@ -110,7 +110,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder name(String miniMessageName) {
-        return name(miniMessage.deserialize(miniMessageName));
+        return name(MINI_MESSAGE.deserialize(miniMessageName));
     }
 
     public ItemBuilder lore(List<? extends ComponentLike> lines) {
@@ -128,7 +128,7 @@ public class ItemBuilder {
 
     public ItemBuilder lore(String... miniMessages) {
         List<Component> components = Arrays.stream(miniMessages)
-                .map(miniMessage::deserialize)
+                .map(MINI_MESSAGE::deserialize)
                 .toList();
         return lore(components);
     }
