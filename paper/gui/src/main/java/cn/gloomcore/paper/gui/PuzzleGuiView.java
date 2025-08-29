@@ -2,6 +2,7 @@ package cn.gloomcore.paper.gui;
 
 import cn.gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import cn.gloomcore.paper.gui.puzzle.Puzzle;
+import cn.gloomcore.paper.scheduler.PaperScheduler;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -13,7 +14,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +33,6 @@ public class PuzzleGuiView implements InventoryHolder {
     private final List<PlaceablePuzzle> placeablePuzzles = new ArrayList<>();
     private final Puzzle[] slotPuzzleArray;
     private final MenuLayout menuLayout;
-    private final JavaPlugin plugin;
 
     private @Nullable Inventory inventory;
 
@@ -42,10 +41,9 @@ public class PuzzleGuiView implements InventoryHolder {
      *
      * @param menuLayout 菜单布局定义
      */
-    public PuzzleGuiView(MenuLayout menuLayout, @NotNull JavaPlugin plugin) {
+    public PuzzleGuiView(MenuLayout menuLayout) {
         this.menuLayout = menuLayout;
         this.slotPuzzleArray = new Puzzle[menuLayout.getSize()];
-        this.plugin = plugin;
     }
 
     /**
@@ -121,12 +119,11 @@ public class PuzzleGuiView implements InventoryHolder {
                 }
                 if (!puzzlesToUpdate.isEmpty()) {
                     Player player = (Player) event.getWhoClicked();
-                    player.getScheduler().runDelayed(plugin, (task) -> {
+                    PaperScheduler.INSTANCE.entity(player).runDelayed((task) -> {
                         for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
                             puzzle.getChangedCallBack().accept(player);
                         }
-                    }, null, 1L);
-
+                    }, 1L);
                 }
             } else if (action == InventoryAction.COLLECT_TO_CURSOR) {
                 event.setCancelled(true);
@@ -152,7 +149,7 @@ public class PuzzleGuiView implements InventoryHolder {
             }
         }
         Player player = (Player) event.getWhoClicked();
-        player.getScheduler().runDelayed(plugin, (task) -> {
+        PaperScheduler.INSTANCE.entity(player).runDelayed((task) -> {
             Set<PlaceablePuzzle> puzzlesToUpdate = new ObjectOpenHashSet<>();
             for (int slot : event.getRawSlots()) {
                 if (slot < size) {
@@ -169,7 +166,7 @@ public class PuzzleGuiView implements InventoryHolder {
             for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
                 puzzle.getChangedCallBack().accept(player);
             }
-        }, null, 1L);
+        }, 1L);
     }
 
     /**

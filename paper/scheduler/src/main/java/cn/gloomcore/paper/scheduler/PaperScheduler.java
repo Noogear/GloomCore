@@ -1,3 +1,5 @@
+package cn.gloomcore.paper.scheduler;
+
 import io.papermc.paper.threadedregions.scheduler.*;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -96,17 +98,27 @@ public enum PaperScheduler {
     }
 
     /**
-     * 任务调度器抽象基类
+     * 任务调度器接口
      * 定义了调度不同类型任务的通用接口
      */
-    public abstract static class TaskScheduler {
+    public interface TaskScheduler {
         /**
          * 立即运行任务
          *
          * @param task 要运行的任务
          * @return 调度任务对象
          */
-        public abstract ScheduledTask run(@NotNull Runnable task);
+        default ScheduledTask run(@NotNull Runnable task) {
+            return run(runnableToConsumer(task));
+        }
+
+        /**
+         * 立即运行任务
+         *
+         * @param task 要运行的任务
+         * @return 调度任务对象
+         */
+        ScheduledTask run(@NotNull Consumer<ScheduledTask> task);
 
         /**
          * 延迟运行任务
@@ -115,7 +127,18 @@ public enum PaperScheduler {
          * @param delay 延迟时间（tick）
          * @return 调度任务对象
          */
-        public abstract ScheduledTask runDelayed(@NotNull Runnable task, long delay);
+        default ScheduledTask runDelayed(@NotNull Runnable task, long delay) {
+            return runDelayed(runnableToConsumer(task), delay);
+        }
+
+        /**
+         * 延迟运行任务
+         *
+         * @param task  要运行的任务
+         * @param delay 延迟时间（tick）
+         * @return 调度任务对象
+         */
+        ScheduledTask runDelayed(@NotNull Consumer<ScheduledTask> task, long delay);
 
         /**
          * 定时重复运行任务
@@ -125,28 +148,40 @@ public enum PaperScheduler {
          * @param period 重复间隔（tick）
          * @return 调度任务对象
          */
-        public abstract ScheduledTask runTimer(@NotNull Runnable task, long delay, long period);
+        default ScheduledTask runTimer(@NotNull Runnable task, long delay, long period) {
+            return runTimer(runnableToConsumer(task), delay, period);
+        }
+
+        /**
+         * 定时重复运行任务
+         *
+         * @param task   要运行的任务
+         * @param delay  延迟时间（tick）
+         * @param period 重复间隔（tick）
+         * @return 调度任务对象
+         */
+        ScheduledTask runTimer(@NotNull Consumer<ScheduledTask> task, long delay, long period);
     }
 
     /**
      * 异步任务调度器实现类
      * 处理在独立线程中运行的任务
      */
-    public final class AsyncWrapper extends TaskScheduler {
+    public final class AsyncWrapper implements TaskScheduler {
 
         @Override
-        public ScheduledTask run(@NotNull Runnable task) {
-            return asyncScheduler.runNow(plugin, runnableToConsumer(task));
+        public ScheduledTask run(@NotNull Consumer<ScheduledTask> task) {
+            return asyncScheduler.runNow(plugin, task);
         }
 
         @Override
-        public ScheduledTask runDelayed(@NotNull Runnable task, long delay) {
-            return asyncScheduler.runDelayed(plugin, runnableToConsumer(task), toSafeTick(delay) * 50, TimeUnit.MILLISECONDS);
+        public ScheduledTask runDelayed(@NotNull Consumer<ScheduledTask> task, long delay) {
+            return asyncScheduler.runDelayed(plugin, task, toSafeTick(delay) * 50, TimeUnit.MILLISECONDS);
         }
 
         @Override
-        public ScheduledTask runTimer(@NotNull Runnable task, long delay, long period) {
-            return asyncScheduler.runAtFixedRate(plugin, runnableToConsumer(task), toSafeTick(delay) * 50, toSafeTick(period) * 50, TimeUnit.MILLISECONDS);
+        public ScheduledTask runTimer(@NotNull Consumer<ScheduledTask> task, long delay, long period) {
+            return asyncScheduler.runAtFixedRate(plugin, task, toSafeTick(delay) * 50, toSafeTick(period) * 50, TimeUnit.MILLISECONDS);
         }
 
         /**
@@ -163,21 +198,21 @@ public enum PaperScheduler {
      * 全局区域任务调度器实现类
      * 处理在整个服务器范围内运行的任务
      */
-    public final class GlobalWrapper extends TaskScheduler {
+    public final class GlobalWrapper implements TaskScheduler {
 
         @Override
-        public ScheduledTask run(@NotNull Runnable task) {
-            return globalRegionScheduler.run(plugin, runnableToConsumer(task));
+        public ScheduledTask run(@NotNull Consumer<ScheduledTask> task) {
+            return globalRegionScheduler.run(plugin, task);
         }
 
         @Override
-        public ScheduledTask runDelayed(@NotNull Runnable task, long delay) {
-            return globalRegionScheduler.runDelayed(plugin, runnableToConsumer(task), toSafeTick(delay));
+        public ScheduledTask runDelayed(@NotNull Consumer<ScheduledTask> task, long delay) {
+            return globalRegionScheduler.runDelayed(plugin, task, toSafeTick(delay));
         }
 
         @Override
-        public ScheduledTask runTimer(@NotNull Runnable task, long delay, long period) {
-            return globalRegionScheduler.runAtFixedRate(plugin, runnableToConsumer(task), toSafeTick(delay), toSafeTick(period));
+        public ScheduledTask runTimer(@NotNull Consumer<ScheduledTask> task, long delay, long period) {
+            return globalRegionScheduler.runAtFixedRate(plugin, task, toSafeTick(delay), toSafeTick(period));
         }
 
         /**
@@ -194,7 +229,7 @@ public enum PaperScheduler {
      * 位置区域任务调度器实现类
      * 处理在特定位置区域运行的任务
      */
-    public final class LocationWrapper extends TaskScheduler {
+    public final class LocationWrapper implements TaskScheduler {
         private final Location location;
 
         private LocationWrapper(@NotNull Location location) {
@@ -202,58 +237,18 @@ public enum PaperScheduler {
         }
 
         @Override
-        public ScheduledTask run(@NotNull Runnable task) {
-            return regionScheduler.run(plugin, location, runnableToConsumer(task));
+        public ScheduledTask run(@NotNull Consumer<ScheduledTask> task) {
+            return regionScheduler.run(plugin, location, task);
         }
 
         @Override
-        public ScheduledTask runDelayed(@NotNull Runnable task, long delay) {
-            return regionScheduler.runDelayed(plugin, location, runnableToConsumer(task), toSafeTick(delay));
+        public ScheduledTask runDelayed(@NotNull Consumer<ScheduledTask> task, long delay) {
+            return regionScheduler.runDelayed(plugin, location, task, toSafeTick(delay));
         }
 
         @Override
-        public ScheduledTask runTimer(@NotNull Runnable task, long delay, long period) {
-            return regionScheduler.runAtFixedRate(plugin, location, runnableToConsumer(task), toSafeTick(delay), toSafeTick(period));
-        }
-
-        /**
-         * 获取执行器
-         *
-         * @return 执行器对象
-         */
-        public @NotNull Executor executor() {
-            return (runnable) -> run(runnable);
-        }
-    }
-
-    /**
-     * 区块区域任务调度器实现类
-     * 处理在特定区块区域运行的任务
-     */
-    public final class ChunkWrapper extends TaskScheduler {
-        private final World world;
-        private final int chunkX;
-        private final int chunkZ;
-
-        private ChunkWrapper(@NotNull World world, int chunkX, int chunkZ) {
-            this.world = world;
-            this.chunkX = chunkX;
-            this.chunkZ = chunkZ;
-        }
-
-        @Override
-        public ScheduledTask run(@NotNull Runnable task) {
-            return regionScheduler.run(plugin, world, chunkX, chunkZ, runnableToConsumer(task));
-        }
-
-        @Override
-        public ScheduledTask runDelayed(@NotNull Runnable task, long delay) {
-            return regionScheduler.runDelayed(plugin, world, chunkX, chunkZ, runnableToConsumer(task), toSafeTick(delay));
-        }
-
-        @Override
-        public ScheduledTask runTimer(@NotNull Runnable task, long delay, long period) {
-            return regionScheduler.runAtFixedRate(plugin, world, chunkX, chunkZ, runnableToConsumer(task), toSafeTick(delay), toSafeTick(period));
+        public ScheduledTask runTimer(@NotNull Consumer<ScheduledTask> task, long delay, long period) {
+            return regionScheduler.runAtFixedRate(plugin, location, task, toSafeTick(delay), toSafeTick(period));
         }
 
         /**
@@ -267,10 +262,51 @@ public enum PaperScheduler {
     }
 
     /**
+     * 区块区域任务调度器实现类
+     * 处理在特定区块区域运行的任务
+     */
+    public final class ChunkWrapper implements TaskScheduler {
+        private final World world;
+        private final int chunkX;
+        private final int chunkZ;
+
+        private ChunkWrapper(@NotNull World world, int chunkX, int chunkZ) {
+            this.world = world;
+            this.chunkX = chunkX;
+            this.chunkZ = chunkZ;
+        }
+
+        @Override
+        public ScheduledTask run(@NotNull Consumer<ScheduledTask> task) {
+            return regionScheduler.run(plugin, world, chunkX, chunkZ, task);
+        }
+
+        @Override
+        public ScheduledTask runDelayed(@NotNull Consumer<ScheduledTask> task, long delay) {
+            return regionScheduler.runDelayed(plugin, world, chunkX, chunkZ, task, toSafeTick(delay));
+        }
+
+        @Override
+        public ScheduledTask runTimer(@NotNull Consumer<ScheduledTask> task, long delay, long period) {
+            return regionScheduler.runAtFixedRate(plugin, world, chunkX, chunkZ, task, toSafeTick(delay), toSafeTick(period));
+        }
+
+        /**
+         * 获取执行器
+         *
+         * @return 执行器对象
+         */
+        public @NotNull Executor executor() {
+            return this::run;
+        }
+    }
+
+
+    /**
      * 实体任务调度器实现类
      * 处理与特定实体相关的任务
      */
-    public final class EntityWrapper extends TaskScheduler {
+    public final class EntityWrapper implements TaskScheduler {
         private final EntityScheduler scheduler;
 
         private EntityWrapper(@NotNull Entity entity) {
@@ -286,6 +322,11 @@ public enum PaperScheduler {
          */
         public ScheduledTask run(@NotNull Runnable task, @Nullable Runnable retired) {
             return scheduler.run(plugin, runnableToConsumer(task), retired);
+        }
+
+        @Override
+        public ScheduledTask run(@NotNull Consumer<ScheduledTask> task) {
+            return scheduler.run(plugin, task, null);
         }
 
         @Override
@@ -306,6 +347,11 @@ public enum PaperScheduler {
         }
 
         @Override
+        public ScheduledTask runDelayed(@NotNull Consumer<ScheduledTask> task, long delay) {
+            return scheduler.runDelayed(plugin, task, null, toSafeTick(delay));
+        }
+
+        @Override
         public ScheduledTask runDelayed(@NotNull Runnable task, long delay) {
             return runDelayed(task, null, delay);
         }
@@ -321,6 +367,11 @@ public enum PaperScheduler {
          */
         public ScheduledTask runTimer(@NotNull Runnable task, @Nullable Runnable retired, long delay, long period) {
             return scheduler.runAtFixedRate(plugin, runnableToConsumer(task), retired, toSafeTick(delay), toSafeTick(period));
+        }
+
+        @Override
+        public ScheduledTask runTimer(@NotNull Consumer<ScheduledTask> task, long delay, long period) {
+            return scheduler.runAtFixedRate(plugin, task, null, toSafeTick(delay), toSafeTick(period));
         }
 
         @Override

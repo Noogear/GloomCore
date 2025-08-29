@@ -2,6 +2,7 @@ package cn.gloomcore.paper.gui.puzzle.impl;
 
 import cn.gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import cn.gloomcore.paper.gui.puzzle.abstracts.AbstractPuzzle;
+import cn.gloomcore.paper.scheduler.PaperScheduler;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -88,7 +89,7 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
         event.setCancelled(false);
         if (onContentsChanged != null) {
             Player player = (Player) event.getWhoClicked();
-            player.getScheduler().runDelayed(plugin, (task) -> onContentsChanged.accept(player), null, 1L);
+            PaperScheduler.INSTANCE.entity(player).runDelayed(() -> onContentsChanged.accept(player), 1L);
         }
 
     }

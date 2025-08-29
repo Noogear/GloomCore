@@ -18,6 +18,14 @@ public class ItemTemplate<C> {
         this.delayedActions = List.copyOf(delayedActions);
     }
 
+    public static <C> Builder<C> builder(Material material) {
+        return new Builder<>(ItemBuilder.of(material));
+    }
+
+    public static <C> Builder<C> builder(ItemStack itemStack) {
+        return new Builder<>(ItemBuilder.of(itemStack));
+    }
+
     public ItemStack apply(C context) {
         ItemBuilder workingBuilder = ItemBuilder.copyOf(prebuiltBuilder);
         for (BiConsumer<ItemBuilder, C> action : delayedActions) {
@@ -35,14 +43,6 @@ public class ItemTemplate<C> {
             }
             return workingBuilder.build();
         });
-    }
-
-    public static <C> Builder<C> builder(Material material) {
-        return new Builder<>(ItemBuilder.of(material));
-    }
-
-    public static <C> Builder<C> builder(ItemStack itemStack) {
-        return new Builder<>(ItemBuilder.of(itemStack));
     }
 
     public static class Builder<C> {
@@ -77,6 +77,6 @@ public class ItemTemplate<C> {
             // 2. 创建并返回模板实例，其中包含了预处理过的 ItemBuilder 和所有“延时”操作。
             return new ItemTemplate<>(this.itemBuilder, this.delayedActions);
         }
-        }
+    }
 
 }
