@@ -110,6 +110,9 @@ public class PuzzleGuiManager implements Listener {
         Deque<PuzzleGuiView> playerHistory = history.get(playerUuid);
         if (playerHistory != null) {
             for (PuzzleGuiView historicalView : playerHistory) {
+                if (!playerUuid.equals(historicalView.getOwner().getUniqueId())) {
+                    continue;
+                }
                 historicalView.handleClose();
             }
         }
@@ -127,8 +130,10 @@ public class PuzzleGuiManager implements Listener {
         if (!(event.getInventory().getHolder(false) instanceof PuzzleGuiView closedView)) {
             return;
         }
-        Player player = (Player) event.getPlayer();
-        UUID playerUuid = player.getUniqueId();
+        UUID playerUuid = event.getPlayer().getUniqueId();
+        if (!playerUuid.equals(closedView.getOwner().getUniqueId())) {
+            return;
+        }
         if (navigatingPlayers.remove(playerUuid)) {
             return;
         }
