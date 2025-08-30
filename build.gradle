@@ -1,75 +1,30 @@
 plugins {
-    id 'java'
-    id("maven-publish")
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
-}
-
-group = 'cn.gloomcore'
-version = '1.0.0.0'
-
-jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-shadowJar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-allprojects {
-    repositories {
-        mavenCentral()
-        maven {url = "https://repo.papermc.io/repository/maven-public/"}
-        maven {url = "https://oss.sonatype.org/content/groups/public/"}
-        maven {url = 'https://repo.extendedclip.com/releases/'}
-    }
-}
-
-repositories {
-    mavenCentral()
-    maven {
-        name = "papermc-repo"
-        url = "https://repo.papermc.io/repository/maven-public/"
-    }
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/groups/public/"
-    }
+    alias(libs.plugins.shadow) apply false
 }
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'maven-publish'
-    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'java-library'
 
-    def targetJavaVersion = 21
-    java {
-        def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-        if (JavaVersion.current()  < javaVersion) {
-            toolchain.languageVersion  = JavaLanguageVersion.of(targetJavaVersion)
-        }
+    group = 'cn.gloomcore'
+    version = '1.0.0.0'
+
+    repositories {
+        mavenCentral()
+        maven { url = "https://repo.papermc.io/repository/maven-public/" }
+        maven { url = "https://oss.sonatype.org/content/groups/public/" }
+        maven { url = 'https://repo.extendedclip.com/releases/' }
     }
 
-    tasks.withType(JavaCompile).configureEach  {
-        options.encoding  = 'UTF-8'
-        if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible())  {
-            options.release.set(targetJavaVersion)
-        }
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(21)
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = 21
     }
 
     dependencies {
-        compileOnly("org.jetbrains:annotations:24.0.1")
-    }
-    tasks {
-        compileJava {
-            options.encoding = "UTF-8"
-        }
-        build {
-            dependsOn(shadowJar)
-        }
+        compileOnly libs.jetbrains.annotations
     }
 }
-
-

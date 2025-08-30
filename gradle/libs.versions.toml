@@ -1,0 +1,11 @@
+[versions]
+paper = "1.21.8-R0.1-SNAPSHOT"
+shadow = "9.1.0"
+jetbrainsAnnotations = "24.1.0"
+
+[libraries]
+paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrainsAnnotations" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

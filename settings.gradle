@@ -1,14 +1,10 @@
 rootProject.name = 'GloomCore'
 
-include(
-        "paper:gui",
-        "paper:placeholder",
-        "paper:item",
-        "paper:scheduler"
-)
+include('core')
 
-
-
-include(
-        "common:random"
-)
+file('common').listFiles()?.findAll { it.isDirectory() }?.each {
+    include "common:${it.name}"
+}
+file('paper').listFiles()?.findAll { it.isDirectory() }?.each {
+    include "paper:${it.name}"
+}
