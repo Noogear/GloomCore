@@ -3,14 +3,12 @@ package gloomcore.paper.gui;
 import gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import gloomcore.paper.gui.puzzle.Puzzle;
 import gloomcore.paper.scheduler.PaperScheduler;
+import gloomcore.paper.util.Log;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -21,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 /**
@@ -36,7 +35,7 @@ public class PuzzleGuiView implements InventoryHolder {
     private final MenuLayout menuLayout;
     private final Function<Player, Component> title;
     private final Player owner;
-
+    private long lastActionTime = 0L;
     private @Nullable Inventory inventory;
 
     /**
@@ -92,6 +91,12 @@ public class PuzzleGuiView implements InventoryHolder {
      * @param event 库存点击事件
      */
     public void handleClick(InventoryClickEvent event) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - this.lastActionTime < 100L) {
+            event.setCancelled(true);
+            return;
+        }
+        this.lastActionTime = currentTime;
         if (inventory == null) return;
         Inventory clickedInventory = event.getClickedInventory();
         if (inventory.equals(clickedInventory)) {
@@ -141,6 +146,11 @@ public class PuzzleGuiView implements InventoryHolder {
      * @param event 库存拖拽事件
      */
     public void handleDrag(InventoryDragEvent event) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - this.lastActionTime < 100L) {
+            event.setCancelled(true);
+            return;
+        }
         int size = menuLayout.getSize();
         for (int slot : event.getRawSlots()) {
             if (slot < size) {
@@ -185,8 +195,20 @@ public class PuzzleGuiView implements InventoryHolder {
      * <p>
      * 当GUI关闭时，此方法会遍历所有可放置的拼图(PlaceablePuzzle)，
      * 并调用它们的清理方法，确保正确处理放置在GUI中的物品
+     *
+     * @param event 库存关闭事件
      */
-    public void handleClose() {
+    public void handleClose(InventoryCloseEvent event) {
+        cleanupOnClose();
+
+    }
+
+    /**
+     * 清理所有可放置拼图组件
+     * <p>
+     * 遍历所有可放置拼图组件并调用其清理方法，确保正确处理放置在GUI中的物品
+     */
+    public void cleanupOnClose() {
         if (!placeablePuzzles.isEmpty()) {
             for (PlaceablePuzzle placeablePuzzle : placeablePuzzles) {
                 placeablePuzzle.cleanupOnClose(owner, inventory);
@@ -226,6 +248,9 @@ public class PuzzleGuiView implements InventoryHolder {
 
     /**
      * 为玩家打开此GUI视图
+     * <p>
+     * 如果GUI尚未渲染或为空，则先渲染所有拼图组件，
+     * 然后在玩家的客户端打开GUI界面
      *
      * @param player 目标玩家
      */
@@ -233,7 +258,36 @@ public class PuzzleGuiView implements InventoryHolder {
         if (inventory == null || inventory.isEmpty()) {
             renderAll();
         }
-        player.openInventory(inventory);
+        if (!inventory.getViewers().contains(player)) {
+            player.openInventory(inventory);
+        }
+    }
+
+    /**
+     * 异步打开GUI视图
+     * <p>
+     * 在异步线程中渲染GUI内容，然后在实体线程中打开GUI给玩家
+     * 这样可以避免在主线程中执行耗时的渲染操作，提高性能
+     *
+     * @param player 目标玩家
+     * @return CompletableFuture对象，可用于链式调用或等待操作完成
+     */
+    public CompletableFuture<Void> openAsync(Player player) {
+        return CompletableFuture
+                .runAsync(() -> {
+                    try {
+                        if (inventory == null || inventory.isEmpty()) {
+                            renderAll();
+                        }
+                    } catch (Exception e) {
+                        Log.INSTANCE.error("Failed to open inventory for player: " + player.getName(), e);
+                    }
+                }, PaperScheduler.INSTANCE.async().executor())
+                .thenAcceptAsync(result -> {
+                    if (inventory != null && !inventory.getViewers().contains(player)) {
+                        player.openInventory(inventory);
+                    }
+                }, PaperScheduler.INSTANCE.entity(player).executor());
     }
 
     /**

@@ -113,7 +113,7 @@ public class PuzzleGuiManager implements Listener {
                 if (!playerUuid.equals(historicalView.getOwner().getUniqueId())) {
                     continue;
                 }
-                historicalView.handleClose();
+                historicalView.cleanupOnClose();
             }
         }
         history.remove(playerUuid);
@@ -137,7 +137,7 @@ public class PuzzleGuiManager implements Listener {
         if (navigatingPlayers.remove(playerUuid)) {
             return;
         }
-        closedView.handleClose();
+        closedView.handleClose(event);
         history.remove(playerUuid);
     }
 

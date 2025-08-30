@@ -30,8 +30,12 @@ public interface Puzzle {
 
     /**
      * 处理库存点击事件
+     * <p>
+     * 当玩家点击与该拼图相关的槽位时调用此方法，
+     * 具体实现类应根据拼图类型和功能需求处理点击逻辑
      *
-     * @param event 库存点击事件
+     * @param event 库存点击事件，包含点击的详细信息
+     * @param owner 拥有此拼图的玩家
      */
     void onClick(InventoryClickEvent event, Player owner);
 

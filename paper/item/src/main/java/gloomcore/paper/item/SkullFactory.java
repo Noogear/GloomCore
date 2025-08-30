@@ -1,11 +1,11 @@
 package gloomcore.paper.item;
 
-import gloomcore.paper.scheduler.PaperScheduler;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import gloomcore.paper.scheduler.PaperScheduler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

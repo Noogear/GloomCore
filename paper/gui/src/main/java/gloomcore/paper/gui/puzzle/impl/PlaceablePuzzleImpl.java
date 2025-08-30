@@ -25,8 +25,6 @@ import java.util.function.Consumer;
 public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzzle {
     private final Consumer<Player> onContentsChanged;
     private final boolean stackingEnabled;
-    private Player owner;
-
 
     /**
      * 构造函数，创建一个可放置物品的拼图实例
@@ -77,6 +75,7 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
      * 允许玩家放置或取出物品，并在内容变化后触发回调函数
      *
      * @param event 库存点击事件
+     * @param owner GUI界面的所有者玩家
      */
     @Override
     public void onClick(InventoryClickEvent event, Player owner) {
