@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzzle {
     private final Consumer<Player> onContentsChanged;
     private final boolean stackingEnabled;
+    private Player owner;
 
 
     /**

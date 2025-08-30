@@ -37,9 +37,8 @@ public abstract class DynamicPuzzle extends AbstractPuzzle {
      */
     @Override
     public void update(Player player) {
-        Inventory topInventory = player.getOpenInventory().getTopInventory();
-        if (topInventory.getHolder(false) instanceof PuzzleGuiView) {
-            render(player, topInventory);
+        if (player.getOpenInventory().getTopInventory().getHolder(false) instanceof PuzzleGuiView puzzleGuiView) {
+            render(puzzleGuiView.getOwner(), puzzleGuiView.getInventory());
         }
     }
 

@@ -2,14 +2,10 @@ package gloomcore.paper.gui;
 
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import net.kyori.adventure.text.Component;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * 菜单布局类，用于定义和管理GUI菜单的布局结构
@@ -44,7 +40,7 @@ public class MenuLayout {
      * @param layout 布局字符串列表，每个字符串代表菜单的一行
      * @return 新创建的菜单布局实例
      */
-    public static MenuLayout ofChest( @NotNull List<String> layout) {
+    public static MenuLayout ofChest(@NotNull List<String> layout) {
         int maxRows = Math.min(layout.size(), 6);
         Char2ObjectOpenHashMap<IntArrayList> slots = new Char2ObjectOpenHashMap<>();
         for (int x = 0; x < maxRows; x++) {
@@ -88,7 +84,6 @@ public class MenuLayout {
     public InventoryType getInventoryType() {
         return inventoryType;
     }
-
 
 
 }
