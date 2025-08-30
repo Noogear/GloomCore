@@ -187,11 +187,13 @@ public class PuzzleGuiView implements InventoryHolder {
      * 并调用它们的清理方法，确保正确处理放置在GUI中的物品
      */
     public void handleClose() {
-        if (placeablePuzzles.isEmpty()) {
-            return;
+        if (!placeablePuzzles.isEmpty()) {
+            for (PlaceablePuzzle placeablePuzzle : placeablePuzzles) {
+                placeablePuzzle.cleanupOnClose(owner, inventory);
+            }
         }
-        for (PlaceablePuzzle placeablePuzzle : placeablePuzzles) {
-            placeablePuzzle.cleanupOnClose(owner, this.getInventory());
+        if (inventory != null) {
+            inventory.close();
         }
     }
 
