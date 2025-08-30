@@ -141,7 +141,7 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
      * @param event 库存点击事件
      */
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(InventoryClickEvent event, Player owner) {
         int clickedRawSlot = event.getRawSlot();
         int slotIndexInPage = Arrays.binarySearch(slots, clickedRawSlot);
         if (slotIndexInPage >= 0) {
@@ -149,7 +149,7 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
             int globalItemIndex = (currentPage * itemsPerPage) + slotIndexInPage;
             if (globalItemIndex < allItems.size()) {
                 Icon clickedItem = allItems.get(globalItemIndex);
-                clickedItem.onClick(event);
+                clickedItem.onClick(event.getClick(), owner);
             }
         }
     }

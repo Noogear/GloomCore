@@ -49,8 +49,8 @@ public class ButtonPuzzleImpl extends DynamicPuzzle {
 
 
     @Override
-    public void onClick(InventoryClickEvent event) {
-        icon.onClick(event);
+    public void onClick(InventoryClickEvent event, Player owner) {
+        icon.onClick(event.getClick(), owner);
     }
 
     @Override

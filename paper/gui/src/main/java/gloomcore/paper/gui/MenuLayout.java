@@ -18,7 +18,6 @@ import java.util.function.Function;
  * 便于在创建菜单时快速定位和放置物品
  */
 public class MenuLayout {
-    private final Function<Player, Component> title;
     private final int size;
     private final Char2ObjectOpenHashMap<IntArrayList> slots;
     private final InventoryType inventoryType;
@@ -30,8 +29,7 @@ public class MenuLayout {
      * @param slots         字符到槽位列表的映射关系
      * @param inventoryType 物品栏类型
      */
-    protected MenuLayout(Function<Player, Component> title, int size, Char2ObjectOpenHashMap<IntArrayList> slots, InventoryType inventoryType) {
-        this.title = title;
+    protected MenuLayout(int size, Char2ObjectOpenHashMap<IntArrayList> slots, InventoryType inventoryType) {
         this.size = size;
         this.slots = slots;
         this.inventoryType = inventoryType;
@@ -46,7 +44,7 @@ public class MenuLayout {
      * @param layout 布局字符串列表，每个字符串代表菜单的一行
      * @return 新创建的菜单布局实例
      */
-    public static MenuLayout ofChest(Function<Player, Component> title, @NotNull List<String> layout) {
+    public static MenuLayout ofChest( @NotNull List<String> layout) {
         int maxRows = Math.min(layout.size(), 6);
         Char2ObjectOpenHashMap<IntArrayList> slots = new Char2ObjectOpenHashMap<>();
         for (int x = 0; x < maxRows; x++) {
@@ -58,7 +56,7 @@ public class MenuLayout {
                 slots.computeIfAbsent(key, k -> new IntArrayList()).add(slot);
             }
         }
-        return new MenuLayout(title, maxRows * 9, slots, InventoryType.CHEST);
+        return new MenuLayout(maxRows * 9, slots, InventoryType.CHEST);
     }
 
 
@@ -92,8 +90,5 @@ public class MenuLayout {
     }
 
 
-    public Component getTitle(Player player) {
-        return title.apply(player);
-    }
 
 }

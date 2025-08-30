@@ -34,7 +34,7 @@ public abstract class StaticPuzzle extends AbstractPuzzle {
      * @param event 库存点击事件
      */
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(InventoryClickEvent event, Player owner) {
         event.setCancelled(true);
     }
 

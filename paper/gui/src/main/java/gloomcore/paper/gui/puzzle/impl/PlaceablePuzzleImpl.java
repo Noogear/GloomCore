@@ -78,11 +78,10 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
      * @param event 库存点击事件
      */
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(InventoryClickEvent event, Player owner) {
         event.setCancelled(false);
         if (onContentsChanged != null) {
-            Player player = (Player) event.getWhoClicked();
-            PaperScheduler.INSTANCE.entity(player).runDelayed(() -> onContentsChanged.accept(player), 1L);
+            PaperScheduler.INSTANCE.entity(event.getWhoClicked()).runDelayed(() -> onContentsChanged.accept(owner), 1L);
         }
 
     }

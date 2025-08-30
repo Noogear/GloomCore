@@ -110,7 +110,7 @@ public class PuzzleGuiManager implements Listener {
         Deque<PuzzleGuiView> playerHistory = history.get(playerUuid);
         if (playerHistory != null) {
             for (PuzzleGuiView historicalView : playerHistory) {
-                historicalView.handleClose(player);
+                historicalView.handleClose();
             }
         }
         history.remove(playerUuid);
@@ -132,7 +132,7 @@ public class PuzzleGuiManager implements Listener {
         if (navigatingPlayers.remove(playerUuid)) {
             return;
         }
-        closedView.handleClose(player);
+        closedView.handleClose();
         history.remove(playerUuid);
     }
 

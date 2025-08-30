@@ -33,7 +33,7 @@ public interface Puzzle {
      *
      * @param event 库存点击事件
      */
-    void onClick(InventoryClickEvent event);
+    void onClick(InventoryClickEvent event, Player owner);
 
     /**
      * 更新拼图显示内容

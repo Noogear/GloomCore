@@ -74,7 +74,7 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
      * @param event 库存点击事件
      */
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(InventoryClickEvent event, Player owner) {
         ItemStack currentItem = event.getCurrentItem();
         ItemStack cursorItem = event.getCursor();
 
@@ -86,15 +86,13 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
         } else {
             event.setCancelled(false);
         }
-
-        Player player = (Player) event.getWhoClicked();
-        PaperScheduler.INSTANCE.entity(player).runDelayed(() -> {
+        PaperScheduler.INSTANCE.entity(event.getWhoClicked()).runDelayed(() -> {
             ItemStack itemAfterClick = event.getInventory().getItem(event.getSlot());
             if (itemAfterClick == null || itemAfterClick.getType().isAir()) {
                 event.getInventory().setItem(event.getSlot(), backgroundItem.clone());
             }
             if (onContentsChanged != null) {
-                onContentsChanged.accept(player);
+                onContentsChanged.accept(owner);
             }
         }, 1L);
     }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * GUI视图类，代表一个可交互的GUI界面
@@ -33,6 +34,8 @@ public class PuzzleGuiView implements InventoryHolder {
     private final List<PlaceablePuzzle> placeablePuzzles = new ArrayList<>();
     private final Puzzle[] slotPuzzleArray;
     private final MenuLayout menuLayout;
+    private final Function<Player, Component> title;
+    private final Player owner;
 
     private @Nullable Inventory inventory;
 
@@ -41,9 +44,11 @@ public class PuzzleGuiView implements InventoryHolder {
      *
      * @param menuLayout 菜单布局定义
      */
-    public PuzzleGuiView(MenuLayout menuLayout) {
+    public PuzzleGuiView(MenuLayout menuLayout, Function<Player, Component> title, Player owner) {
         this.menuLayout = menuLayout;
         this.slotPuzzleArray = new Puzzle[menuLayout.getSize()];
+        this.title = title;
+        this.owner = owner;
     }
 
     /**
@@ -73,11 +78,9 @@ public class PuzzleGuiView implements InventoryHolder {
 
     /**
      * 渲染所有拼图组件到玩家的库存中
-     *
-     * @param player 目标玩家
      */
-    private void renderAll(Player player) {
-        puzzles.forEach(puzzle -> puzzle.render(player, getInventory()));
+    private void renderAll() {
+        puzzles.forEach(puzzle -> puzzle.render(owner, getInventory()));
     }
 
 
@@ -93,7 +96,7 @@ public class PuzzleGuiView implements InventoryHolder {
         Inventory clickedInventory = event.getClickedInventory();
         if (inventory.equals(clickedInventory)) {
             event.setCancelled(true);
-            findPuzzleBySlot(event.getRawSlot()).ifPresent(puzzle -> puzzle.onClick(event));
+            findPuzzleBySlot(event.getRawSlot()).ifPresent(puzzle -> puzzle.onClick(event, owner));
             return;
         }
 
@@ -118,10 +121,9 @@ public class PuzzleGuiView implements InventoryHolder {
                     }
                 }
                 if (!puzzlesToUpdate.isEmpty()) {
-                    Player player = (Player) event.getWhoClicked();
-                    PaperScheduler.INSTANCE.entity(player).runDelayed((task) -> {
+                    PaperScheduler.INSTANCE.entity(event.getWhoClicked()).runDelayed((task) -> {
                         for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
-                            puzzle.getChangedCallBack().accept(player);
+                            puzzle.getChangedCallBack().accept(owner);
                         }
                     }, 1L);
                 }
@@ -148,8 +150,7 @@ public class PuzzleGuiView implements InventoryHolder {
                 }
             }
         }
-        Player player = (Player) event.getWhoClicked();
-        PaperScheduler.INSTANCE.entity(player).runDelayed((task) -> {
+        PaperScheduler.INSTANCE.entity(event.getWhoClicked()).runDelayed((task) -> {
             Set<PlaceablePuzzle> puzzlesToUpdate = new ObjectOpenHashSet<>();
             for (int slot : event.getRawSlots()) {
                 if (slot < size) {
@@ -164,7 +165,7 @@ public class PuzzleGuiView implements InventoryHolder {
                 return;
             }
             for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
-                puzzle.getChangedCallBack().accept(player);
+                puzzle.getChangedCallBack().accept(owner);
             }
         }, 1L);
     }
@@ -179,20 +180,18 @@ public class PuzzleGuiView implements InventoryHolder {
     public void handleOpen(InventoryOpenEvent event) {
     }
 
-
     /**
-     * 处理库存关闭事件
+     * 处理GUI关闭事件，清理所有可放置的拼图组件
      * <p>
-     * 当玩家关闭GUI时调用，清理所有可放置拼图的状态
-     *
-     * @param player 关闭GUI的玩家
+     * 当GUI关闭时，此方法会遍历所有可放置的拼图(PlaceablePuzzle)，
+     * 并调用它们的清理方法，确保正确处理放置在GUI中的物品
      */
-    public void handleClose(Player player) {
+    public void handleClose() {
         if (placeablePuzzles.isEmpty()) {
             return;
         }
         for (PlaceablePuzzle placeablePuzzle : placeablePuzzles) {
-            placeablePuzzle.cleanupOnClose(player, this.getInventory());
+            placeablePuzzle.cleanupOnClose(owner, this.getInventory());
         }
     }
 
@@ -202,7 +201,7 @@ public class PuzzleGuiView implements InventoryHolder {
      * @return 菜单标题组件
      */
     public Component parsedMenuTitle() {
-        return menuLayout.getInventoryType().defaultTitle();
+        return title.apply(owner);
     }
 
 
@@ -219,14 +218,20 @@ public class PuzzleGuiView implements InventoryHolder {
         return Optional.empty();
     }
 
+    public Player getOwner() {
+        return owner;
+    }
+
     /**
      * 为玩家打开此GUI视图
      *
      * @param player 目标玩家
      */
     public void open(Player player) {
-        renderAll(player);
-        player.openInventory(this.getInventory());
+        if (inventory == null || inventory.isEmpty()) {
+            renderAll();
+        }
+        player.openInventory(inventory);
     }
 
     /**
@@ -237,8 +242,9 @@ public class PuzzleGuiView implements InventoryHolder {
     @Override
     public @NotNull Inventory getInventory() {
         if (inventory == null) {
-            inventory = Bukkit.createInventory(this, menuLayout.getSize(), menuLayout.getTitle(null));
+            inventory = Bukkit.createInventory(this, menuLayout.getSize(), parsedMenuTitle());
         }
         return inventory;
     }
+
 }
