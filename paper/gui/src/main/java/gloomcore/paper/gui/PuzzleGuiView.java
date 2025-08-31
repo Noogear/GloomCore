@@ -25,7 +25,8 @@ import java.util.function.Function;
  * GUI视图类，代表一个可交互的GUI界面
  * <p>
  * 该类管理GUI中的所有拼图(Puzzle)组件，处理事件并渲染界面内容。
- * 每个GUI视图都与特定的玩家相关联，并包含一个菜单布局定义
+ * 每个GUI视图都有一个唯一的“所有者” (owner)。所有的渲染、事件回调和状态变更都将以所有者的视角和名义进行，
+ * 即使有多个玩家（观察者）可以同时查看此界面。
  */
 public class PuzzleGuiView implements InventoryHolder {
     private final List<Puzzle> puzzles = new ArrayList<>();
@@ -75,7 +76,8 @@ public class PuzzleGuiView implements InventoryHolder {
     }
 
     /**
-     * 渲染所有拼图组件到玩家的库存中
+     * 根据GUI所有者(owner)的视角，渲染所有拼图组件。
+     * 例如，某些拼图可能会根据所有者的权限或数据显示不同的状态。
      */
     private void renderAll() {
         puzzles.forEach(puzzle -> puzzle.render(owner, getInventory()));
@@ -86,6 +88,8 @@ public class PuzzleGuiView implements InventoryHolder {
      * 处理库存点击事件
      * <p>
      * 处理玩家在GUI中的点击操作，包括取消事件、处理拼图点击以及物品移动等操作
+     * 请注意：所有由此产生的拼图回调（如 onClick, onChanged）都将传递 GUI 的所有者 (owner) 作为目标玩家，
+     * 而非实际点击操作的玩家。如果需要操作者，请从 event.getWhoClicked() 获取。
      *
      * @param event 库存点击事件
      */
@@ -203,9 +207,9 @@ public class PuzzleGuiView implements InventoryHolder {
     }
 
     /**
-     * 清理所有可放置拼图组件
+     * 清理所有可放置拼图组件。
      * <p>
-     * 遍历所有可放置拼图组件并调用其清理方法，确保正确处理放置在GUI中的物品
+     * 遍历所有可放置拼图组件并调用其清理方法，这通常用于将放置在GUI中的物品返还给所有者(owner)。
      */
     public void cleanupOnClose() {
         if (!placeablePuzzles.isEmpty()) {
@@ -259,6 +263,20 @@ public class PuzzleGuiView implements InventoryHolder {
         }
         if (!inventory.getViewers().contains(player)) {
             player.openInventory(inventory);
+        }
+    }
+
+    /**
+     * 关闭玩家当前打开的GUI界面
+     * <p>
+     * 该方法会检查指定玩家当前打开的界面是否为本GUI界面，如果是则关闭它。
+     * </p>
+     *
+     * @param player 需要关闭GUI界面的玩家
+     */
+    public void close(Player player) {
+        if (inventory != null && inventory.equals(player.getOpenInventory().getTopInventory())) {
+            player.closeInventory();
         }
     }
 

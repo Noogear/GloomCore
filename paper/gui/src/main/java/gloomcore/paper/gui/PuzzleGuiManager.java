@@ -77,6 +77,7 @@ public class PuzzleGuiManager implements Listener {
         Deque<PuzzleGuiView> playerHistory = history.get(player.getUniqueId());
         if (playerHistory != null && !playerHistory.isEmpty()) {
             PuzzleGuiView previousView = playerHistory.pop();
+            navigatingPlayers.add(player.getUniqueId());
             previousView.open(player);
             return true;
         }
@@ -106,18 +107,16 @@ public class PuzzleGuiManager implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID playerUuid = player.getUniqueId();
-
-        Deque<PuzzleGuiView> playerHistory = history.get(playerUuid);
-        if (playerHistory != null) {
-            for (PuzzleGuiView historicalView : playerHistory) {
-                if (!playerUuid.equals(historicalView.getOwner().getUniqueId())) {
-                    continue;
-                }
+        navigatingPlayers.remove(playerUuid);
+        Deque<PuzzleGuiView> playerHistory = history.remove(playerUuid);
+        if (playerHistory == null || playerHistory.isEmpty()) {
+            return;
+        }
+        for (PuzzleGuiView historicalView : playerHistory) {
+            if (playerUuid.equals(historicalView.getOwner().getUniqueId())) {
                 historicalView.cleanupOnClose();
             }
         }
-        history.remove(playerUuid);
-        navigatingPlayers.remove(playerUuid);
     }
 
     /**
@@ -131,14 +130,13 @@ public class PuzzleGuiManager implements Listener {
             return;
         }
         UUID playerUuid = event.getPlayer().getUniqueId();
-        if (!playerUuid.equals(closedView.getOwner().getUniqueId())) {
-            return;
-        }
         if (navigatingPlayers.remove(playerUuid)) {
             return;
         }
-        closedView.handleClose(event);
         history.remove(playerUuid);
+        if (playerUuid.equals(closedView.getOwner().getUniqueId())) {
+            closedView.handleClose(event);
+        }
     }
 
     /**
