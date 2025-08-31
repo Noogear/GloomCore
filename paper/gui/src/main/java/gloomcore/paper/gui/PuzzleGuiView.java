@@ -3,7 +3,6 @@ package gloomcore.paper.gui;
 import gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import gloomcore.paper.gui.puzzle.Puzzle;
 import gloomcore.paper.scheduler.PaperScheduler;
-import gloomcore.paper.util.Log;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -275,12 +274,8 @@ public class PuzzleGuiView implements InventoryHolder {
     public CompletableFuture<Void> openAsync(Player player) {
         return CompletableFuture
                 .runAsync(() -> {
-                    try {
-                        if (inventory == null || inventory.isEmpty()) {
-                            renderAll();
-                        }
-                    } catch (Exception e) {
-                        Log.INSTANCE.error("Failed to open inventory for player: " + player.getName(), e);
+                    if (inventory == null || inventory.isEmpty()) {
+                        renderAll();
                     }
                 }, PaperScheduler.INSTANCE.async().executor())
                 .thenAcceptAsync(result -> {
