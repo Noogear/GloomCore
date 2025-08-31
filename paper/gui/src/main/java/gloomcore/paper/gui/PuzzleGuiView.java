@@ -59,7 +59,7 @@ public class PuzzleGuiView implements InventoryHolder {
      * @param puzzle 要添加的拼图组件
      * @throws IllegalArgumentException 当槽位已被占用时抛出
      */
-    protected void addPuzzle(Puzzle puzzle) {
+    public PuzzleGuiView addPuzzle(Puzzle puzzle) {
         this.puzzles.add(puzzle);
         for (int slot : puzzle.getSlots()) {
             if (slot >= 0 && slot < this.slotPuzzleArray.length) {
@@ -72,6 +72,7 @@ public class PuzzleGuiView implements InventoryHolder {
         if (puzzle instanceof PlaceablePuzzle placeablePuzzle) {
             this.placeablePuzzles.add(placeablePuzzle);
         }
+        return this;
     }
 
     public MenuLayout getMenuLayout() {
@@ -157,6 +158,7 @@ public class PuzzleGuiView implements InventoryHolder {
             event.setCancelled(true);
             return;
         }
+        this.lastActionTime = currentTime;
         int size = menuLayout.getSize();
         for (int slot : event.getRawSlots()) {
             if (slot < size) {
