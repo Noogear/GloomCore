@@ -55,7 +55,7 @@ public class CombinedItemPuzzleImpl extends StaticPuzzle {
         for (int slot : this.slots) {
             IconDisplay display = this.slotIconMap.get(slot);
             if (display != null) {
-                ItemStack itemStack = display.parse(player);
+                ItemStack itemStack = display.apply(player);
                 inventory.setItem(slot, itemStack);
             } else {
                 inventory.setItem(slot, null);

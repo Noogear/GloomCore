@@ -1,10 +1,14 @@
 rootProject.name = 'GloomCore'
 
-include('core')
 
 file('common').listFiles()?.findAll { it.isDirectory() }?.each {
     include "common:${it.name}"
 }
+
 file('paper').listFiles()?.findAll { it.isDirectory() }?.each {
     include "paper:${it.name}"
+}
+
+file('contract').listFiles()?.findAll { it.isDirectory() }?.each {
+    include "contract:${it.name}"
 }

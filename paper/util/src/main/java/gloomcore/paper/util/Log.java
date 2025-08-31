@@ -15,6 +15,15 @@ public enum Log {
     private final Logger logger = plugin.getSLF4JLogger();
 
     /**
+     * 获取当前实例的日志记录器
+     *
+     * @return Logger对象，用于记录日志信息
+     */
+    public Logger getLogger() {
+        return logger;
+    }
+
+    /**
      * 记录一条 INFO 级别的日志。
      *
      * @param message 消息模板，使用 {} 作为占位符

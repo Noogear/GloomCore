@@ -101,11 +101,11 @@ public class Icon {
      * @return 图标的物品堆实例
      */
     public ItemStack display() {
-        return display.parse();
+        return display(null);
     }
 
     public ItemStack display(Player player) {
-        return display.parse(player);
+        return display.apply(player);
     }
 
 

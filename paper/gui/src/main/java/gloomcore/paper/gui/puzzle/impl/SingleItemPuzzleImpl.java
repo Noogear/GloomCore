@@ -43,7 +43,7 @@ public class SingleItemPuzzleImpl extends StaticPuzzle {
 
     @Override
     public void render(Player player, @NotNull Inventory inventory) {
-        ItemStack itemStack = display.parse(player);
+        ItemStack itemStack = display.apply(player);
         for (int slot : slots) {
             inventory.setItem(slot, itemStack);
         }
