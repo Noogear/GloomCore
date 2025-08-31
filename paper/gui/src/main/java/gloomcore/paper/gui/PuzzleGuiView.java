@@ -72,7 +72,10 @@ public class PuzzleGuiView implements InventoryHolder {
         if (puzzle instanceof PlaceablePuzzle placeablePuzzle) {
             this.placeablePuzzles.add(placeablePuzzle);
         }
+    }
 
+    public MenuLayout getMenuLayout() {
+        return menuLayout;
     }
 
     /**
