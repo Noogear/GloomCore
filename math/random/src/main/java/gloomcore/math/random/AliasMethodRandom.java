@@ -1,4 +1,4 @@
-package gloomcore.common.random;
+package gloomcore.math.random;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;

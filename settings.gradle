@@ -1,8 +1,8 @@
 rootProject.name = 'GloomCore'
 
 
-file('common').listFiles()?.findAll { it.isDirectory() }?.each {
-    include "common:${it.name}"
+file('math').listFiles()?.findAll { it.isDirectory() }?.each {
+    include "math:${it.name}"
 }
 
 file('paper').listFiles()?.findAll { it.isDirectory() }?.each {
