@@ -4,8 +4,8 @@ import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -189,7 +189,7 @@ public enum FluxScheduler {
         private final boolean isAsync;
         private final int phaseIndex;
         private final Consumer<TaskGroup> onExecuteCallback;
-        private final CopyOnWriteArraySet<Runnable> tasks = new CopyOnWriteArraySet<>();
+        private final Set<Runnable> tasks = ConcurrentHashMap.newKeySet();
         private ScheduledTask scheduledTask;
 
         /**

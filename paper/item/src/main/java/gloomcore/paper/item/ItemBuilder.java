@@ -98,6 +98,7 @@ public class ItemBuilder implements IBuilder<ItemBuilder, ItemStack> {
         builderConsumer.accept(this);
         return this;
     }
+
     /**
      * 创建当前构建器的一个精确副本。
      * 这是一个深拷贝，因为它基于 build() 方法创建的克隆 ItemStack。

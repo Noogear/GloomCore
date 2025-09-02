@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * @param <C> 上下文类型，用于延迟操作的参数
  */
 
-public class ItemTemplate<C> implements ITemplate< C,ItemStack> {
+public class ItemTemplate<C> implements ITemplate<C, ItemStack> {
 
     private final ItemBuilder prebuiltBuilder;
     private final List<BiConsumer<ItemBuilder, C>> delayedActions;
@@ -26,7 +26,18 @@ public class ItemTemplate<C> implements ITemplate< C,ItemStack> {
         this.prebuiltBuilder = prebuiltBuilder;
         this.delayedActions = List.copyOf(delayedActions);
     }
-    
+
+    /**
+     * 创建ItemTemplate构建器
+     *
+     * @param builderSupplier ItemBuilder供应器
+     * @param <C>             上下文类型
+     * @return ItemTemplate构建器实例
+     */
+    public static <C> Builder<C> builder(Supplier<ItemBuilder> builderSupplier) {
+        return new Builder<>(builderSupplier.get());
+    }
+
     /**
      * 应用模板并构建物品
      *
@@ -60,7 +71,6 @@ public class ItemTemplate<C> implements ITemplate< C,ItemStack> {
         applyToBuilder(workingBuilder, context);
         return workingBuilder.build();
     }
-    
 
     /**
      * 将此模板的延迟操作应用到指定的 ItemBuilder 实例上。
@@ -73,18 +83,6 @@ public class ItemTemplate<C> implements ITemplate< C,ItemStack> {
         for (BiConsumer<ItemBuilder, C> action : delayedActions) {
             action.accept(builder, context);
         }
-    }
-    
-
-    /**
-     * 创建ItemTemplate构建器
-     *
-     * @param builderSupplier ItemBuilder供应器
-     * @param <C>             上下文类型
-     * @return ItemTemplate构建器实例
-     */
-    public static <C> Builder<C> builder(Supplier<ItemBuilder> builderSupplier) {
-        return new Builder<>(builderSupplier.get());
     }
 
     public static class Builder<C> {

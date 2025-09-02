@@ -1,10 +1,10 @@
-package gloomcore.paper.placeholder;
+package gloomcore.paper.placeholder.util.internal;
 
-public class CacheText {
+public class CacheEntry {
     private String text;
     private long lastUpdate;
 
-    public CacheText(String text, long lastUpdate) {
+    public CacheEntry(String text, long lastUpdate) {
         this.text = text;
         this.lastUpdate = lastUpdate;
     }
@@ -22,5 +22,4 @@ public class CacheText {
         this.lastUpdate = lastUpdate;
         return text;
     }
-
 }
