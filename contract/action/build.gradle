@@ -1,0 +1,2 @@
+// Contract action module - provides action and event handling interfaces
+description = 'Action and event handling interfaces'

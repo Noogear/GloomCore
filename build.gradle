@@ -1,30 +1,82 @@
 plugins {
     alias(libs.plugins.shadow) apply false
+    id 'jacoco-report-aggregation'
 }
 
-subprojects {
-    apply plugin: 'java-library'
-
+// Define common configurations for all projects
+allprojects {
     group = 'cn.gloomcore'
     version = '1.0.0.0'
-
+    
     repositories {
         mavenCentral()
         maven { url = "https://repo.papermc.io/repository/maven-public/" }
         maven { url = "https://oss.sonatype.org/content/groups/public/" }
         maven { url = 'https://repo.extendedclip.com/releases/' }
     }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'checkstyle'
+    apply plugin: 'jacoco'
 
     java {
         toolchain.languageVersion = JavaLanguageVersion.of(21)
+        withJavadocJar()
+        withSourcesJar()
     }
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
         options.release = 21
+        options.compilerArgs.addAll(['-Xlint:unchecked', '-Xlint:deprecation'])
     }
 
+    // Configure testing
+    testing {
+        suites {
+            test {
+                useJUnitJupiter()
+            }
+        }
+    }
+
+    // Common dependencies for all subprojects
     dependencies {
         compileOnly libs.jetbrains.annotations
+        
+        // Test dependencies
+        testImplementation platform(libs.junit.bom)
+        testImplementation libs.junit.jupiter
+        testImplementation libs.mockito.core
+        testImplementation libs.mockito.junit.jupiter
+    }
+
+    // Configure Checkstyle
+    checkstyle {
+        toolVersion = libs.versions.checkstyle.get()
+        configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+        // Ignore checkstyle failures for now, but generate reports
+        ignoreFailures = true
+    }
+
+    // Configure JaCoCo
+    jacocoTestReport {
+        reports {
+            xml.required = true
+            html.required = true
+        }
+    }
+
+    // Configure Javadoc generation
+    javadoc {
+        options.encoding = 'UTF-8'
+        options.charSet = 'UTF-8'
+        options.author = true
+        options.version = true
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
     }
 }
