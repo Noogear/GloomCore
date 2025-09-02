@@ -1,0 +1,2 @@
+// Contract builder module - provides generic builder interface
+description = 'Generic builder interface for fluent API design'
