@@ -1,6 +1,6 @@
 package gloomcore.paper.placeholder.util;
 
-import gloomcore.paper.placeholder.util.internal.FixedPlaceholder;
+import gloomcore.paper.placeholder.util.internal.Placeholder;
 import gloomcore.paper.placeholder.util.internal.PlayerCacheHandler;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
@@ -18,7 +18,7 @@ public final class PlaceholderManager extends PlaceholderExpansion {
     private final String identifier;
     private final String author;
     private final String version;
-    private final Map<String, FixedPlaceholder> fixedPlaceholderMap = new ConcurrentHashMap<>();
+    private final Map<String, Placeholder> fixedPlaceholderMap = new ConcurrentHashMap<>();
 
     public PlaceholderManager(@NotNull JavaPlugin plugin, @NotNull String identifier, @NotNull String author, @NotNull String version) {
         this.plugin = plugin;
@@ -40,17 +40,17 @@ public final class PlaceholderManager extends PlaceholderExpansion {
         return new PlaceholderBuilder(this, key);
     }
 
-    void register(@NotNull String key, @NotNull FixedPlaceholder fixedPlaceholder) {
-        this.fixedPlaceholderMap.put(key, fixedPlaceholder);
+    void register(@NotNull String key, @NotNull Placeholder placeholder) {
+        this.fixedPlaceholderMap.put(key, placeholder);
     }
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        FixedPlaceholder fixedPlaceholder = fixedPlaceholderMap.get(params);
-        if (fixedPlaceholder == null) {
+        Placeholder placeholder = fixedPlaceholderMap.get(params);
+        if (placeholder == null) {
             return null;
         }
-        return player != null && player.isOnline() ? fixedPlaceholder.apply(player.getPlayer()) : fixedPlaceholder.apply();
+        return player != null && player.isOnline() ? placeholder.apply(player.getPlayer()) : placeholder.apply();
     }
 
     @Override

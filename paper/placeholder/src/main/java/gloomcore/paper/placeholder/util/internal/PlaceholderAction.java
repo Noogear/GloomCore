@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  * 它本身就是一个 Placeholder，用于定义如何生成最终的文本。
  */
 @FunctionalInterface
-public interface PlaceholderAction extends FixedPlaceholder {
+public interface PlaceholderAction extends Placeholder {
 
     /**
      * 从一个固定的字符串创建一个动作。

@@ -2,19 +2,18 @@ package gloomcore.paper.placeholder.util.decorator;
 
 import gloomcore.paper.placeholder.util.internal.CacheEntry;
 import gloomcore.paper.placeholder.util.internal.FixedPlaceholder;
-import gloomcore.paper.placeholder.util.internal.PlaceholderAction;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * 一个只处理共享缓存的装饰器。
  */
-public final class SharedCacheDecorator implements FixedPlaceholder {
-    private final PlaceholderAction action;
+public final class SharedFixedCacheDecorator implements FixedPlaceholder {
+    private final FixedPlaceholder action;
     private final long intervalMillis;
     private final CacheEntry sharedCache;
 
-    public SharedCacheDecorator(PlaceholderAction action, long intervalMillis) {
+    public SharedFixedCacheDecorator(FixedPlaceholder action, long intervalMillis) {
         this.action = action;
         this.intervalMillis = intervalMillis;
         this.sharedCache = new CacheEntry(action.apply(), System.currentTimeMillis());

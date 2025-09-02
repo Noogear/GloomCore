@@ -1,9 +1,9 @@
 package gloomcore.paper.placeholder.util;
 
 import gloomcore.paper.placeholder.util.decorator.PlayerCacheDecorator;
-import gloomcore.paper.placeholder.util.decorator.SharedCacheDecorator;
+import gloomcore.paper.placeholder.util.decorator.SharedFixedCacheDecorator;
 import gloomcore.paper.placeholder.util.internal.FixedPlaceholder;
-import gloomcore.paper.placeholder.util.internal.PlaceholderAction;
+import gloomcore.paper.placeholder.util.internal.Placeholder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ public final class PlaceholderBuilder {
     private final PlaceholderManager manager;
     private final String key;
 
-    private PlaceholderAction action;
+    private FixedPlaceholder action;
     private Duration cacheDuration = Duration.ZERO;
     private boolean isCacheShared = false;
 
@@ -26,17 +26,17 @@ public final class PlaceholderBuilder {
     }
 
     public PlaceholderBuilder from(@NotNull String staticText) {
-        this.action = PlaceholderAction.of(staticText);
+        this.action = FixedPlaceholder.of(staticText);
         return this;
     }
 
     public PlaceholderBuilder from(@NotNull Supplier<String> supplier) {
-        this.action = PlaceholderAction.of(supplier);
+        this.action = FixedPlaceholder.of(supplier);
         return this;
     }
 
     public PlaceholderBuilder fromPlayer(@NotNull Function<Player, String> function) {
-        this.action = PlaceholderAction.of(function);
+        this.action = FixedPlaceholder.of(function);
         return this;
     }
 
@@ -60,18 +60,18 @@ public final class PlaceholderBuilder {
             throw new IllegalStateException("Placeholder action/source must be defined via from() or fromPlayer() for key: '" + key + "'");
         }
 
-        FixedPlaceholder finalFixedPlaceholder = buildPlaceholder();
-        manager.register(key, finalFixedPlaceholder);
+        Placeholder finalPlaceholder = buildPlaceholder();
+        manager.register(key, finalPlaceholder);
         return manager;
     }
 
-    private FixedPlaceholder buildPlaceholder() {
+    private Placeholder buildPlaceholder() {
         if (cacheDuration == null || cacheDuration.isZero() || cacheDuration.isNegative()) {
             return this.action;
         }
 
         if (isCacheShared) {
-            return new SharedCacheDecorator(this.action, this.cacheDuration.toMillis());
+            return new SharedFixedCacheDecorator(this.action, this.cacheDuration.toMillis());
         } else {
             return new PlayerCacheDecorator(this.action, this.cacheDuration.toMillis(), this.key, this.manager.playerCacheHandler);
         }
