@@ -42,11 +42,15 @@ public final class PlaceholderManager extends PlaceholderExpansion {
         return new PlaceholderBuilder(this, key);
     }
 
+    public PlaceholderBuilder define(@NotNull String[] path) {
+        return new PlaceholderBuilder(this, path);
+    }
+
     void register(@NotNull String key, @NotNull FixedPlaceholder placeholder) {
         this.fixedPlaceholderMap.put(key, placeholder);
     }
 
-    void registerTree(@NotNull String[] path, @NotNull ParmPlaceholder placeholder) {
+    void register(@NotNull String[] path, @NotNull ParmPlaceholder placeholder) {
         this.rootNode.addPlaceholder(path, placeholder);
     }
 

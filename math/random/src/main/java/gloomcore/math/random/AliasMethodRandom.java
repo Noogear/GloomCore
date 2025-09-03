@@ -3,7 +3,7 @@ package gloomcore.math.random;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public final class AliasMethodRandom{
+public final class AliasMethodRandom {
     private final int[] alias;
     private final double[] probability;
 

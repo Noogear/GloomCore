@@ -9,7 +9,7 @@ import java.util.TreeMap;
  * 该类通过将大数值缩放到预定义的阈值并附加相应单位，来实现格式化。
  * 例如，它可以将 {@code 15500} 格式化为 {@code "15.5K"} (当精度为1时)。
  *
- * <h3>基本用法</h3>
+ * <h2>基本用法</h2>
  * <pre>{@code
  * Map<Double, String> config = Map.of(
  *     1000.0, "K",

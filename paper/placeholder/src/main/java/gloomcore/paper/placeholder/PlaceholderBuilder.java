@@ -145,7 +145,7 @@ public final class PlaceholderBuilder implements IBuilder<PlaceholderBuilder, Pl
     public PlaceholderManager register() {
         Placeholder placeholder = this.build();
         if (isParm) {
-            this.manager.registerTree(this.path, (ParmPlaceholder) placeholder);
+            this.manager.register(this.path, (ParmPlaceholder) placeholder);
             return this.manager;
         }
         this.manager.register(this.key, (FixedPlaceholder) placeholder);

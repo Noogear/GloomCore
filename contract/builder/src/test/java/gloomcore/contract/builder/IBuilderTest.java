@@ -1,8 +1,10 @@
 package gloomcore.contract.builder;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * 测试 IBuilder 接口的基本功能
@@ -28,11 +30,11 @@ class IBuilderTest {
     @DisplayName("应该能够根据条件配置构建器")
     void shouldConfigureConditionally() {
         MockBuilder builder = MockBuilder.create();
-        
+
         // 测试条件为真的情况
         builder.configureIf(true, b -> b.setValue("configured"));
         assertEquals("configured", builder.getValue());
-        
+
         // 测试条件为假的情况
         builder.configureIf(false, b -> b.setValue("not configured"));
         assertEquals("configured", builder.getValue()); // 应该保持原值
@@ -48,13 +50,13 @@ class IBuilderTest {
             return new MockBuilder();
         }
 
+        public String getValue() {
+            return value;
+        }
+
         public MockBuilder setValue(String value) {
             this.value = value;
             return this;
-        }
-
-        public String getValue() {
-            return value;
         }
 
         @Override
