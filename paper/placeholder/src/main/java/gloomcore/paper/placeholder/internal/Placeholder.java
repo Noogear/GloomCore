@@ -1,4 +1,4 @@
-package gloomcore.paper.placeholder.util.internal;
+package gloomcore.paper.placeholder.internal;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

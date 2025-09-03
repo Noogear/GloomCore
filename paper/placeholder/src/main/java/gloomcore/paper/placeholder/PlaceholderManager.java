@@ -1,15 +1,15 @@
-package gloomcore.paper.placeholder.util;
+package gloomcore.paper.placeholder;
 
-import gloomcore.paper.placeholder.util.internal.Placeholder;
-import gloomcore.paper.placeholder.util.internal.PlayerCacheHandler;
+import gloomcore.paper.placeholder.internal.FixedPlaceholder;
+import gloomcore.paper.placeholder.internal.ParmPlaceholder;
+import gloomcore.paper.placeholder.internal.PlaceholderNode;
+import gloomcore.paper.placeholder.internal.PlayerCacheHandler;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class PlaceholderManager extends PlaceholderExpansion {
 
@@ -18,7 +18,8 @@ public final class PlaceholderManager extends PlaceholderExpansion {
     private final String identifier;
     private final String author;
     private final String version;
-    private final Map<String, Placeholder> fixedPlaceholderMap = new ConcurrentHashMap<>();
+    private final Object2ObjectOpenHashMap<String, FixedPlaceholder> fixedPlaceholderMap = new Object2ObjectOpenHashMap<>();
+    private final PlaceholderNode rootNode;
 
     public PlaceholderManager(@NotNull JavaPlugin plugin, @NotNull String identifier, @NotNull String author, @NotNull String version) {
         this.plugin = plugin;
@@ -26,6 +27,7 @@ public final class PlaceholderManager extends PlaceholderExpansion {
         this.author = author;
         this.version = version;
         this.playerCacheHandler = new PlayerCacheHandler();
+        this.rootNode = new PlaceholderNode();
         plugin.getServer().getPluginManager().registerEvents(playerCacheHandler, plugin);
     }
 
@@ -40,17 +42,20 @@ public final class PlaceholderManager extends PlaceholderExpansion {
         return new PlaceholderBuilder(this, key);
     }
 
-    void register(@NotNull String key, @NotNull Placeholder placeholder) {
+    void register(@NotNull String key, @NotNull FixedPlaceholder placeholder) {
         this.fixedPlaceholderMap.put(key, placeholder);
+    }
+
+    void registerTree(@NotNull String[] path, @NotNull ParmPlaceholder placeholder) {
+        this.rootNode.addPlaceholder(path, placeholder);
     }
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        Placeholder placeholder = fixedPlaceholderMap.get(params);
-        if (placeholder == null) {
-            return null;
+        if (fixedPlaceholderMap.containsKey(params)) {
+            return fixedPlaceholderMap.get(params).apply(player != null ? player.getPlayer() : null);
         }
-        return player != null && player.isOnline() ? placeholder.apply(player.getPlayer()) : placeholder.apply();
+        return rootNode.resolve(player != null ? player.getPlayer() : null, params);
     }
 
     @Override

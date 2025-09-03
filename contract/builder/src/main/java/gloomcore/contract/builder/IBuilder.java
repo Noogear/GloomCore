@@ -34,6 +34,21 @@ public interface IBuilder<T extends IBuilder<T, R>, R> {
     T configure(Consumer<T> builderConsumer);
 
     /**
+     * 应用多个配置函数
+     *
+     * @param consumers 配置函数数组
+     * @return 当前构建器实例
+     */
+    @SuppressWarnings("unchecked")
+    default T configure(Consumer<T>... consumers) {
+        final T self = (T) this;
+        for (Consumer<T> consumer : consumers) {
+            consumer.accept(self);
+        }
+        return self;
+    }
+
+    /**
      * 如果条件为真，则对构建器进行配置
      *
      * @param condition       判断条件

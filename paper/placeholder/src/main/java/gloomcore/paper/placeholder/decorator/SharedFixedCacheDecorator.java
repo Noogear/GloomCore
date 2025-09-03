@@ -1,7 +1,7 @@
-package gloomcore.paper.placeholder.util.decorator;
+package gloomcore.paper.placeholder.decorator;
 
-import gloomcore.paper.placeholder.util.internal.CacheEntry;
-import gloomcore.paper.placeholder.util.internal.FixedPlaceholder;
+import gloomcore.paper.placeholder.internal.CacheEntry;
+import gloomcore.paper.placeholder.internal.FixedPlaceholder;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,10 +21,6 @@ public final class SharedFixedCacheDecorator implements FixedPlaceholder {
 
     @Override
     public @Nullable String apply(@Nullable Player player) {
-        long interval = System.currentTimeMillis() - sharedCache.getLastUpdate();
-        if (interval > intervalMillis || interval < 0) {
-            return sharedCache.update(action.apply(), System.currentTimeMillis());
-        }
-        return sharedCache.getText();
+        return sharedCache.getOrUpdate(intervalMillis, action::apply);
     }
 }

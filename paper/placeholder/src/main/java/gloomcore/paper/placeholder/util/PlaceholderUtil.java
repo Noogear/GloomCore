@@ -1,4 +1,4 @@
-package gloomcore.paper.placeholder.util.util;
+package gloomcore.paper.placeholder.util;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
