@@ -17,14 +17,6 @@ public class CacheEntry {
         this.lastUpdate = lastUpdate;
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public long getLastUpdate() {
-        return lastUpdate;
-    }
-
     public String getOrUpdate(long intervalMillis, Supplier<String> supplier) {
         readLock.lock();
         try {
@@ -45,12 +37,6 @@ public class CacheEntry {
         } finally {
             writeLock.unlock();
         }
-    }
-
-    public String update(String text, long lastUpdate) {
-        this.text = text;
-        this.lastUpdate = lastUpdate;
-        return text;
     }
 
     private boolean isCacheValid(long intervalMillis) {

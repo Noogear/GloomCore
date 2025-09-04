@@ -151,7 +151,7 @@ public enum SkullFactory {
      * 根据玩家名创建PlayerProfile
      *
      * @param name 玩家名
-     * @return CompletableFuture<PlayerProfile> 异步获取的PlayerProfile
+     * @return 异步获取的PlayerProfile
      */
     private CompletableFuture<PlayerProfile> createProfileFromName(@NotNull String name) {
         return Bukkit.createProfile(name)
@@ -163,7 +163,7 @@ public enum SkullFactory {
      * 根据UUID创建PlayerProfile
      *
      * @param uuid 玩家UUID
-     * @return CompletableFuture<PlayerProfile> 异步获取的PlayerProfile
+     * @return 异步获取的PlayerProfile
      */
     private CompletableFuture<PlayerProfile> createProfileFromUuid(@NotNull UUID uuid) {
         return Bukkit.createProfile(uuid)
@@ -175,7 +175,7 @@ public enum SkullFactory {
      * 根据Base64编码的纹理值创建PlayerProfile
      *
      * @param textureValue Base64编码的纹理值
-     * @return CompletableFuture<PlayerProfile> 异步创建的PlayerProfile
+     * @return 异步创建的PlayerProfile
      */
     private CompletableFuture<PlayerProfile> createProfileFromTextureValue(@NotNull String textureValue) {
         return CompletableFuture.supplyAsync(() -> {
@@ -195,7 +195,7 @@ public enum SkullFactory {
      * 根据URL字符串创建PlayerProfile
      *
      * @param url URL字符串
-     * @return CompletableFuture<PlayerProfile> 异步创建的PlayerProfile
+     * @return 异步创建的PlayerProfile
      */
     private CompletableFuture<PlayerProfile> createProfileFromUrlString(@NotNull String url) {
         return CompletableFuture.supplyAsync(() -> {
@@ -239,7 +239,7 @@ public enum SkullFactory {
      *
      * @param key             缓存键，用于标识特定的PlayerProfile
      * @param mappingFunction 用于创建PlayerProfile的函数，当缓存未命中时调用
-     * @return CompletableFuture<PlayerProfile> 异步获取的PlayerProfile
+     * @return 异步获取的PlayerProfile
      */
     private CompletableFuture<PlayerProfile> getCachedProfile(@NotNull String key, @NotNull Supplier<CompletableFuture<PlayerProfile>> mappingFunction) {
         try {
@@ -300,7 +300,7 @@ public enum SkullFactory {
         /**
          * 异步构建SkullMeta
          *
-         * @return CompletableFuture<SkullMeta> 异步构建的SkullMeta
+         * @return 异步构建的SkullMeta
          */
         @NotNull
         public CompletableFuture<SkullMeta> buildMetaAsync() {
@@ -317,7 +317,7 @@ public enum SkullFactory {
          * 异步将头颅元数据应用到指定物品上
          *
          * @param baseItem 基础物品
-         * @return CompletableFuture<ItemStack> 异步应用后的物品
+         * @return 异步应用后的物品
          */
         @NotNull
         public CompletableFuture<ItemStack> applyToAsync(@NotNull ItemStack baseItem) {
@@ -331,7 +331,7 @@ public enum SkullFactory {
          * 将头颅元数据应用到指定物品上（在主线程执行）
          *
          * @param baseItem 基础物品
-         * @return CompletableFuture<ItemStack> 异步应用后的物品
+         * @return 异步应用后的物品
          */
         @NotNull
         public CompletableFuture<ItemStack> applyTo(@NotNull ItemStack baseItem) {
@@ -344,7 +344,7 @@ public enum SkullFactory {
         /**
          * 构建新的头颅物品
          *
-         * @return CompletableFuture<ItemStack> 异步构建的头颅物品
+         * @return 异步构建的头颅物品
          */
         @NotNull
         public CompletableFuture<ItemStack> build() {

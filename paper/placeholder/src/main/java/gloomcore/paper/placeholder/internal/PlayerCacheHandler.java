@@ -1,5 +1,6 @@
 package gloomcore.paper.placeholder.internal;
 
+import gloomcore.paper.placeholder.internal.key.PlaceholderKey;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,9 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class PlayerCacheHandler implements Listener {
-    private final Map<UUID, Object2ObjectOpenHashMap<String, CacheEntry>> playerCache = new ConcurrentHashMap<>();
+    private final Map<UUID, Object2ObjectOpenHashMap<PlaceholderKey, CacheEntry>> playerCache = new ConcurrentHashMap<>();
 
-    public @Nullable String getOrUpdate(UUID uuid, String key, long intervalMillis, Supplier<String> supplier) {
+    public @Nullable String getOrUpdate(UUID uuid, PlaceholderKey key, long intervalMillis, Supplier<String> supplier) {
         return playerCache
                 .computeIfAbsent(uuid, k -> new Object2ObjectOpenHashMap<>())
                 .computeIfAbsent(key, k -> new CacheEntry(supplier.get(), System.currentTimeMillis()))

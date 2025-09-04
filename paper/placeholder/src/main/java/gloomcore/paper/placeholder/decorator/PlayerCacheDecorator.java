@@ -2,10 +2,9 @@ package gloomcore.paper.placeholder.decorator;
 
 import gloomcore.paper.placeholder.internal.Placeholder;
 import gloomcore.paper.placeholder.internal.PlayerCacheHandler;
+import gloomcore.paper.placeholder.internal.key.GuavaKeyInterner;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
 
 /**
  * 一个只处理玩家独立缓存的装饰器。
@@ -28,6 +27,8 @@ public final class PlayerCacheDecorator implements Placeholder {
         if (player == null) {
             return null;
         }
-        return playerCacheHandler.getOrUpdate(player.getUniqueId(), args.length > 0 ? key + Arrays.hashCode(args) : key, intervalMillis, () -> action.apply(player, args));
+        return playerCacheHandler.getOrUpdate(player.getUniqueId(),
+                GuavaKeyInterner.intern(key, args),
+                intervalMillis, () -> action.apply(player, args));
     }
 }
