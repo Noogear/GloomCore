@@ -125,7 +125,7 @@ public final class PlaceholderBuilder implements IBuilder<PlaceholderBuilder, Pl
 
         switch (cacheStrategy) {
             case PER_PLAYER:
-                return new PlayerCacheDecorator(baseAction, cacheDuration.toMillis(), key, manager.playerCacheHandler);
+                return new PlayerCacheDecorator(baseAction, cacheDuration.toMillis(), key, manager);
 
             case SHARED:
                 if (!isParm) {

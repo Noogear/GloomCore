@@ -1,7 +1,7 @@
 package gloomcore.paper.placeholder.decorator;
 
+import gloomcore.paper.placeholder.PlaceholderManager;
 import gloomcore.paper.placeholder.internal.Placeholder;
-import gloomcore.paper.placeholder.internal.PlayerCacheHandler;
 import gloomcore.paper.placeholder.internal.key.GuavaKeyInterner;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -13,9 +13,9 @@ public final class PlayerCacheDecorator implements Placeholder {
     private final Placeholder action;
     private final long intervalMillis;
     private final String key;
-    private final PlayerCacheHandler playerCacheHandler;
+    private final PlaceholderManager playerCacheHandler;
 
-    public PlayerCacheDecorator(Placeholder action, long intervalMillis, String key, PlayerCacheHandler playerCacheHandler) {
+    public PlayerCacheDecorator(Placeholder action, long intervalMillis, String key, PlaceholderManager playerCacheHandler) {
         this.action = action;
         this.intervalMillis = intervalMillis;
         this.key = key;

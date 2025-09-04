@@ -1,45 +1,35 @@
 package gloomcore.paper.placeholder.internal;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 public class CacheEntry {
-    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
-    private final Lock readLock = rwLock.readLock();
-    private final Lock writeLock = rwLock.writeLock();
-    private volatile String text;
-    private volatile long lastUpdate;
+
+    private volatile State currentState;
 
     public CacheEntry(String text, long lastUpdate) {
-        this.text = text;
-        this.lastUpdate = lastUpdate;
+        this.currentState = new State(text, lastUpdate);
     }
 
     public String getOrUpdate(long intervalMillis, Supplier<String> supplier) {
-        readLock.lock();
-        try {
-            if (isCacheValid(intervalMillis)) {
-                return this.text;
-            }
-        } finally {
-            readLock.unlock();
+        State state = this.currentState;
+        if (isCacheValid(state, intervalMillis)) {
+            return state.text;
         }
-        writeLock.lock();
-        try {
-            if (isCacheValid(intervalMillis)) {
-                return this.text;
+        synchronized (this) {
+            state = this.currentState;
+            if (isCacheValid(state, intervalMillis)) {
+                return state.text;
             }
-            this.text = supplier.get();
-            this.lastUpdate = System.currentTimeMillis();
-            return this.text;
-        } finally {
-            writeLock.unlock();
+            String newText = supplier.get();
+            this.currentState = new State(newText, System.currentTimeMillis());
+            return newText;
         }
     }
 
-    private boolean isCacheValid(long intervalMillis) {
-        return (System.currentTimeMillis() - this.lastUpdate) <= intervalMillis;
+    private boolean isCacheValid(State state, long intervalMillis) {
+        return (System.currentTimeMillis() - state.lastUpdate) <= intervalMillis;
+    }
+
+    private record State(String text, long lastUpdate) {
     }
 }

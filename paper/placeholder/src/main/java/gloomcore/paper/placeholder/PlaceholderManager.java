@@ -1,34 +1,62 @@
 package gloomcore.paper.placeholder;
 
+import gloomcore.paper.placeholder.internal.CacheEntry;
 import gloomcore.paper.placeholder.internal.FixedPlaceholder;
 import gloomcore.paper.placeholder.internal.ParmPlaceholder;
 import gloomcore.paper.placeholder.internal.PlaceholderNode;
-import gloomcore.paper.placeholder.internal.PlayerCacheHandler;
+import gloomcore.paper.placeholder.internal.key.PlaceholderKey;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import me.clip.placeholderapi.events.ExpansionsLoadedEvent;
+import me.clip.placeholderapi.expansion.Cacheable;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class PlaceholderManager extends PlaceholderExpansion {
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
-    final PlayerCacheHandler playerCacheHandler;
+public final class PlaceholderManager extends PlaceholderExpansion implements Cacheable, Listener {
+
     private final JavaPlugin plugin;
     private final String identifier;
     private final String author;
     private final String version;
     private final Object2ObjectOpenHashMap<String, FixedPlaceholder> fixedPlaceholderMap = new Object2ObjectOpenHashMap<>();
     private final PlaceholderNode rootNode;
+    private final Map<UUID, Object2ObjectOpenHashMap<PlaceholderKey, CacheEntry>> playerCache = new ConcurrentHashMap<>();
 
     public PlaceholderManager(@NotNull JavaPlugin plugin, @NotNull String identifier, @NotNull String author, @NotNull String version) {
         this.plugin = plugin;
         this.identifier = identifier;
         this.author = author;
         this.version = version;
-        this.playerCacheHandler = new PlayerCacheHandler();
         this.rootNode = new PlaceholderNode();
-        plugin.getServer().getPluginManager().registerEvents(playerCacheHandler, plugin);
+    }
+
+    public @Nullable String getOrUpdate(UUID uuid, PlaceholderKey key, long intervalMillis, Supplier<String> supplier) {
+        return playerCache
+                .computeIfAbsent(uuid, k -> new Object2ObjectOpenHashMap<>())
+                .computeIfAbsent(key, k -> new CacheEntry(supplier.get(), System.currentTimeMillis()))
+                .getOrUpdate(intervalMillis, supplier);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        playerCache.remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onExpansionsLoaded(ExpansionsLoadedEvent event) {
+        if (!isRegistered()) {
+            register();
+        }
     }
 
     /**
@@ -80,5 +108,10 @@ public final class PlaceholderManager extends PlaceholderExpansion {
     @Override
     public @NotNull String getRequiredPlugin() {
         return plugin.getName();
+    }
+
+    @Override
+    public void clear() {
+        playerCache.clear();
     }
 }
