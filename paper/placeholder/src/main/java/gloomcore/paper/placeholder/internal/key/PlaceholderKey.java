@@ -1,17 +1,26 @@
 package gloomcore.paper.placeholder.internal.key;
 
+import com.google.common.collect.Interner;
+import com.google.common.collect.Interners;
+
 import java.util.Arrays;
 import java.util.Objects;
 
 public final class PlaceholderKey {
+    private static final Interner<PlaceholderKey> KEY_INTERNER = Interners.newWeakInterner();
+
     private final String baseKey;
     private final String[] args;
-    private final int hashCode; // 缓存哈希码
+    private final int hashCode;
 
-    public PlaceholderKey(String baseKey, String[] args) {
+    private PlaceholderKey(String baseKey, String[] args) {
         this.baseKey = Objects.requireNonNull(baseKey);
-        this.args = args.clone();
+        this.args = args;
         this.hashCode = computeHashCode();
+    }
+
+    public static PlaceholderKey intern(String baseKey, String[] args) {
+        return KEY_INTERNER.intern(new PlaceholderKey(baseKey, args));
     }
 
     private int computeHashCode() {

@@ -15,4 +15,5 @@ public interface Placeholder {
     default String apply(@NotNull String[] args) {
         return apply(null, args);
     }
+
 }

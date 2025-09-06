@@ -2,7 +2,6 @@ package gloomcore.paper.placeholder.decorator;
 
 import gloomcore.paper.placeholder.internal.CacheEntry;
 import gloomcore.paper.placeholder.internal.Placeholder;
-import gloomcore.paper.placeholder.internal.key.GuavaKeyInterner;
 import gloomcore.paper.placeholder.internal.key.StringArrayKey;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +23,7 @@ public class SharedParmCacheDecorator implements Placeholder {
     @Override
     public @Nullable String apply(@Nullable Player player, @NotNull String[] args) {
         return sharedCache
-                .computeIfAbsent(GuavaKeyInterner.intern(args), k -> new CacheEntry(action.apply(args), System.currentTimeMillis()))
+                .computeIfAbsent(StringArrayKey.intern(args), k -> new CacheEntry(action.apply(args), System.currentTimeMillis()))
                 .getOrUpdate(intervalMillis, () -> action.apply(args));
     }
 }
