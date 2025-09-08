@@ -1,7 +1,6 @@
 package gloomcore.paper.command.framework;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import gloomcore.paper.command.interfaces.*;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
@@ -45,7 +44,7 @@ public abstract class AbstractCommandNode implements ICommandNode, IParentNode, 
 
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build() {
-        LiteralArgumentBuilder<CommandSourceStack> builder = LiteralArgumentBuilder.literal(getName());
+        ArgumentBuilder<CommandSourceStack, ?> builder = createBuilder();
 
         // 1. 应用权限
         builder.requires(getRequirement());
