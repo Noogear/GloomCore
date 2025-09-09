@@ -1,8 +1,9 @@
-package gloomcore.paper.command.framework;
+package gloomcore.paper.command.framework.argument;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import gloomcore.paper.command.framework.AbstractCommandNode;
 import gloomcore.paper.command.interfaces.ISuggestable;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
