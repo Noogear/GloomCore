@@ -17,4 +17,11 @@ public interface ICommandNode {
      * 这是将我们的面向对象节点转换为 Brigadier 节点的核心方法。
      */
     ArgumentBuilder<CommandSourceStack, ?> build();
+
+    NodeType getNodeType();
+
+    enum NodeType {
+        LITERAL,
+        ARGUMENT
+    }
 }

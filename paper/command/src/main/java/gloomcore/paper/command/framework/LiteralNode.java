@@ -13,4 +13,9 @@ public abstract class LiteralNode extends AbstractCommandNode {
     protected ArgumentBuilder<CommandSourceStack, ?> createBuilder() {
         return LiteralArgumentBuilder.literal(getName());
     }
+
+    @Override
+    public NodeType getNodeType() {
+        return NodeType.LITERAL;
+    }
 }

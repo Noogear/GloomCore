@@ -37,7 +37,7 @@ public abstract class CustomArgumentNode<T, N> extends AbstractCommandNode imple
      * 否则，回退到 ArgumentType 的默认行为。
      */
     @Override
-    public final <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
+    public final <S> @NotNull CompletableFuture<Suggestions> listSuggestions(final @NotNull CommandContext<S> context, final SuggestionsBuilder builder) {
         if (this instanceof ISuggestable) {
             try {
                 // 类型转换是安全的，因为我们的框架只使用 CommandSourceStack
@@ -50,5 +50,10 @@ public abstract class CustomArgumentNode<T, N> extends AbstractCommandNode imple
         }
         // 否则，使用默认的建议行为
         return CustomArgumentType.super.listSuggestions(context, builder);
+    }
+
+    @Override
+    public NodeType getNodeType() {
+        return NodeType.ARGUMENT;
     }
 }

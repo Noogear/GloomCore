@@ -46,8 +46,16 @@ public abstract class AbstractCommandNode implements ICommandNode, IParentNode, 
     public ArgumentBuilder<CommandSourceStack, ?> build() {
         ArgumentBuilder<CommandSourceStack, ?> builder = createBuilder();
 
-        // 1. 应用权限
-        builder.requires(getRequirement());
+        // 1. 应用权限：IRequire 与 IPermission 同时生效（AND）
+        Predicate<CommandSourceStack> require = getRequirement();
+        if (this instanceof IPermission p) {
+            String perm = p.getPermission();
+            if (perm != null && !perm.isBlank()) {
+                Predicate<CommandSourceStack> sourceStackPredicate = source -> source.getSender().hasPermission(perm);
+                require = (require == null) ? sourceStackPredicate : require.and(sourceStackPredicate);
+            }
+        }
+        if (require != null) builder.requires(require);
 
         // 2. 应用执行逻辑 (如果可执行)
         if (this instanceof IExecutable) {

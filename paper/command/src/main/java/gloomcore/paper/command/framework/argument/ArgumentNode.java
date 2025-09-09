@@ -33,4 +33,9 @@ public abstract class ArgumentNode<T> extends AbstractCommandNode {
 
         return builder;
     }
+
+    @Override
+    public NodeType getNodeType() {
+        return NodeType.ARGUMENT;
+    }
 }
