@@ -51,7 +51,7 @@ public abstract class AbstractCommandNode implements ICommandNode, IParentNode, 
                 hasCustomRequirement = true;
             }
         }
-        if (hasCustomRequirement && requirement != null && requirement != IRequireable.ALWAYS_TRUE) {
+        if (hasCustomRequirement && requirement != IRequireable.ALWAYS_TRUE) {
             builder.requires(requirement);
         }
 
