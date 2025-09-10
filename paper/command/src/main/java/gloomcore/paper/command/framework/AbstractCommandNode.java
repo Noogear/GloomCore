@@ -10,17 +10,12 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * 框架的核心抽象基类.
- * 实现了基本接口，并提供了一个智能的 build 方法，可根据节点实现的接口来组装功能。
+ * 框架的核心抽象基类。
+ * 实现了基本接口，并提供智能 build 方法。
  */
 public abstract class AbstractCommandNode implements ICommandNode, IParentNode, IRequireable {
 
     private final List<ICommandNode> children = new ArrayList<>();
-
-    @Override
-    public Predicate<CommandSourceStack> getRequirement() {
-        return source -> true;
-    }
 
     @Override
     public void addChild(ICommandNode child) {
@@ -35,51 +30,50 @@ public abstract class AbstractCommandNode implements ICommandNode, IParentNode, 
     }
 
     /**
-     * 模板方法，由子类（LiteralNode, ArgumentNode）实现，用于创建特定类型的 Builder。
+     * 创建具体节点 Builder（由子类实现）。
      *
-     * @return a new ArgumentBuilder instance.
+     * @return builder
      */
     protected abstract ArgumentBuilder<CommandSourceStack, ?> createBuilder();
-
 
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build() {
         ArgumentBuilder<CommandSourceStack, ?> builder = createBuilder();
 
-        // 1. 应用权限：IRequire 与 IPermission 同时生效（AND）
-        Predicate<CommandSourceStack> require = getRequirement();
+        Predicate<CommandSourceStack> requirement = getRequirement();
+        boolean hasCustomRequirement = requirement != null && requirement != IRequireable.ALWAYS_TRUE;
+
         if (this instanceof IPermission p) {
             String perm = p.getPermission();
             if (perm != null && !perm.isBlank()) {
-                Predicate<CommandSourceStack> sourceStackPredicate = source -> source.getSender().hasPermission(perm);
-                require = (require == null) ? sourceStackPredicate : require.and(sourceStackPredicate);
+                Predicate<CommandSourceStack> permPredicate = src -> src.getSender().hasPermission(perm);
+                requirement = hasCustomRequirement ? requirement.and(permPredicate) : permPredicate;
+                hasCustomRequirement = true;
             }
         }
-        if (require != null) builder.requires(require);
-
-        // 2. 应用执行逻辑 (如果可执行)
-        if (this instanceof IExecutable) {
-            builder.executes(((IExecutable) this)::execute);
+        if (hasCustomRequirement && requirement != null && requirement != IRequireable.ALWAYS_TRUE) {
+            builder.requires(requirement);
         }
 
-        // 3. 应用重定向逻辑 (如果可重定向)
+        if (this instanceof IExecutable exec) {
+            builder.executes(exec::execute);
+        }
+
         if (this instanceof IRedirectable redirectable) {
             com.mojang.brigadier.tree.CommandNode<CommandSourceStack> target = redirectable.getRedirectTarget();
-
             if (target != null) {
                 if (!children.isEmpty() || this instanceof IExecutable) {
-                    throw new IllegalStateException("Redirected node '" + getName() + "' cannot have children or an executor.");
+                    throw new IllegalStateException(
+                            "Redirected node '" + getName() + "' cannot have children or an executor.");
                 }
                 builder.forward(target, redirectable.getRedirectModifier(), redirectable.isFork());
                 return builder;
             }
         }
 
-        // 5. 构建并添加子节点
-        for (ICommandNode child : getChildren()) {
+        for (ICommandNode child : children) {
             builder.then(child.build());
         }
-
         return builder;
     }
 }

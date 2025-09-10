@@ -3,14 +3,11 @@ package gloomcore.paper.command.util;
 import gloomcore.paper.command.framework.AbstractCommandNode;
 import gloomcore.paper.command.interfaces.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 将自定义命令节点树渲染为可读的 ASCII 文本。
- * 调用时机：在命令加载 / 注册完成构建根节点后调用。
+ * 用于日志与调试，输出稳定（对子节点名称排序）。
  */
 public final class CommandTreePrinter {
 
@@ -19,12 +16,15 @@ public final class CommandTreePrinter {
 
     /**
      * 打印单棵命令树。
+     *
+     * @param root 根节点
+     * @return ASCII 文本
      */
     public static String toText(ICommandNode root) {
         Objects.requireNonNull(root, "root");
         StringBuilder sb = new StringBuilder();
         if (!(root instanceof AbstractCommandNode n)) {
-            sb.append(root.getName()).append("\n");
+            sb.append(root.getName()).append('\n');
             return sb.toString();
         }
         appendNode(sb, n, "", true);
@@ -32,20 +32,28 @@ public final class CommandTreePrinter {
     }
 
     /**
-     * 打印多棵根命令树（例如注册了多个根命令）。
+     * 打印多棵根命令树。
+     *
+     * @param roots 根节点集合
+     * @return 合并后的 ASCII 文本
      */
     public static String toText(Collection<? extends ICommandNode> roots) {
+        if (roots == null || roots.isEmpty()) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
-        if (roots == null || roots.isEmpty()) return "";
-        int i = 0, size = roots.size();
-        for (ICommandNode node : roots) {
-            boolean last = (++i == size);
+        List<ICommandNode> list = new ArrayList<>(roots);
+        list.sort(Comparator.comparing(ICommandNode::getName));
+        int size = list.size();
+        for (int i = 0; i < size; i++) {
+            ICommandNode node = list.get(i);
+            boolean last = (i == size - 1);
             if (node instanceof AbstractCommandNode n) {
                 appendNode(sb, n, "", last);
             } else {
                 sb.append(last ? "└─ " : "├─ ")
                         .append(node.getName())
-                        .append("\n");
+                        .append('\n');
             }
         }
         return sb.toString();
@@ -55,12 +63,14 @@ public final class CommandTreePrinter {
         sb.append(prefix)
                 .append(tail ? "└─ " : "├─ ")
                 .append(labelFor(node))
-                .append("\n");
+                .append('\n');
 
-        List<ICommandNode> children = new ArrayList<>(safeChildren(node));
-        for (int i = 0; i < children.size(); i++) {
+        List<ICommandNode> children = new ArrayList<>(CommandNodeUtils.childrenOf(node));
+        children.sort(Comparator.comparing(ICommandNode::getName));
+        int size = children.size();
+        for (int i = 0; i < size; i++) {
             ICommandNode child = children.get(i);
-            boolean last = (i == children.size() - 1);
+            boolean last = (i == size - 1);
             String childPrefix = prefix + (tail ? "   " : "│  ");
             if (child instanceof AbstractCommandNode n) {
                 appendNode(sb, n, childPrefix, last);
@@ -68,45 +78,33 @@ public final class CommandTreePrinter {
                 sb.append(childPrefix)
                         .append(last ? "└─ " : "├─ ")
                         .append(child.getName())
-                        .append("\n");
+                        .append('\n');
             }
         }
     }
 
     private static String labelFor(AbstractCommandNode node) {
-        String base;
-
-        if (Objects.requireNonNull(node.getNodeType()) == ICommandNode.NodeType.ARGUMENT) {
-            base = "<" + node.getName() + ">";
-        } else {
-            base = node.getName();
-        }
-
+        String base = CommandNodeUtils.baseToken(node);
         StringBuilder sb = new StringBuilder(base);
-        if (node instanceof IExecutable) sb.append(" *");
-        if (node instanceof ISuggestable) sb.append(" ~");
-        if (node instanceof IRedirectable r) {
-            if (r.getRedirectTarget() != null) {
-                sb.append(r.isFork() ? " ->(fork)" : " ->");
-            }
+        if (node instanceof IExecutable) {
+            sb.append(" *");
         }
-        // 追加描述（若实现 IDescribed）
+        if (node instanceof ISuggestable) {
+            sb.append(" ~");
+        }
+        if (node instanceof IRedirectable r && r.getRedirectTarget() != null) {
+            sb.append(r.isFork() ? " ->(fork)" : " ->");
+        }
         if (node instanceof IDescribed d) {
             String desc = d.getDescription();
-            if (desc != null && !desc.isBlank()) sb.append("  // ").append(desc.trim());
+            if (desc != null && !desc.isBlank()) {
+                sb.append("  // ").append(desc.trim());
+            }
         }
         return sb.toString();
     }
 
-    private static String simpleTypeName(Object o) {
-        return (o == null) ? "?" : o.getClass().getSimpleName();
-    }
-
-    private static Collection<ICommandNode> safeChildren(ICommandNode node) {
-        if (node instanceof IParentNode p) {
-            Collection<ICommandNode> c = p.getChildren();
-            return (c == null) ? List.of() : c;
-        }
-        return List.of();
+    private static Collection<ICommandNode> safeChildren(ICommandNode node) { // 标记为弃用，兼容旧引用，后续可删除
+        return CommandNodeUtils.childrenOf(node);
     }
 }
