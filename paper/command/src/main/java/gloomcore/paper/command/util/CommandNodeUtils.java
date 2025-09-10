@@ -41,7 +41,7 @@ public final class CommandNodeUtils {
     }
 
     /**
-     * 返回基础 token（参数采用 <name>，字面量为 name）。
+     * 返回基础 token（参数采用 &lt;name&gt;，字面量为 name）。
      *
      * @param node 节点
      * @return 基础 token
