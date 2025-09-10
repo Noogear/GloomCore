@@ -1,6 +1,10 @@
 package gloomcore.paper.command.util;
 
-import gloomcore.paper.command.interfaces.*;
+import gloomcore.paper.command.interfaces.ICommandNode;
+import gloomcore.paper.command.interfaces.IDescribed;
+import gloomcore.paper.command.interfaces.IParentNode;
+import gloomcore.paper.command.interfaces.IPermission;
+import gloomcore.paper.command.interfaces.IRequireable;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.util.Collection;
@@ -8,8 +12,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * 命令节点通用辅助方法集合。集中提供：
- * 1) 子节点安全获取 2) 基础名称生成 3) 描述文本获取。
+ * 命令节点通用辅助方法集合，提供子节点获取、基础 token 与描述处理。
  */
 public final class CommandNodeUtils {
 
@@ -31,7 +34,7 @@ public final class CommandNodeUtils {
     }
 
     /**
-     * 是否为参数节点。
+     * 判断是否为参数节点。
      *
      * @param node 节点
      * @return true 表示为参数
@@ -41,13 +44,15 @@ public final class CommandNodeUtils {
     }
 
     /**
-     * 返回基础 token（参数采用 &lt;name&gt;，字面量为 name）。
+     * 返回基础 token（参数使用 <name> 形式，字面量为名称本身）。
      *
      * @param node 节点
      * @return 基础 token
      */
     public static String baseToken(ICommandNode node) {
-        if (node == null) return "";
+        if (node == null) {
+            return "";
+        }
         return isArgument(node) ? ("<" + node.getName() + ">") : node.getName();
     }
 
@@ -68,7 +73,11 @@ public final class CommandNodeUtils {
     }
 
     /**
-     * 统一权限 / 条件判定，供渲染或过滤使用。
+     * 判定节点对给定来源是否允许（权限与 requirement 组合）。
+     *
+     * @param node   节点
+     * @param source 来源
+     * @return 是否允许
      */
     public static boolean isAllowed(ICommandNode node, CommandSourceStack source) {
         if (node instanceof IRequireable r) {

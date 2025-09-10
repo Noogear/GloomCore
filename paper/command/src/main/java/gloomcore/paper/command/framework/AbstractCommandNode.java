@@ -1,7 +1,12 @@
 package gloomcore.paper.command.framework;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import gloomcore.paper.command.interfaces.*;
+import gloomcore.paper.command.interfaces.ICommandNode;
+import gloomcore.paper.command.interfaces.IExecutable;
+import gloomcore.paper.command.interfaces.IPermission;
+import gloomcore.paper.command.interfaces.IParentNode;
+import gloomcore.paper.command.interfaces.IRedirectable;
+import gloomcore.paper.command.interfaces.IRequireable;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.util.ArrayList;
@@ -10,8 +15,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * 框架的核心抽象基类。
- * 实现了基本接口，并提供智能 build 方法。
+ * 抽象命令节点基类，实现核心接口并提供统一 build 逻辑。
  */
 public abstract class AbstractCommandNode implements ICommandNode, IParentNode, IRequireable {
 
@@ -30,7 +34,7 @@ public abstract class AbstractCommandNode implements ICommandNode, IParentNode, 
     }
 
     /**
-     * 创建具体节点 Builder（由子类实现）。
+     * 创建具体节点的 Brigadier Builder 由子类实现。
      *
      * @return builder
      */

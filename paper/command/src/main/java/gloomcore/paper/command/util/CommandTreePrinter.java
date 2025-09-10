@@ -1,13 +1,20 @@
 package gloomcore.paper.command.util;
 
 import gloomcore.paper.command.framework.AbstractCommandNode;
-import gloomcore.paper.command.interfaces.*;
+import gloomcore.paper.command.interfaces.ICommandNode;
+import gloomcore.paper.command.interfaces.IDescribed;
+import gloomcore.paper.command.interfaces.IExecutable;
+import gloomcore.paper.command.interfaces.IRedirectable;
+import gloomcore.paper.command.interfaces.ISuggestable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * 将自定义命令节点树渲染为可读的 ASCII 文本。
- * 用于日志与调试，输出稳定（对子节点名称排序）。
+ * 将自定义命令节点树渲染为可读 ASCII 文本（稳定排序便于调试）。
  */
 public final class CommandTreePrinter {
 
