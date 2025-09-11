@@ -26,10 +26,8 @@ public final class CommandRegistrar {
         plugin.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             // 每次命令重载都会触发此事件，因此需要重新构建根节点
             Collection<? extends CommandNode> roots = provider.buildRoots();
-            // 注册并缓存，同时输出文字版命令树
+            // 注册并缓存
             registerRootsAndCache(roots, event.registrar().getDispatcher());
-            // 若需要：也可以通过缓存服务自行获取：
-            // String tree = CommandTreeCache.getInstance().getCombined();
         });
     }
 
@@ -45,6 +43,8 @@ public final class CommandRegistrar {
             ArgumentBuilder<CommandSourceStack, ?> builder = root.build();
             dispatcher.getRoot().addChild(builder.build());
         }
+        // 注册完成后，重置并预热命令树渲染缓存（与权限无关，基于样式与静态结构）
+        gloomcore.paper.command.util.CommandTreeMiniMessage.clearCaches();
+        gloomcore.paper.command.util.CommandTreeMiniMessage.prewarm(roots);
     }
 }
-
