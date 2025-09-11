@@ -62,6 +62,172 @@ public final class CommandTreeMiniMessage {
         return sb.toString();
     }
 
+    // ======================== 分页渲染 ========================
+    /**
+     * 分页渲染多棵根命令（1 基页码）。
+     * - page <= 0 时按 1 处理；pageSize <= 0 时按 1 处理。
+     * - 分页时不拆分子树；若当前页剩余行数不足以容纳某个子树，则换到下一页，并从父节点（含必要祖先链）续上。
+     */
+    public static String toMiniMessage(Collection<? extends CommandNode> roots,
+                                       CommandSourceStack source,
+                                       int page,
+                                       int pageSize) {
+        if (roots == null || roots.isEmpty()) {
+            return "";
+        }
+        int targetPage = Math.max(1, page);
+        int sizePerPage = Math.max(1, pageSize);
+
+        List<NodeModel> rootModels = new ArrayList<>();
+        List<CommandNode> sorted = new ArrayList<>(roots);
+        sorted.sort(Comparator.comparing(CommandNode::getName));
+        for (CommandNode n : sorted) {
+            if (CommandNodeUtils.isAllowed(n, source)) {
+                rootModels.add(buildModel(n, source));
+            }
+        }
+        if (rootModels.isEmpty()) {
+            return "";
+        }
+
+        Pager pager = new Pager(targetPage, sizePerPage);
+        int lastIdx = rootModels.size() - 1;
+        for (int i = 0; i < rootModels.size(); i++) {
+            NodeModel m = rootModels.get(i);
+            boolean tail = (i == lastIdx);
+            pager.emitSubtree(m, "", tail, "/" + m.node.getName());
+        }
+        return pager.result();
+    }
+
+    /**
+     * 分页渲染单棵根命令（1 基页码）。
+     * - page <= 0 时按 1 处理；pageSize <= 0 时按 1 处理。
+     * - 分页时不拆分子树；若当前页剩余行数不足以容纳某个子树，则换到下一页，并从父节点（含必要祖先链）续上。
+     */
+    public static String toMiniMessage(CommandNode root,
+                                       CommandSourceStack source,
+                                       int page,
+                                       int pageSize) {
+        Objects.requireNonNull(root, "root");
+        if (!CommandNodeUtils.isAllowed(root, source)) {
+            return "";
+        }
+        int targetPage = Math.max(1, page);
+        int sizePerPage = Math.max(1, pageSize);
+        NodeModel model = buildModel(root, source);
+        Pager pager = new Pager(targetPage, sizePerPage);
+        pager.emitSubtree(model, "", true, "/" + model.node.getName());
+        return pager.result();
+    }
+
+    // 用于分页的轻量模型（已按权限过滤并排序），并预计算子树行数
+    private static final class NodeModel {
+        final CommandNode node;
+        final List<NodeModel> children;
+        final int lines; // 包含自己的一行
+        NodeModel(CommandNode node, List<NodeModel> children) {
+            this.node = node;
+            this.children = children;
+            int sum = 1;
+            for (NodeModel c : children) sum += c.lines;
+            this.lines = sum;
+        }
+    }
+
+    private static NodeModel buildModel(CommandNode node, CommandSourceStack source) {
+        List<CommandNode> raw = new ArrayList<>(CommandNodeUtils.childrenOf(node));
+        raw.sort(Comparator.comparing(CommandNode::getName));
+        List<NodeModel> vis = new ArrayList<>();
+        for (CommandNode c : raw) {
+            if (CommandNodeUtils.isAllowed(c, source)) {
+                vis.add(buildModel(c, source));
+            }
+        }
+        return new NodeModel(node, Collections.unmodifiableList(vis));
+    }
+
+    private static final class AncEntry {
+        final NodeModel model; final String prefix; final boolean tail; final String path;
+        AncEntry(NodeModel m, String p, boolean t, String path) { this.model = m; this.prefix = p; this.tail = t; this.path = path; }
+    }
+
+    private static final class Pager {
+        final int targetPage; final int pageSize;
+        int currentPage = 1; int remaining;
+        boolean producedTarget = false;
+        final StringBuilder pageBuf = new StringBuilder();
+        final Deque<AncEntry> chain = new ArrayDeque<>();
+        Pager(int targetPage, int pageSize) { this.targetPage = targetPage; this.pageSize = pageSize; this.remaining = pageSize; }
+        String result() { return producedTarget ? pageBuf.toString() : ""; }
+
+        void emitSubtree(NodeModel node, String prefix, boolean tail, String path) {
+            ensureSpaceOrTurnPage();
+            appendLine(node.node, prefix, tail, path);
+            chain.addLast(new AncEntry(node, prefix, tail, path));
+            int last = node.children.size() - 1;
+            for (int i = 0; i < node.children.size(); i++) {
+                NodeModel ch = node.children.get(i);
+                boolean chTail = (i == last);
+                String chPrefix = prefix + (tail ? "   " : "│  ");
+                String chPath = nextPath(path, ch.node);
+                if (ch.lines > remaining) {
+                    turnPageAndReprintContext();
+                }
+                emitSubtree(ch, chPrefix, chTail, chPath);
+            }
+            chain.removeLast();
+        }
+        private void ensureSpaceOrTurnPage() {
+            if (remaining > 0) return;
+            newPage();
+            reprintContextForNewPage();
+        }
+        private void turnPageAndReprintContext() {
+            newPage();
+            reprintContextForNewPage();
+        }
+        private void newPage() { currentPage++; remaining = pageSize; }
+        private void reprintContextForNewPage() {
+            if (chain.isEmpty()) return;
+            int allow = Math.max(0, pageSize - 1);
+            if (allow == 0) return;
+            int ctx = Math.min(chain.size(), allow);
+            AncEntry[] arr = chain.toArray(new AncEntry[0]);
+            int start = chain.size() - ctx;
+            for (int i = start; i < arr.length; i++) {
+                AncEntry e = arr[i];
+                appendLine(e.model.node, e.prefix, e.tail, e.path);
+            }
+        }
+        private void appendLine(CommandNode node, String prefix, boolean tail, String path) {
+            if (remaining <= 0) { newPage(); }
+            if (currentPage == targetPage) {
+                producedTarget = true;
+                CommandTreeStyle style = CommandTreeStyle.get();
+                String label = labelFor(node, style);
+                String desc = CommandNodeUtils.description(node);
+                String hover = desc.isEmpty() ? stripTags(label) : (stripTags(label) + "\n" + desc);
+                String suggest = argAwareSuggest(path, node);
+                pageBuf.append(style.openTree())
+                        .append(prefix)
+                        .append(tail ? "└─ " : "├─ ")
+                        .append(style.closeTree())
+                        .append(clickable(label, suggest, hover));
+                if (!desc.isEmpty()) {
+                    pageBuf.append(" ")
+                            .append(style.openDescription())
+                            .append("- ")
+                            .append(escapeMini(desc))
+                            .append(style.closeDescription());
+                }
+                pageBuf.append('\n');
+            }
+            remaining--; if (remaining < 0) remaining = 0;
+        }
+    }
+
+    // ======================== 原完整渲染 ========================
     private static void appendNode(StringBuilder sb,
                                    CommandNode node,
                                    CommandSourceStack source,
@@ -117,8 +283,7 @@ public final class CommandTreeMiniMessage {
     }
 
     /**
-     * 计算建议文本：若路径中存在第一个参数占位符 <...> ，截断到第一个 '>' 为止；
-     * 否则在末尾追加空格便于继续输入。
+     * 计算建议文本：若路径中存在第一个参数占位符 <...> ，截断到第一个 '>' 为止；否则末尾留空格。
      */
     private static String argAwareSuggest(String currentPath, CommandNode node) {
         int lt = currentPath.indexOf('<');
@@ -151,9 +316,7 @@ public final class CommandTreeMiniMessage {
         }
         if (node instanceof RedirectableNode r && r.getRedirectTarget() != null) {
             sb.append(" ").append(style.openRedirect()).append("->");
-            if (r.isFork()) {
-                sb.append("(fork)");
-            }
+            if (r.isFork()) sb.append("(fork)");
             sb.append(style.closeRedirect());
         }
         return sb.toString();
@@ -174,5 +337,39 @@ public final class CommandTreeMiniMessage {
 
     private static String escapeAttr(String s) {
         return (s == null) ? "" : s.replace("'", "\\'").replace("\n", " ");
+    }
+
+    // ======================== 统计辅助 ========================
+    /** 统计多根（按权限过滤后）的总行数 */
+    public static int totalLines(Collection<? extends CommandNode> roots, CommandSourceStack source) {
+        if (roots == null || roots.isEmpty()) return 0;
+        List<CommandNode> sorted = new ArrayList<>(roots);
+        sorted.sort(Comparator.comparing(CommandNode::getName));
+        int sum = 0;
+        for (CommandNode n : sorted) {
+            if (CommandNodeUtils.isAllowed(n, source)) sum += buildModel(n, source).lines;
+        }
+        return sum;
+    }
+
+    /** 统计单根（按权限过滤后）的总行数 */
+    public static int totalLines(CommandNode root, CommandSourceStack source) {
+        Objects.requireNonNull(root, "root");
+        if (!CommandNodeUtils.isAllowed(root, source)) return 0;
+        return buildModel(root, source).lines;
+    }
+
+    /** 计算总页数（ceil(lines/pageSize)，pageSize<=0 按 1）- 多根 */
+    public static int totalPages(Collection<? extends CommandNode> roots, CommandSourceStack source, int pageSize) {
+        int ps = Math.max(1, pageSize);
+        int lines = totalLines(roots, source);
+        return lines == 0 ? 0 : (int) Math.ceil(lines / (double) ps);
+    }
+
+    /** 计算总页数（ceil(lines/pageSize)，pageSize<=0 按 1）- 单根 */
+    public static int totalPages(CommandNode root, CommandSourceStack source, int pageSize) {
+        int ps = Math.max(1, pageSize);
+        int lines = totalLines(root, source);
+        return lines == 0 ? 0 : (int) Math.ceil(lines / (double) ps);
     }
 }

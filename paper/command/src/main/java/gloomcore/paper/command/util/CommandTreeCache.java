@@ -39,7 +39,8 @@ public enum CommandTreeCache {
 
     private void rebuildCombinedSorted() {
         List<String> keys = new ArrayList<>(perRoot.keySet());
-        Collections.sort(keys); // 稳定顺序
+        // 稳定顺序
+        Collections.sort(keys);
         StringBuilder sb = new StringBuilder();
         for (String k : keys) {
             String text = perRoot.get(k);
