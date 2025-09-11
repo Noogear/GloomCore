@@ -2,6 +2,7 @@ package gloomcore.paper.command.framework;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import gloomcore.paper.command.interfaces.*;
+import gloomcore.paper.command.util.CommandNodeUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.util.ArrayList;
@@ -39,18 +40,9 @@ public abstract class AbstractCommandNode implements CommandNode, ParentNode, Re
     public ArgumentBuilder<CommandSourceStack, ?> build() {
         ArgumentBuilder<CommandSourceStack, ?> builder = createBuilder();
 
-        Predicate<CommandSourceStack> requirement = getRequirement();
-        boolean hasCustomRequirement = requirement != null && requirement != RequireableNode.ALWAYS_TRUE;
-
-        if (this instanceof PermissionNode p) {
-            String perm = p.getPermission();
-            if (perm != null && !perm.isBlank()) {
-                Predicate<CommandSourceStack> permPredicate = src -> src.getSender().hasPermission(perm);
-                requirement = hasCustomRequirement ? requirement.and(permPredicate) : permPredicate;
-                hasCustomRequirement = true;
-            }
-        }
-        if (hasCustomRequirement && requirement != RequireableNode.ALWAYS_TRUE) {
+        // 统一合成 requires 谓词（权限 + 其它要求），避免重复逻辑
+        Predicate<CommandSourceStack> requirement = CommandNodeUtils.effectiveRequirement(this);
+        if (requirement != RequireableNode.ALWAYS_TRUE) {
             builder.requires(requirement);
         }
 

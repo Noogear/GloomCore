@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * 命令节点通用辅助方法集合，提供子节点获取、基础 token 与描述处理。
+ * 命令节点通用辅助方法集合，提供子节点获取、基础 token 与描述处理，以及权限/条件组合。
+ *
  */
 public final class CommandNodeUtils {
 
@@ -69,6 +70,32 @@ public final class CommandNodeUtils {
     }
 
     /**
+     * 组合“执行要求”(RequireableNode#getRequirement) 与 “权限”(PermissionNode) 为一个统一的 Brigadier requires 谓词。
+     * - 若两者均为放行（恒 true / 空权限），返回 ALWAYS_TRUE 以避免冗余注册。
+     * - 返回的谓词与 {@link #isAllowed(CommandNode, CommandSourceStack)} 判定相一致。
+     *
+     * @param node 目标节点
+     * @return 合成后的 requires 谓词（可能为 ALWAYS_TRUE）
+     */
+    public static Predicate<CommandSourceStack> effectiveRequirement(CommandNode node) {
+        Predicate<CommandSourceStack> req = RequireableNode.ALWAYS_TRUE;
+        if (node instanceof RequireableNode r) {
+            Predicate<CommandSourceStack> base = r.getRequirement();
+            if (base != null && base != RequireableNode.ALWAYS_TRUE) {
+                req = base;
+            }
+        }
+        if (node instanceof PermissionNode p) {
+            String perm = p.getPermission();
+            if (perm != null && !perm.isBlank()) {
+                Predicate<CommandSourceStack> permPred = src -> src.getSender().hasPermission(perm);
+                req = (req == RequireableNode.ALWAYS_TRUE) ? permPred : req.and(permPred);
+            }
+        }
+        return req;
+    }
+
+    /**
      * 判定节点对给定来源是否允许（权限与 requirement 组合）。
      *
      * @param node   节点
@@ -76,15 +103,6 @@ public final class CommandNodeUtils {
      * @return 是否允许
      */
     public static boolean isAllowed(CommandNode node, CommandSourceStack source) {
-        if (node instanceof RequireableNode r) {
-            Predicate<CommandSourceStack> req = r.getRequirement();
-            if (req != null && !req.test(source)) {
-                return false;
-            }
-        }
-        if (node instanceof PermissionNode p) {
-            return p.hasPermission(source);
-        }
-        return true;
+        return effectiveRequirement(node).test(source);
     }
 }

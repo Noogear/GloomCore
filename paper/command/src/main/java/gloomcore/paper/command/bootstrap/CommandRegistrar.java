@@ -3,7 +3,6 @@ package gloomcore.paper.command.bootstrap;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import gloomcore.paper.command.interfaces.CommandNode;
-import gloomcore.paper.command.util.CommandTreeCache;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -41,15 +40,11 @@ public final class CommandRegistrar {
                                              CommandDispatcher<CommandSourceStack> dispatcher) {
         Objects.requireNonNull(roots, "roots");
         Objects.requireNonNull(dispatcher, "dispatcher");
-
         // 注册到 Brigadier
         for (CommandNode root : roots) {
             ArgumentBuilder<CommandSourceStack, ?> builder = root.build();
             dispatcher.getRoot().addChild(builder.build());
         }
-
-        // 缓存并可选输出
-        CommandTreeCache.INSTANCE.cacheAll(roots);
     }
 }
 

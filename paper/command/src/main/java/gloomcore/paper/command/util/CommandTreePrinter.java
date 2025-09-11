@@ -3,10 +3,14 @@ package gloomcore.paper.command.util;
 import gloomcore.paper.command.framework.AbstractCommandNode;
 import gloomcore.paper.command.interfaces.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 将自定义命令节点树渲染为可读 ASCII 文本（稳定排序便于调试）。
+ *
  */
 public final class CommandTreePrinter {
 
@@ -30,33 +34,6 @@ public final class CommandTreePrinter {
         return sb.toString();
     }
 
-    /**
-     * 打印多棵根命令树。
-     *
-     * @param roots 根节点集合
-     * @return 合并后的 ASCII 文本
-     */
-    public static String toText(Collection<? extends CommandNode> roots) {
-        if (roots == null || roots.isEmpty()) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        List<CommandNode> list = new ArrayList<>(roots);
-        list.sort(Comparator.comparing(CommandNode::getName));
-        int size = list.size();
-        for (int i = 0; i < size; i++) {
-            CommandNode node = list.get(i);
-            boolean last = (i == size - 1);
-            if (node instanceof AbstractCommandNode n) {
-                appendNode(sb, n, "", last);
-            } else {
-                sb.append(last ? "└─ " : "├─ ")
-                        .append(node.getName())
-                        .append('\n');
-            }
-        }
-        return sb.toString();
-    }
 
     private static void appendNode(StringBuilder sb, AbstractCommandNode node, String prefix, boolean tail) {
         sb.append(prefix)
@@ -101,9 +78,5 @@ public final class CommandTreePrinter {
             }
         }
         return sb.toString();
-    }
-
-    private static Collection<CommandNode> safeChildren(CommandNode node) { // 标记为弃用，兼容旧引用，后续可删除
-        return CommandNodeUtils.childrenOf(node);
     }
 }
