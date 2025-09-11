@@ -3,10 +3,10 @@ package gloomcore.paper.command.util;
 import gloomcore.paper.command.framework.LiteralNode;
 import gloomcore.paper.command.framework.argument.ArgumentNode;
 import gloomcore.paper.command.framework.argument.CustomArgumentNode;
-import gloomcore.paper.command.interfaces.ICommandNode;
-import gloomcore.paper.command.interfaces.IExecutable;
-import gloomcore.paper.command.interfaces.IRedirectable;
-import gloomcore.paper.command.interfaces.ISuggestable;
+import gloomcore.paper.command.interfaces.CommandNode;
+import gloomcore.paper.command.interfaces.ExecutableNode;
+import gloomcore.paper.command.interfaces.RedirectableNode;
+import gloomcore.paper.command.interfaces.SuggestableNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.util.*;
@@ -28,15 +28,15 @@ public final class CommandTreeMiniMessage {
      * @param source 权限来源
      * @return MiniMessage 文本
      */
-    public static String toMiniMessage(Collection<? extends ICommandNode> roots, CommandSourceStack source) {
+    public static String toMiniMessage(Collection<? extends CommandNode> roots, CommandSourceStack source) {
         if (roots == null || roots.isEmpty()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        List<ICommandNode> sorted = new ArrayList<>(roots);
-        sorted.sort(Comparator.comparing(ICommandNode::getName));
+        List<CommandNode> sorted = new ArrayList<>(roots);
+        sorted.sort(Comparator.comparing(CommandNode::getName));
         for (int i = 0; i < sorted.size(); i++) {
-            ICommandNode node = sorted.get(i);
+            CommandNode node = sorted.get(i);
             boolean last = (i == sorted.size() - 1);
             if (CommandNodeUtils.isAllowed(node, source)) {
                 appendNode(sb, node, source, "", last, "/" + node.getName());
@@ -52,7 +52,7 @@ public final class CommandTreeMiniMessage {
      * @param source 权限来源
      * @return MiniMessage 文本
      */
-    public static String toMiniMessage(ICommandNode root, CommandSourceStack source) {
+    public static String toMiniMessage(CommandNode root, CommandSourceStack source) {
         Objects.requireNonNull(root, "root");
         if (!CommandNodeUtils.isAllowed(root, source)) {
             return "";
@@ -63,7 +63,7 @@ public final class CommandTreeMiniMessage {
     }
 
     private static void appendNode(StringBuilder sb,
-                                   ICommandNode node,
+                                   CommandNode node,
                                    CommandSourceStack source,
                                    String prefix,
                                    boolean tail,
@@ -88,16 +88,16 @@ public final class CommandTreeMiniMessage {
         }
         sb.append('\n');
 
-        List<ICommandNode> children = new ArrayList<>(CommandNodeUtils.childrenOf(node));
-        children.sort(Comparator.comparing(ICommandNode::getName));
-        List<ICommandNode> visible = new ArrayList<>();
-        for (ICommandNode c : children) {
+        List<CommandNode> children = new ArrayList<>(CommandNodeUtils.childrenOf(node));
+        children.sort(Comparator.comparing(CommandNode::getName));
+        List<CommandNode> visible = new ArrayList<>();
+        for (CommandNode c : children) {
             if (CommandNodeUtils.isAllowed(c, source)) {
                 visible.add(c);
             }
         }
         for (int i = 0; i < visible.size(); i++) {
-            ICommandNode child = visible.get(i);
+            CommandNode child = visible.get(i);
             boolean childLast = (i == visible.size() - 1);
             String childPrefix = prefix + (tail ? "   " : "│  ");
             String childPath = nextPath(currentPath, child);
@@ -105,7 +105,7 @@ public final class CommandTreeMiniMessage {
         }
     }
 
-    private static String nextPath(String current, ICommandNode node) {
+    private static String nextPath(String current, CommandNode node) {
         String name = node.getName();
         if (node instanceof LiteralNode) {
             return current + " " + name;
@@ -120,7 +120,7 @@ public final class CommandTreeMiniMessage {
      * 计算建议文本：若路径中存在第一个参数占位符 <...> ，截断到第一个 '>' 为止；
      * 否则在末尾追加空格便于继续输入。
      */
-    private static String argAwareSuggest(String currentPath, ICommandNode node) {
+    private static String argAwareSuggest(String currentPath, CommandNode node) {
         int lt = currentPath.indexOf('<');
         if (lt >= 0) {
             int gt = currentPath.indexOf('>', lt + 1);
@@ -137,19 +137,19 @@ public final class CommandTreeMiniMessage {
         return currentPath + " ";
     }
 
-    private static String labelFor(ICommandNode node, CommandTreeStyle style) {
+    private static String labelFor(CommandNode node, CommandTreeStyle style) {
         boolean arg = CommandNodeUtils.isArgument(node);
         String open = arg ? style.openArgument() : style.openLiteral();
         String close = arg ? style.closeArgument() : style.closeLiteral();
         String base = CommandNodeUtils.baseToken(node);
         StringBuilder sb = new StringBuilder(open).append(escapeMini(base)).append(close);
-        if (node instanceof IExecutable) {
+        if (node instanceof ExecutableNode) {
             sb.append(" ").append(style.openSymbol()).append("*").append(style.closeSymbol());
         }
-        if (node instanceof ISuggestable) {
+        if (node instanceof SuggestableNode) {
             sb.append(" ").append(style.openSymbol()).append("~").append(style.closeSymbol());
         }
-        if (node instanceof IRedirectable r && r.getRedirectTarget() != null) {
+        if (node instanceof RedirectableNode r && r.getRedirectTarget() != null) {
             sb.append(" ").append(style.openRedirect()).append("->");
             if (r.isFork()) {
                 sb.append("(fork)");

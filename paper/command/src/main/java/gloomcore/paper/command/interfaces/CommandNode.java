@@ -6,7 +6,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 /**
  * 所有命令节点的根接口。定义名称、构建 Brigadier Builder、节点类型。
  */
-public interface ICommandNode {
+public interface CommandNode {
     /**
      * 获取命令节点的字面量名称。
      *

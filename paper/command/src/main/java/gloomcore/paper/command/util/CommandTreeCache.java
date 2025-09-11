@@ -1,6 +1,6 @@
 package gloomcore.paper.command.util;
 
-import gloomcore.paper.command.interfaces.ICommandNode;
+import gloomcore.paper.command.interfaces.CommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.time.Instant;
@@ -23,7 +23,7 @@ public enum CommandTreeCache {
     private final MiniCache miniPerRootCache = new MiniCache(512, 2000);
     private volatile Instant lastUpdated = null;
     // 最近一次构建的根节点快照，用于按权限快速渲染 MiniMessage（保持名称排序，输出稳定）
-    private volatile List<ICommandNode> lastRoots = List.of();
+    private volatile List<CommandNode> lastRoots = List.of();
 
     private static String styleFingerprint(CommandTreeStyle s) {
         return String.join(",",
@@ -31,9 +31,9 @@ public enum CommandTreeCache {
                 s.getDescriptionColor(), s.getSymbolColor(), s.getRedirectColor());
     }
 
-    private static List<ICommandNode> sortedCopy(Collection<? extends ICommandNode> roots) {
-        List<ICommandNode> list = new ArrayList<>(roots);
-        list.sort(Comparator.comparing(ICommandNode::getName));
+    private static List<CommandNode> sortedCopy(Collection<? extends CommandNode> roots) {
+        List<CommandNode> list = new ArrayList<>(roots);
+        list.sort(Comparator.comparing(CommandNode::getName));
         return List.copyOf(list);
     }
 
@@ -55,12 +55,12 @@ public enum CommandTreeCache {
      *
      * @param root 根命令节点
      */
-    public void cacheSingle(ICommandNode root) {
+    public void cacheSingle(CommandNode root) {
         Objects.requireNonNull(root, "root");
         perRoot.put(root.getName(), CommandTreePrinter.toText(root));
         this.lastUpdated = Instant.now();
         // 合并快照（保持排序）
-        List<ICommandNode> copy = new ArrayList<>(lastRoots);
+        List<CommandNode> copy = new ArrayList<>(lastRoots);
         copy.removeIf(n -> Objects.equals(n.getName(), root.getName()));
         copy.add(root);
         lastRoots = sortedCopy(copy);
@@ -76,10 +76,10 @@ public enum CommandTreeCache {
      *
      * @param roots 根命令集合
      */
-    public void cacheAll(Collection<? extends ICommandNode> roots) {
+    public void cacheAll(Collection<? extends CommandNode> roots) {
         Objects.requireNonNull(roots, "roots");
         perRoot.clear();
-        for (ICommandNode root : roots) {
+        for (CommandNode root : roots) {
             perRoot.put(root.getName(), CommandTreePrinter.toText(root));
         }
         this.lastUpdated = Instant.now();
@@ -114,7 +114,7 @@ public enum CommandTreeCache {
      *
      * @return 根节点不可变列表
      */
-    public List<ICommandNode> getRootsSnapshot() {
+    public List<CommandNode> getRootsSnapshot() {
         return lastRoots;
     }
 
@@ -125,7 +125,7 @@ public enum CommandTreeCache {
      * @return 渲染后的 MiniMessage 文本
      */
     public String renderMiniFor(CommandSourceStack source) {
-        List<ICommandNode> roots = this.lastRoots;
+        List<CommandNode> roots = this.lastRoots;
         if (roots == null || roots.isEmpty()) {
             return "";
         }
@@ -155,7 +155,7 @@ public enum CommandTreeCache {
         if (cached != null) {
             return cached;
         }
-        for (ICommandNode n : lastRoots) {
+        for (CommandNode n : lastRoots) {
             if (rootName.equals(n.getName())) {
                 String rendered = CommandTreeMiniMessage.toMiniMessage(n, source);
                 miniPerRootCache.put(key, rendered);

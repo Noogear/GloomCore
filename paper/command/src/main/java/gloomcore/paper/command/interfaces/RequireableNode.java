@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 /**
  * 实现此接口的命令节点可以定义执行要求（例如权限）。
  */
-public interface IRequireable {
+public interface RequireableNode {
     /**
      * 恒为 true 的公共常量，用于判定是否需要在 Brigadier 中注册 requires()。
      */

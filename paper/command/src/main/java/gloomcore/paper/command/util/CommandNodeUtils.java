@@ -1,10 +1,6 @@
 package gloomcore.paper.command.util;
 
-import gloomcore.paper.command.interfaces.ICommandNode;
-import gloomcore.paper.command.interfaces.IDescribed;
-import gloomcore.paper.command.interfaces.IParentNode;
-import gloomcore.paper.command.interfaces.IPermission;
-import gloomcore.paper.command.interfaces.IRequireable;
+import gloomcore.paper.command.interfaces.*;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.util.Collection;
@@ -25,9 +21,9 @@ public final class CommandNodeUtils {
      * @param node 节点
      * @return 子节点集合（可能为空不可变）
      */
-    public static Collection<ICommandNode> childrenOf(ICommandNode node) {
-        if (node instanceof IParentNode p) {
-            Collection<ICommandNode> c = p.getChildren();
+    public static Collection<CommandNode> childrenOf(CommandNode node) {
+        if (node instanceof ParentNode p) {
+            Collection<CommandNode> c = p.getChildren();
             return (c == null) ? List.of() : c;
         }
         return List.of();
@@ -39,8 +35,8 @@ public final class CommandNodeUtils {
      * @param node 节点
      * @return true 表示为参数
      */
-    public static boolean isArgument(ICommandNode node) {
-        return node != null && node.getNodeType() == ICommandNode.NodeType.ARGUMENT;
+    public static boolean isArgument(CommandNode node) {
+        return node != null && node.getNodeType() == CommandNode.NodeType.ARGUMENT;
     }
 
     /**
@@ -49,7 +45,7 @@ public final class CommandNodeUtils {
      * @param node 节点
      * @return 基础 token
      */
-    public static String baseToken(ICommandNode node) {
+    public static String baseToken(CommandNode node) {
         if (node == null) {
             return "";
         }
@@ -62,8 +58,8 @@ public final class CommandNodeUtils {
      * @param node 节点
      * @return 描述或空串
      */
-    public static String description(ICommandNode node) {
-        if (node instanceof IDescribed d) {
+    public static String description(CommandNode node) {
+        if (node instanceof DescribedNode d) {
             String s = d.getDescription();
             if (s != null && !s.isBlank()) {
                 return s.trim();
@@ -79,14 +75,14 @@ public final class CommandNodeUtils {
      * @param source 来源
      * @return 是否允许
      */
-    public static boolean isAllowed(ICommandNode node, CommandSourceStack source) {
-        if (node instanceof IRequireable r) {
+    public static boolean isAllowed(CommandNode node, CommandSourceStack source) {
+        if (node instanceof RequireableNode r) {
             Predicate<CommandSourceStack> req = r.getRequirement();
             if (req != null && !req.test(source)) {
                 return false;
             }
         }
-        if (node instanceof IPermission p) {
+        if (node instanceof PermissionNode p) {
             return p.hasPermission(source);
         }
         return true;

@@ -1,12 +1,7 @@
 package gloomcore.paper.command.framework;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import gloomcore.paper.command.interfaces.ICommandNode;
-import gloomcore.paper.command.interfaces.IExecutable;
-import gloomcore.paper.command.interfaces.IPermission;
-import gloomcore.paper.command.interfaces.IParentNode;
-import gloomcore.paper.command.interfaces.IRedirectable;
-import gloomcore.paper.command.interfaces.IRequireable;
+import gloomcore.paper.command.interfaces.*;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 import java.util.ArrayList;
@@ -17,19 +12,19 @@ import java.util.function.Predicate;
 /**
  * 抽象命令节点基类，实现核心接口并提供统一 build 逻辑。
  */
-public abstract class AbstractCommandNode implements ICommandNode, IParentNode, IRequireable {
+public abstract class AbstractCommandNode implements CommandNode, ParentNode, RequireableNode {
 
-    private final List<ICommandNode> children = new ArrayList<>();
+    private final List<CommandNode> children = new ArrayList<>();
 
     @Override
-    public void addChild(ICommandNode child) {
+    public void addChild(CommandNode child) {
         if (child != null) {
             this.children.add(child);
         }
     }
 
     @Override
-    public Collection<ICommandNode> getChildren() {
+    public Collection<CommandNode> getChildren() {
         return this.children;
     }
 
@@ -45,9 +40,9 @@ public abstract class AbstractCommandNode implements ICommandNode, IParentNode, 
         ArgumentBuilder<CommandSourceStack, ?> builder = createBuilder();
 
         Predicate<CommandSourceStack> requirement = getRequirement();
-        boolean hasCustomRequirement = requirement != null && requirement != IRequireable.ALWAYS_TRUE;
+        boolean hasCustomRequirement = requirement != null && requirement != RequireableNode.ALWAYS_TRUE;
 
-        if (this instanceof IPermission p) {
+        if (this instanceof PermissionNode p) {
             String perm = p.getPermission();
             if (perm != null && !perm.isBlank()) {
                 Predicate<CommandSourceStack> permPredicate = src -> src.getSender().hasPermission(perm);
@@ -55,18 +50,18 @@ public abstract class AbstractCommandNode implements ICommandNode, IParentNode, 
                 hasCustomRequirement = true;
             }
         }
-        if (hasCustomRequirement && requirement != IRequireable.ALWAYS_TRUE) {
+        if (hasCustomRequirement && requirement != RequireableNode.ALWAYS_TRUE) {
             builder.requires(requirement);
         }
 
-        if (this instanceof IExecutable exec) {
+        if (this instanceof ExecutableNode exec) {
             builder.executes(exec::execute);
         }
 
-        if (this instanceof IRedirectable redirectable) {
+        if (this instanceof RedirectableNode redirectable) {
             com.mojang.brigadier.tree.CommandNode<CommandSourceStack> target = redirectable.getRedirectTarget();
             if (target != null) {
-                if (!children.isEmpty() || this instanceof IExecutable) {
+                if (!children.isEmpty() || this instanceof ExecutableNode) {
                     throw new IllegalStateException(
                             "Redirected node '" + getName() + "' cannot have children or an executor.");
                 }
@@ -75,7 +70,7 @@ public abstract class AbstractCommandNode implements ICommandNode, IParentNode, 
             }
         }
 
-        for (ICommandNode child : children) {
+        for (CommandNode child : children) {
             builder.then(child.build());
         }
         return builder;

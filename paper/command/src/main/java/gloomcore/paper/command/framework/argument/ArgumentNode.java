@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import gloomcore.paper.command.framework.AbstractCommandNode;
-import gloomcore.paper.command.interfaces.ISuggestable;
+import gloomcore.paper.command.interfaces.SuggestableNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 
 /**
@@ -26,9 +26,9 @@ public abstract class ArgumentNode<T> extends AbstractCommandNode {
         RequiredArgumentBuilder<CommandSourceStack, T> builder = RequiredArgumentBuilder.argument(getName(), getType());
 
         // 检查当前实例是否实现了 ISuggestable 接口
-        if (this instanceof ISuggestable) {
+        if (this instanceof SuggestableNode) {
             // 如果是，就调用接口的方法来应用建议
-            builder.suggests(((ISuggestable) this).getSuggestionsProvider());
+            builder.suggests(((SuggestableNode) this).getSuggestionsProvider());
         }
 
         return builder;

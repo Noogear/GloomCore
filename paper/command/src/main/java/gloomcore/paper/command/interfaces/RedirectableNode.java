@@ -7,7 +7,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 /**
  * 实现此接口的命令节点支持 redirect 和 fork 功能。
  */
-public interface IRedirectable {
+public interface RedirectableNode {
     CommandNode<CommandSourceStack> getRedirectTarget();
 
     RedirectModifier<CommandSourceStack> getRedirectModifier();

@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import gloomcore.paper.command.framework.AbstractCommandNode;
-import gloomcore.paper.command.interfaces.ISuggestable;
+import gloomcore.paper.command.interfaces.SuggestableNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import org.jetbrains.annotations.NotNull;
@@ -38,11 +38,11 @@ public abstract class CustomArgumentNode<T, N> extends AbstractCommandNode imple
      */
     @Override
     public final <S> @NotNull CompletableFuture<Suggestions> listSuggestions(final @NotNull CommandContext<S> context, final SuggestionsBuilder builder) {
-        if (this instanceof ISuggestable) {
+        if (this instanceof SuggestableNode) {
             try {
                 // 类型转换是安全的，因为我们的框架只使用 CommandSourceStack
                 @SuppressWarnings("unchecked") final CommandContext<CommandSourceStack> stackContext = (CommandContext<CommandSourceStack>) context;
-                return ((ISuggestable) this).getSuggestionsProvider().getSuggestions(stackContext, builder);
+                return ((SuggestableNode) this).getSuggestionsProvider().getSuggestions(stackContext, builder);
             } catch (CommandSyntaxException e) {
                 e.printStackTrace();
                 return Suggestions.empty();

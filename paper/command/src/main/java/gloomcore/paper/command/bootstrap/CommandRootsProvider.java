@@ -1,6 +1,6 @@
 package gloomcore.paper.command.bootstrap;
 
-import gloomcore.paper.command.interfaces.ICommandNode;
+import gloomcore.paper.command.interfaces.CommandNode;
 
 import java.util.Collection;
 
@@ -9,6 +9,6 @@ import java.util.Collection;
  */
 @FunctionalInterface
 public interface CommandRootsProvider {
-    Collection<? extends ICommandNode> buildRoots();
+    Collection<? extends CommandNode> buildRoots();
 }
 
