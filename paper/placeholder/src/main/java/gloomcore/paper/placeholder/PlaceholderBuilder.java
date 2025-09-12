@@ -1,6 +1,6 @@
 package gloomcore.paper.placeholder;
 
-import gloomcore.contract.builder.IBuilder;
+import gloomcore.contract.builder.SelfBuilder;
 import gloomcore.paper.placeholder.decorator.PlayerCacheDecorator;
 import gloomcore.paper.placeholder.decorator.SharedFixedCacheDecorator;
 import gloomcore.paper.placeholder.decorator.SharedParmCacheDecorator;
@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public final class PlaceholderBuilder implements IBuilder<PlaceholderBuilder, Placeholder> {
+public final class PlaceholderBuilder implements SelfBuilder<PlaceholderBuilder, Placeholder> {
     private final PlaceholderManager manager;
     private final String key;
     private String[] path;

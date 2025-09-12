@@ -8,13 +8,7 @@ import java.util.function.Consumer;
  * @param <T> 实现此接口的具体构建器类型 (自限定泛型)
  * @param <R> 构建操作最终返回的产品类型
  */
-public interface IBuilder<T extends IBuilder<T, R>, R> {
-    /**
-     * 构建并返回最终产品
-     *
-     * @return 构建完成的产品
-     */
-    R build();
+public interface SelfBuilder<T extends SelfBuilder<T, R>, R> extends Buildable<R> {
 
     /**
      * 构建产品，并将其传递给消费者进行后续处理

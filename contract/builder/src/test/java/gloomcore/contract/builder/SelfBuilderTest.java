@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * 测试 IBuilder 接口的基本功能
  * 这是一个示例测试类，展示了现代 Java 测试的最佳实践
  */
-class IBuilderTest {
+class SelfBuilderTest {
 
     /**
      * 测试构建器的基本功能
@@ -43,7 +43,7 @@ class IBuilderTest {
     /**
      * 示例构建器实现，用于测试
      */
-    private static class MockBuilder implements IBuilder<MockBuilder, String> {
+    private static class MockBuilder implements SelfBuilder<MockBuilder, String> {
         private String value = "default";
 
         public static MockBuilder create() {

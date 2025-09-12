@@ -1,6 +1,6 @@
 package gloomcore.paper.item;
 
-import gloomcore.contract.builder.IBuilder;
+import gloomcore.contract.builder.SelfBuilder;
 import io.papermc.paper.datacomponent.DataComponentType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 @NullMarked
-public class ItemBuilder implements IBuilder<ItemBuilder, ItemStack> {
+public class ItemBuilder implements SelfBuilder<ItemBuilder, ItemStack> {
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
     private final ItemStack itemStack;

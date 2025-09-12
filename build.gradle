@@ -22,14 +22,14 @@ subprojects {
     apply plugin: 'jacoco'
 
     java {
-        toolchain.languageVersion = JavaLanguageVersion.of(21)
+        toolchain.languageVersion = JavaLanguageVersion.of(22)
         withJavadocJar()
         withSourcesJar()
     }
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-        options.release = 21
+        options.release = 22
         options.compilerArgs.addAll(['-Xlint:unchecked', '-Xlint:deprecation'])
     }
 

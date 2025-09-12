@@ -1,6 +1,5 @@
 package gloomcore.paper.gui.icon;
 
-import gloomcore.paper.util.Log;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -24,7 +23,7 @@ public interface IconAction {
     static @NotNull IconAction of(@NotNull EnumMap<ClickType, PlayerAction> clickMap) {
         return (type, player) -> {
             if (clickMap.containsKey(type)) {
-                clickMap.get(type).launch(player, Log.INSTANCE::error);
+                clickMap.get(type).execute(player);
             }
         };
     }
@@ -39,7 +38,7 @@ public interface IconAction {
     static @NotNull IconAction of(@NotNull ClickType clickType, @NotNull PlayerAction playerAction) {
         return (type, player) -> {
             if (type == clickType) {
-                playerAction.launch(player, Log.INSTANCE::error);
+                playerAction.execute(player);
             }
         };
     }

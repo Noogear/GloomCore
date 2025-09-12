@@ -13,5 +13,5 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 @FunctionalInterface
-public interface PlayerAction extends Action<Player> {
+public interface PlayerAction extends Action<Player, Void> {
 }
