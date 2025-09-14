@@ -1,6 +1,5 @@
 package gloomcore.paper.gui.puzzle.impl;
 
-import gloomcore.paper.gui.icon.IconDisplay;
 import gloomcore.paper.gui.puzzle.abstracts.StaticPuzzle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -8,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * 静态物品拼图实现类
@@ -16,7 +16,7 @@ import java.util.Collection;
  * 图标可以在多个槽位中显示，但不处理用户的点击事件
  */
 public class SingleItemPuzzleImpl extends StaticPuzzle {
-    private final IconDisplay display;
+    private final Function<Player, ItemStack> display;
 
     /**
      * 构造函数，创建一个静态物品拼图实例
@@ -24,7 +24,7 @@ public class SingleItemPuzzleImpl extends StaticPuzzle {
      * @param slotList 拼图占据的槽位列表
      * @param display  需要显示的图标内容
      */
-    public SingleItemPuzzleImpl(Collection<Integer> slotList, IconDisplay display) {
+    public SingleItemPuzzleImpl(Collection<Integer> slotList, Function<Player, ItemStack> display) {
         super(slotList);
         this.display = display;
     }

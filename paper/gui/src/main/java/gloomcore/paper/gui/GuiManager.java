@@ -1,5 +1,6 @@
 package gloomcore.paper.gui;
 
+import gloomcore.paper.gui.view.AbstractGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -23,8 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * 该类负责处理玩家打开GUI、返回上一级GUI、以及清理玩家数据等操作，
  * 同时监听相关事件并转发给对应的GUI视图处理
  */
-public class PuzzleGuiManager implements Listener {
-    private final ConcurrentHashMap<UUID, Deque<PuzzleGuiView>> history = new ConcurrentHashMap<>();
+public class GuiManager implements Listener {
+    private final ConcurrentHashMap<UUID, Deque<AbstractGui>> history = new ConcurrentHashMap<>();
     private final Set<UUID> navigatingPlayers = ConcurrentHashMap.newKeySet();
 
     /**
@@ -32,7 +33,7 @@ public class PuzzleGuiManager implements Listener {
      *
      * @param plugin 插件实例，用于注册事件监听器
      */
-    public PuzzleGuiManager(JavaPlugin plugin) {
+    public GuiManager(JavaPlugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -47,8 +48,8 @@ public class PuzzleGuiManager implements Listener {
      * @param view         要打开的GUI
      * @param storeHistory 是否将当前打开的GUI存入历史
      */
-    public void open(Player player, PuzzleGuiView view, boolean storeHistory) {
-        if (storeHistory && player.getOpenInventory().getTopInventory().getHolder(false) instanceof PuzzleGuiView currentHolder) {
+    public void open(Player player, AbstractGui view, boolean storeHistory) {
+        if (storeHistory && player.getOpenInventory().getTopInventory().getHolder(false) instanceof AbstractGui currentHolder) {
             history.computeIfAbsent(player.getUniqueId(), k -> new ArrayDeque<>()).push(currentHolder);
         }
         navigatingPlayers.add(player.getUniqueId());
@@ -61,7 +62,7 @@ public class PuzzleGuiManager implements Listener {
      * @param player 玩家
      * @param view   要打开的GUI视图
      */
-    public void open(Player player, PuzzleGuiView view) {
+    public void open(Player player, AbstractGui view) {
         history.remove(player.getUniqueId());
         navigatingPlayers.add(player.getUniqueId());
         view.open(player);
@@ -74,9 +75,9 @@ public class PuzzleGuiManager implements Listener {
      * @return 如果成功返回，返回true
      */
     public boolean back(Player player) {
-        Deque<PuzzleGuiView> playerHistory = history.get(player.getUniqueId());
+        Deque<AbstractGui> playerHistory = history.get(player.getUniqueId());
         if (playerHistory != null && !playerHistory.isEmpty()) {
-            PuzzleGuiView previousView = playerHistory.pop();
+            AbstractGui previousView = playerHistory.pop();
             navigatingPlayers.add(player.getUniqueId());
             previousView.open(player);
             return true;
@@ -92,10 +93,10 @@ public class PuzzleGuiManager implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
-        if (!(inventory.getHolder(false) instanceof PuzzleGuiView puzzleGuiView)) {
+        if (!(inventory.getHolder(false) instanceof AbstractGui gui)) {
             return;
         }
-        puzzleGuiView.handleClick(event);
+        gui.handleClick(event);
     }
 
     /**
@@ -108,11 +109,11 @@ public class PuzzleGuiManager implements Listener {
         Player player = event.getPlayer();
         UUID playerUuid = player.getUniqueId();
         navigatingPlayers.remove(playerUuid);
-        Deque<PuzzleGuiView> playerHistory = history.remove(playerUuid);
+        Deque<AbstractGui> playerHistory = history.remove(playerUuid);
         if (playerHistory == null || playerHistory.isEmpty()) {
             return;
         }
-        for (PuzzleGuiView historicalView : playerHistory) {
+        for (AbstractGui historicalView : playerHistory) {
             if (playerUuid.equals(historicalView.getOwner().getUniqueId())) {
                 historicalView.cleanupOnClose();
             }
@@ -126,7 +127,7 @@ public class PuzzleGuiManager implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (!(event.getInventory().getHolder(false) instanceof PuzzleGuiView closedView)) {
+        if (!(event.getInventory().getHolder(false) instanceof AbstractGui closedView)) {
             return;
         }
         UUID playerUuid = event.getPlayer().getUniqueId();
@@ -147,10 +148,10 @@ public class PuzzleGuiManager implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
         Inventory inventory = event.getInventory();
-        if (!(inventory.getHolder(false) instanceof PuzzleGuiView puzzleGuiView)) {
+        if (!(inventory.getHolder(false) instanceof AbstractGui gui)) {
             return;
         }
-        puzzleGuiView.handleDrag(event);
+        gui.handleDrag(event);
     }
 
 

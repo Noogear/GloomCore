@@ -7,7 +7,7 @@ plugins {
 allprojects {
     group = 'cn.gloomcore'
     version = '1.0.0.0'
-    
+
     repositories {
         mavenCentral()
         maven { url = "https://repo.papermc.io/repository/maven-public/" }
@@ -45,7 +45,7 @@ subprojects {
     // Common dependencies for all subprojects
     dependencies {
         compileOnly libs.jetbrains.annotations
-        
+
         // Test dependencies
         testImplementation platform(libs.junit.bom)
         testImplementation libs.junit.jupiter

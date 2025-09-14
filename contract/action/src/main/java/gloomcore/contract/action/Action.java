@@ -1,10 +1,11 @@
 package gloomcore.contract.action;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * 表示一个可执行的、独立的异步操作单元。该接口实例为可复用“动作”，可被 ActionChain 编排。
@@ -18,8 +19,8 @@ public interface Action<C, R> {
     /**
      * 创建忽略输入并异步提供结果的 Action。
      *
-     * @param <T> 被忽略的输入类型
-     * @param <R> 输出结果类型
+     * @param <T>      被忽略的输入类型
+     * @param <R>      输出结果类型
      * @param supplier 结果提供者（在线程池中执行）
      * @param executor 执行异步任务的线程池
      * @return 异步提供结果的 Action
@@ -33,7 +34,7 @@ public interface Action<C, R> {
     /**
      * 创建执行副作用后原样传递上下文的异步 Action。
      *
-     * @param <C> 上下文类型
+     * @param <C>      上下文类型
      * @param runnable 副作用逻辑
      * @param executor 执行副作用的线程池
      * @return C -> C 的异步副作用 Action
@@ -47,8 +48,8 @@ public interface Action<C, R> {
     /**
      * 创建一个立即完成并返回常量结果的 Action。
      *
-     * @param <T> 被忽略的输入类型
-     * @param <R> 输出结果类型
+     * @param <T>    被忽略的输入类型
+     * @param <R>    输出结果类型
      * @param result 常量结果
      * @return 立即完成的常量 Action
      */

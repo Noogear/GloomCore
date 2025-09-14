@@ -1,6 +1,6 @@
 package gloomcore.paper.gui.puzzle.abstracts;
 
-import gloomcore.paper.gui.PuzzleGuiView;
+import gloomcore.paper.gui.view.PuzzleGuiView;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;

@@ -161,6 +161,19 @@ public enum PaperScheduler {
          * @return 调度任务对象
          */
         ScheduledTask runTimer(@NotNull Consumer<ScheduledTask> task, long delay, long period);
+
+        /**
+         * 获取执行器
+         *
+         * @return 执行器对象
+         */
+        default @NotNull Executor executor() {
+            return this::run;
+        }
+
+        default @NotNull Executor executor(long period) {
+            return (runnable) -> runDelayed(runnable, period);
+        }
     }
 
     /**
@@ -184,14 +197,6 @@ public enum PaperScheduler {
             return asyncScheduler.runAtFixedRate(plugin, task, toSafeTick(delay) * 50, toSafeTick(period) * 50, TimeUnit.MILLISECONDS);
         }
 
-        /**
-         * 获取执行器
-         *
-         * @return 执行器对象
-         */
-        public @NotNull Executor executor() {
-            return this::run;
-        }
     }
 
     /**
@@ -215,14 +220,6 @@ public enum PaperScheduler {
             return globalRegionScheduler.runAtFixedRate(plugin, task, toSafeTick(delay), toSafeTick(period));
         }
 
-        /**
-         * 获取执行器
-         *
-         * @return 执行器对象
-         */
-        public @NotNull Executor executor() {
-            return this::run;
-        }
     }
 
     /**
@@ -251,14 +248,6 @@ public enum PaperScheduler {
             return regionScheduler.runAtFixedRate(plugin, location, task, toSafeTick(delay), toSafeTick(period));
         }
 
-        /**
-         * 获取执行器
-         *
-         * @return 执行器对象
-         */
-        public @NotNull Executor executor() {
-            return this::run;
-        }
     }
 
     /**
@@ -291,14 +280,6 @@ public enum PaperScheduler {
             return regionScheduler.runAtFixedRate(plugin, world, chunkX, chunkZ, task, toSafeTick(delay), toSafeTick(period));
         }
 
-        /**
-         * 获取执行器
-         *
-         * @return 执行器对象
-         */
-        public @NotNull Executor executor() {
-            return this::run;
-        }
     }
 
 
@@ -389,13 +370,9 @@ public enum PaperScheduler {
             return (runnable) -> run(runnable, retired);
         }
 
-        /**
-         * 获取执行器
-         *
-         * @return 执行器对象
-         */
-        public @NotNull Executor executor() {
-            return executor(null);
+        public @NotNull Executor executor(long period, @Nullable Runnable retired) {
+            return (runnable) -> runDelayed(runnable, retired, period);
         }
+
     }
 }

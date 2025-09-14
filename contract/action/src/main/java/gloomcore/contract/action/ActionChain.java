@@ -74,7 +74,7 @@ public class ActionChain<C, R> implements Action<C, R> {
         /**
          * 添加一个同步动作。\n * 在前一个阶段完成后于相同线程（或默认 ForkJoinPool）执行。
          *
-         * @param <NR> 新结果类型
+         * @param <NR>       新结果类型
          * @param syncAction 同步转换函数，接收上一步结果 {@code R}，返回新结果 {@code NR}
          * @return 新的 Builder，其输出类型更新为 {@code NR}
          */
@@ -86,9 +86,9 @@ public class ActionChain<C, R> implements Action<C, R> {
         /**
          * 在指定的线程池上异步地添加一个同步动作。\n * 函数本身仍然是同步的，只是调度到指定 {@link Executor}。
          *
-         * @param <NR> 新结果类型
+         * @param <NR>       新结果类型
          * @param syncAction 同步转换函数
-         * @param executor 执行该同步函数的线程池
+         * @param executor   执行该同步函数的线程池
          * @return 新的 Builder，其输出类型更新为 {@code NR}
          */
         public <NR> Builder<C, NR> addSync(Function<R, NR> syncAction, Executor executor) {
@@ -100,7 +100,7 @@ public class ActionChain<C, R> implements Action<C, R> {
         /**
          * 添加一个异步动作。\n * 上一步的结果 {@code R} 经 {@code asyncAction} 转换为 {@code CompletableFuture<NR>} 并扁平化。
          *
-         * @param <NR> 新结果类型
+         * @param <NR>        新结果类型
          * @param asyncAction 异步转换函数（签名：{@code R -> CompletableFuture<NR>}}）
          * @return 新的 Builder，其输出类型更新为 {@code NR}
          */
@@ -112,9 +112,9 @@ public class ActionChain<C, R> implements Action<C, R> {
         /**
          * 在指定 {@link Executor} 上调度并执行一个异步动作。
          *
-         * @param <NR> 新结果类型
+         * @param <NR>        新结果类型
          * @param asyncAction 异步转换函数（签名：{@code R -> CompletableFuture<NR>}}）
-         * @param executor 用于调度该异步函数的线程池
+         * @param executor    用于调度该异步函数的线程池
          * @return 新的 Builder，其输出类型更新为 {@code NR}
          */
         public <NR> Builder<C, NR> addAsync(Function<R, CompletableFuture<NR>> asyncAction, Executor executor) {
@@ -126,7 +126,7 @@ public class ActionChain<C, R> implements Action<C, R> {
         /**
          * 添加一个预先定义好的、类型安全的 {@link Action} 实例。\n * 可复用业务逻辑块的组合方式。
          *
-         * @param <NR> 新结果类型
+         * @param <NR>   新结果类型
          * @param action 一个 {@code Action<R, NR>} 实例，它的输入类型 {@code R} 必须匹配当前链的输出类型
          * @return 新的 Builder，其输出类型更新为 {@code NR}
          */

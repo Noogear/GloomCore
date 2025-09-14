@@ -1,5 +1,6 @@
 package gloomcore.paper.gui.icon;
 
+import gloomcore.contract.action.Action;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,7 +21,7 @@ public interface IconAction {
      * @param clickMap 指定的点击类型与操作的映射
      * @return ClickAction实例
      */
-    static @NotNull IconAction of(@NotNull EnumMap<ClickType, PlayerAction> clickMap) {
+    static @NotNull IconAction of(@NotNull EnumMap<ClickType, Action<Player, Void>> clickMap) {
         return (type, player) -> {
             if (clickMap.containsKey(type)) {
                 clickMap.get(type).execute(player);
@@ -35,7 +36,7 @@ public interface IconAction {
      * @param playerAction 需要执行的操作
      * @return ClickAction实例
      */
-    static @NotNull IconAction of(@NotNull ClickType clickType, @NotNull PlayerAction playerAction) {
+    static @NotNull IconAction of(@NotNull ClickType clickType, @NotNull Action<Player, Void> playerAction) {
         return (type, player) -> {
             if (type == clickType) {
                 playerAction.execute(player);

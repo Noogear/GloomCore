@@ -7,13 +7,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Function;
+
 /**
  * 图标类，用于表示UI中的图标元素
  * <p>
  * 包含图标的显示内容和点击时的响应动作
  */
 public class Icon {
-    protected IconDisplay display;
+    protected Function<Player, ItemStack> display;
     protected IconAction iconAction;
 
     /**
@@ -21,7 +23,7 @@ public class Icon {
      *
      * @param display 图标的显示内容
      */
-    public Icon(@NotNull IconDisplay display) {
+    public Icon(@NotNull Function<Player, ItemStack> display) {
         this.display = display;
     }
 
@@ -41,7 +43,7 @@ public class Icon {
      * @param display    图标的显示内容
      * @param iconAction 图标的点击动作
      */
-    public Icon(@NotNull IconDisplay display, @Nullable IconAction iconAction) {
+    public Icon(@NotNull Function<Player, ItemStack> display, @Nullable IconAction iconAction) {
         this.display = display;
         this.iconAction = iconAction;
     }
@@ -90,7 +92,7 @@ public class Icon {
      * @param display 显示内容
      * @return 当前图标实例，支持链式调用
      */
-    public Icon setDisplay(@NotNull IconDisplay display) {
+    public Icon setDisplay(@NotNull Function<Player, ItemStack> display) {
         this.display = display;
         return this;
     }
