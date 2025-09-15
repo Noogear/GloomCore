@@ -12,7 +12,6 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,18 +25,17 @@ import java.util.function.Function;
  * 每个GUI视图都有一个唯一的“所有者” (owner)。所有的渲染、事件回调和状态变更都将以所有者的视角和名义进行，
  * 即使有多个玩家（观察者）可以同时查看此界面。
  */
-public class PuzzleGuiView extends AbstractGui {
+public class PlaceableChestView extends AbstractGui {
     private final List<PlaceablePuzzle> placeablePuzzles = new ArrayList<>();
     private final ChestLayout menuLayout;
     private long lastActionTime = 0L;
-    private @Nullable Inventory inventory;
 
     /**
      * 构造一个新的GUI视图实例
      *
      * @param menuLayout 菜单布局定义
      */
-    public PuzzleGuiView(ChestLayout menuLayout, Function<Player, Component> title, Player owner) {
+    public PlaceableChestView(ChestLayout menuLayout, Function<Player, Component> title, Player owner) {
         super(owner, title, new Puzzle[menuLayout.getSize()]);
         this.menuLayout = menuLayout;
     }
@@ -51,7 +49,7 @@ public class PuzzleGuiView extends AbstractGui {
      * @param puzzle 要添加的拼图组件
      * @throws IllegalArgumentException 当槽位已被占用时抛出
      */
-    public PuzzleGuiView addPuzzle(Puzzle puzzle) {
+    public PlaceableChestView addPuzzle(Puzzle puzzle) {
         this.puzzles.add(puzzle);
         for (int slot : puzzle.getSlots()) {
             if (slot >= 0 && slot < this.slotPuzzleArray.length) {

@@ -8,8 +8,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayDeque;
@@ -92,8 +92,7 @@ public class GuiManager implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
-        Inventory inventory = event.getInventory();
-        if (!(inventory.getHolder(false) instanceof AbstractGui gui)) {
+        if (!(event.getInventory().getHolder(false) instanceof AbstractGui gui)) {
             return;
         }
         gui.handleClick(event);
@@ -147,11 +146,18 @@ public class GuiManager implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
-        Inventory inventory = event.getInventory();
-        if (!(inventory.getHolder(false) instanceof AbstractGui gui)) {
+        if (!(event.getInventory().getHolder(false) instanceof AbstractGui gui)) {
             return;
         }
         gui.handleDrag(event);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onInventoryOpen(InventoryOpenEvent event) {
+        if (!(event.getInventory().getHolder(false) instanceof AbstractGui gui)) {
+            return;
+        }
+        gui.handleOpen(event);
     }
 
 

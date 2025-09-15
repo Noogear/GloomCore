@@ -35,7 +35,6 @@ public class ChestLayout {
      * 字符串中的每个字符代表一个槽位，相同字符表示相同类型的槽位。
      *
      * @param layout 布局字符串列表，每个字符串代表菜单的一行
-     * @return 新创建的菜单布局实例
      */
     public ChestLayout(@NotNull List<String> layout) {
         int maxRows = Math.min(layout.size(), 6);

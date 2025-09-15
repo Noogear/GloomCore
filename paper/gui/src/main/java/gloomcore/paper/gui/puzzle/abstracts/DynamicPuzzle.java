@@ -1,6 +1,6 @@
 package gloomcore.paper.gui.puzzle.abstracts;
 
-import gloomcore.paper.gui.view.PuzzleGuiView;
+import gloomcore.paper.gui.view.AbstractGui;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -29,15 +29,15 @@ public abstract class DynamicPuzzle extends AbstractPuzzle {
     /**
      * 更新拼图显示内容
      * <p>
-     * 该方法会检查玩家当前打开的库存是否为PuzzleGuiView类型，
+     * 该方法会检查玩家当前打开的库存是否为AbstractGui类型，
      * 如果是则重新渲染拼图内容到该库存中
      *
      * @param player 需要更新拼图显示的玩家
      */
     @Override
     public void update(Player player) {
-        if (player.getOpenInventory().getTopInventory().getHolder(false) instanceof PuzzleGuiView puzzleGuiView) {
-            render(puzzleGuiView.getOwner(), puzzleGuiView.getInventory());
+        if (player.getOpenInventory().getTopInventory().getHolder(false) instanceof AbstractGui gui) {
+            render(gui.getOwner(), gui.getInventory());
         }
     }
 
