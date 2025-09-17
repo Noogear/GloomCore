@@ -38,16 +38,5 @@ public abstract class StaticPuzzle<C extends Context> extends AbstractPuzzle<C> 
         event.setCancelled(true);
     }
 
-    /**
-     * 更新拼图显示内容，静态拼图不执行任何操作
-     * <p>
-     * 静态拼图的内容不会发生变化，因此此方法为空实现
-     *
-     * @param context 目标上下文
-     */
-    @Override
-    public void update(C context) {
-    }
-
 
 }

@@ -6,22 +6,22 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * 拼图接口，定义了GUI中可交互组件的基本行为
+ * 拼图接口：定义 GUI 中可交互组件的最小行为集合。
  * <p>
- * 拼图是GUI界面的基本组成单元，每个拼图可以占据一个或多个槽位，
- * 并能处理点击事件、渲染内��和更新显示
+ * 每个拼图可以占据一个或多个槽位，能够将自身渲染到指定的 Inventory，
+ * 并在对应槽位被点击时处理交互事件。
  */
 public interface Puzzle<C extends Context> {
 
     /**
-     * 获取拼图占据的所有槽位
+     * 获取拼图占用的所有槽位。
      *
-     * @return 包含所有槽位索引的集合
+     * @return 已排序且去重后的槽位索引数组
      */
     int[] getSlots();
 
     /**
-     * 渲染拼图内容到指定库存中
+     * 将拼图内容渲染到指定库存。
      *
      * @param context   业务上下文（由玩家 UUID 构造）
      * @param inventory 目标库存
@@ -29,33 +29,24 @@ public interface Puzzle<C extends Context> {
     void render(C context, @NotNull Inventory inventory);
 
     /**
-     * 处理库存点击事件
+     * 处理库存点击事件。
      * <p>
-     * 当玩家点击与该拼图相关的槽位时调用此方法，
-     * 具体实现类应根据拼图类型和功能需求处理点击逻辑
+     * 当玩家点击与该拼图相关的槽位时调用。实现类应根据需求执行相应逻辑。
      *
-     * @param event   库存点击事件，包含点击的详细信息
-     * @param context 拥有此拼图的上下文
+     * @param event   库存点击事件
+     * @param context 拼图所属的上下文
      */
     void onClick(InventoryClickEvent event, C context);
 
     /**
-     * 更新拼图显示内容
-     *
-     * @param context 目标上下文
-     */
-    void update(C context);
-
-    /**
-     * 获取拼图类型
+     * 获取拼图类型。
      *
      * @return 拼图类型枚举值
      */
     PuzzleType getPuzzleType();
 
-
     /**
-     * 拼图类型枚举，定义了不同类型的拼图
+     * 拼图类型枚举。
      * <p>
      * COMMON: 普通拼图
      * PAGINATED: 分页拼图
@@ -66,6 +57,4 @@ public interface Puzzle<C extends Context> {
         PAGINATED,
         PLACEABLE
     }
-
-
 }

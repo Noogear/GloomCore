@@ -18,11 +18,8 @@ public interface PlaceablePuzzle<C extends Context> extends Puzzle<C> {
 
     /**
      * 当GUI被关闭时执行的清理逻辑。
-     *
-     * @param context   关闭GUI的上下文
-     * @param inventory 被关闭的GUI的Inventory实例
      */
-    void cleanupOnClose(C context, Inventory inventory);
+    void cleanupOnClose();
 
     /**
      * 尝试接受物品到拼图中

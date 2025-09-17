@@ -7,9 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 /**
- * 动态拼图抽象类，实现可更新的拼图组件
+ * 动态拼图抽象类，实现可更新的拼图组件。
  * <p>
- * 动态/可变拼图在构造时必须与其所属 GUI 绑定��
+ * 动态/可变拼图在构造时必须与其所属 GUI 绑定。
  */
 public abstract class DynamicPuzzle<C extends Context> extends AbstractPuzzle<C> {
 
@@ -21,7 +21,7 @@ public abstract class DynamicPuzzle<C extends Context> extends AbstractPuzzle<C>
     }
 
     /**
-     * 拷贝构造函数（保持原 GUI 绑定）
+     * 拷贝构造函数（保持原 GUI 绑定）。
      */
     protected DynamicPuzzle(DynamicPuzzle<C> other) {
         super(other);
@@ -29,7 +29,7 @@ public abstract class DynamicPuzzle<C extends Context> extends AbstractPuzzle<C>
     }
 
     /**
-     * 拷贝构造函数（可选择重新绑定到新的 GUI）
+     * 拷贝构造函数（可选择重新绑定到新的 GUI）。
      */
     protected DynamicPuzzle(DynamicPuzzle<C> other, @NotNull AbstractGui<C> gui) {
         super(other);
@@ -37,12 +37,9 @@ public abstract class DynamicPuzzle<C extends Context> extends AbstractPuzzle<C>
     }
 
     /**
-     * 更新拼图显示内容：始终使用绑定的 GUI ��行重渲染。
-     *
-     * @param context 需要更新拼图显示的上下文
+     * 无参更新：始终使用绑定的 GUI 进行重渲染。
      */
-    @Override
-    public void update(C context) {
+    public void update() {
         render(gui.getOwner(), gui.getInventory());
     }
 }

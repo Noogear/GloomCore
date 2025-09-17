@@ -19,11 +19,10 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * GUI视图类，代表一个可交互的GUI界面
+ * 可放置类的通用箱型 GUI 视图。
  * <p>
- * 该类管理GUI中的所有拼图(Puzzle)组件，处理事件并渲染界面内容。
- * 每个GUI视图都有一个唯一的“所有者” (owner)。所有的渲染、事件回调和状态变更都将以所有者的视角和名义进行，
- * 即使有多个玩家（观察者）可以同时查看此界面。
+ * 管理拼图（Puzzle）的渲染与交互，将事件分发给对应拼图；
+ * 同时在 GUI 关闭时负责触发可放置拼图的清理逻辑。
  */
 public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
     private final List<PlaceablePuzzle<C>> placeablePuzzles = new ArrayList<>();
@@ -31,9 +30,7 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
     private long lastActionTime = 0L;
 
     /**
-     * 构造一个新的GUI视图实例
-     *
-     * @param menuLayout 菜单布局定义
+     * 使用给定布局与标题构造视图。
      */
     @SuppressWarnings("unchecked")
     public PlaceableChestView(ChestLayout menuLayout, Function<C, Component> title, C owner) {
@@ -42,13 +39,8 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
     }
 
     /**
-     * 向GUI视图中添加一个拼图组件
-     * <p>
-     * 拼图组件会被添加到视图的拼图集合中，并根据其槽位分配到对应的槽位数组中。
-     * 如果指定槽位已被占用，则抛出异常
-     *
-     * @param puzzle 要添加的拼图组件
-     * @throws IllegalArgumentException 当槽位已被占用时抛出
+     * 添加一个拼图并占据相应槽位。
+     * 若槽位已被占用将抛出异常。
      */
     public PlaceableChestView<C> addPuzzle(Puzzle<C> puzzle) {
         this.puzzles.add(puzzle);
@@ -71,13 +63,9 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
     }
 
     /**
-     * 处理库存点击事件
-     * <p>
-     * 处理玩家在GUI中的点击操作，包括取消事件、处理拼图点击以及物品移动等操作
-     * 请注意：所有由此产生的拼图回调（如 onClick, onChanged）都将传递 GUI 的所有者 (owner) 作为目标玩家，
-     * 而非实际点击操作的玩家。如果需要操作者，请从 event.getWhoClicked() 获取。
-     *
-     * @param event 库存点击事件
+     * 处理库存点击事件（两类）：
+     * 1) GUI 内部点击 -> 定位拼图并转发；
+     * 2) 玩家背包点击 -> 尝试迁移物品至可放置槽位。
      */
     @Override
     public void handleClick(InventoryClickEvent event) {
@@ -87,53 +75,47 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
             return;
         }
         this.lastActionTime = currentTime;
-        if (inventory == null) return;
-        Inventory clickedInventory = event.getClickedInventory();
-        if (inventory.equals(clickedInventory)) {
-            event.setCancelled(true);
-            findPuzzleBySlot(event.getRawSlot()).ifPresent(puzzle -> puzzle.onClick(event, owner));
-            return;
-        }
+        super.handleClick(event);
+    }
 
-        if (clickedInventory != null) {
-            InventoryAction action = event.getAction();
-            if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-                event.setCancelled(true);
-                ItemStack itemToMove = event.getCurrentItem();
-                if (itemToMove == null || itemToMove.isEmpty()) {
-                    return;
-                }
-                Set<PlaceablePuzzle<C>> puzzlesToUpdate = new ObjectOpenHashSet<>();
-                for (PlaceablePuzzle<C> puzzle : this.placeablePuzzles) {
-                    if (puzzle.tryAcceptItem(itemToMove, this.getInventory())) {
-                        if (puzzle.hasChangedCallBack()) {
-                            puzzlesToUpdate.add(puzzle);
-                        }
-                    }
-                    if (itemToMove.getAmount() <= 0) {
-                        event.setCurrentItem(null);
-                        break;
-                    }
-                }
-                if (!puzzlesToUpdate.isEmpty()) {
-                    PaperScheduler.INSTANCE.entity(event.getWhoClicked()).runDelayed((task) -> {
-                        for (PlaceablePuzzle<C> puzzle : puzzlesToUpdate) {
-                            puzzle.getChangedCallBack().accept(owner);
-                        }
-                    }, 1L);
-                }
-            } else if (action == InventoryAction.COLLECT_TO_CURSOR) {
-                event.setCancelled(true);
+    /**
+     * 处理玩家背包区域的物品点击（如 Shift+点击搬运）。
+     */
+    @Override
+    public void handlePlayerInventoryClick(InventoryClickEvent event) {
+        InventoryAction action = event.getAction();
+        if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+            event.setCancelled(true);
+            ItemStack itemToMove = event.getCurrentItem();
+            if (itemToMove == null || itemToMove.isEmpty()) {
+                return;
             }
+            Set<PlaceablePuzzle<C>> puzzlesToUpdate = new ObjectOpenHashSet<>();
+            for (PlaceablePuzzle<C> puzzle : this.placeablePuzzles) {
+                if (puzzle.tryAcceptItem(itemToMove, this.getInventory())) {
+                    if (puzzle.hasChangedCallBack()) {
+                        puzzlesToUpdate.add(puzzle);
+                    }
+                }
+                if (itemToMove.getAmount() <= 0) {
+                    event.setCurrentItem(null);
+                    break;
+                }
+            }
+            if (!puzzlesToUpdate.isEmpty()) {
+                PaperScheduler.INSTANCE.entity(event.getWhoClicked()).runDelayed((_) -> {
+                    for (PlaceablePuzzle<C> puzzle : puzzlesToUpdate) {
+                        puzzle.getChangedCallBack().accept(owner);
+                    }
+                }, 1L);
+            }
+        } else if (action == InventoryAction.COLLECT_TO_CURSOR) {
+            event.setCancelled(true);
         }
     }
 
     /**
-     * 处理库存拖拽事件
-     * <p>
-     * 处理玩家在GUI中的拖拽操作，验证拖拽目标槽位是否为可放置拼图，并在需要时更新相关拼图
-     *
-     * @param event 库存拖拽事件
+     * 处理 GUI 内拖拽事件：仅允许拖拽到可放置拼图槽位。
      */
     @Override
     public void handleDrag(InventoryDragEvent event) {
@@ -156,7 +138,6 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
             Set<PlaceablePuzzle<C>> puzzlesToUpdate = new ObjectOpenHashSet<>();
             for (int slot : event.getRawSlots()) {
                 if (slot < size) {
-                    @SuppressWarnings("unchecked")
                     PlaceablePuzzle<C> puzzle = (PlaceablePuzzle<C>) slotPuzzleArray[slot];
                     if (puzzle.hasChangedCallBack()) {
                         puzzlesToUpdate.add(puzzle);
@@ -174,23 +155,14 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
     }
 
     /**
-     * 处理库存打开事件
-     * <p>
-     * 当前实现为空，可由子类重写以提供具体功能
-     *
-     * @param event 库存打开��件
+     * 处理库存打开事件（子类可扩展）。
      */
     @Override
     public void handleOpen(InventoryOpenEvent event) {
     }
 
     /**
-     * 处理GUI关闭事件，清理所有可放置的拼图组件
-     * <p>
-     * 当GUI关闭时，此方法会遍历所有可放置的拼图(PlaceablePuzzle)，
-     * 并调用它们的清理方法，确保正确处理放置在GUI中的物品
-     *
-     * @param event 库存关闭事件
+     * 处理 GUI 关闭事件并触发清理。
      */
     @Override
     public void handleClose(InventoryCloseEvent event) {
@@ -199,15 +171,13 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
     }
 
     /**
-     * 清理所有可放置拼图组件。
-     * <p>
-     * 遍历所有可放置拼图组件并调用其清理方法，这通常用于将放置在GUI中的物品返还给所有者(owner)。
+     * 清理所有可放置拼图：返还玩家物品并关闭库存。
      */
     @Override
     public void cleanupOnClose() {
         if (!placeablePuzzles.isEmpty()) {
             for (PlaceablePuzzle<C> placeablePuzzle : placeablePuzzles) {
-                placeablePuzzle.cleanupOnClose(owner, inventory);
+                placeablePuzzle.cleanupOnClose();
             }
         }
         if (inventory != null) {
@@ -216,9 +186,7 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
     }
 
     /**
-     * 获取与此视图关联的库存对象
-     *
-     * @return 库存对象
+     * 获取与此视图关联的库存对象。
      */
     @Override
     public @NotNull Inventory getInventory() {

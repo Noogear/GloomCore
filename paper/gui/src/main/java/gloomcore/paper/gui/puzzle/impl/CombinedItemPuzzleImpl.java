@@ -13,7 +13,7 @@ import java.util.function.Function;
 /**
  * 复合静态物品拼图实现类
  * <p>
- * 该类用于在一个拼图对象中管理多个不同的静态图标，并将它们精��地渲染到各自指定的槽位上。
+ * 该类用于在一个拼图对象中管理多个不同的静态图标，并将它们精确地渲染到各自指定的槽位上。
  * 它通过遍历父类 AbstractPuzzle 提供的、经过排序和去重的 slots 数组来保证渲染的稳定性和一致性。
  */
 public class CombinedItemPuzzleImpl<C extends Context> extends StaticPuzzle<C> {
@@ -22,7 +22,7 @@ public class CombinedItemPuzzleImpl<C extends Context> extends StaticPuzzle<C> {
     /**
      * 构造函数，创建一个复合静态物品拼图实例。
      *
-     * @param slotIconMap ���个映射，其中 Key 是槽位索引 (Integer)，Value 是��显示在该槽位的图标 (IconDisplay)。
+     * @param slotIconMap 一个映射，其中 Key 为槽位索引 (Integer)，Value 为在该槽位显示的图标生成函数。
      *                    拼图将自动占据所有 Map 中定义的槽位。
      */
     public CombinedItemPuzzleImpl(@NotNull Map<Integer, Function<C, ItemStack>> slotIconMap) {
@@ -41,14 +41,10 @@ public class CombinedItemPuzzleImpl<C extends Context> extends StaticPuzzle<C> {
     }
 
     /**
-     * 渲染拼图内容到指定库存中。(已修改)
+     * 渲染拼图内容到指定库存中。
      * <p>
-     * 遍历由父类 AbstractPuzzle 管理的、已排序的 'slots' 数组。
-     * 对于数组中的每一个槽位，从 Map 中查找对应的图标并进行渲染。
-     * 这种方式完全适配了父类的设计。
-     *
-     * @param context    目标上下文
-     * @param inventory 目标库存
+     * 遍历父类 AbstractPuzzle 管理的已排序 slots 数组，
+     * 对每个槽位从 Map 中取出对应图标并进行渲染。
      */
     @Override
     public void render(C context, @NotNull Inventory inventory) {

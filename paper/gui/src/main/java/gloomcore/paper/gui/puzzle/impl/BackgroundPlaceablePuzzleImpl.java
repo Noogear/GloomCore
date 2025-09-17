@@ -47,7 +47,7 @@ public class BackgroundPlaceablePuzzleImpl<C extends Context> extends PlaceableB
     public void onClick(InventoryClickEvent event, C owner) {
         ItemStack current = event.getCurrentItem();
         ItemStack cursor = event.getCursor();
-        if (cursor != null && !cursor.isEmpty()) {
+        if (!cursor.isEmpty()) {
             event.setCancelled(false);
         } else if (current != null && current.isSimilar(backgroundItem)) {
             event.setCancelled(true);
@@ -61,7 +61,7 @@ public class BackgroundPlaceablePuzzleImpl<C extends Context> extends PlaceableB
                 event.getInventory().setItem(event.getSlot(), backgroundItem.clone());
             }
             if (onContentsChanged != null) {
-                onContentsChanged.accept(owner);
+                onContentsChanged.accept(gui.getOwner());
             }
         }, 1L);
     }

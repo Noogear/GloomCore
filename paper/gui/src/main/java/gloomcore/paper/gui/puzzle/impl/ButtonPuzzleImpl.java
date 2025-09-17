@@ -59,7 +59,7 @@ public class ButtonPuzzleImpl<C extends Context> extends DynamicPuzzle<C> {
 
     @Override
     public void onClick(InventoryClickEvent event, C owner) {
-        icon.onClick(event, owner);
+        icon.onClick(event, gui.getOwner());
     }
 
     @Override

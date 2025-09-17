@@ -18,10 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 分页物品拼图类，用于在GUI中显示可分页的物品列表
- * <p>
- * 该拼图将一组物品分页显示在指定的槽位中，支持翻页功能，
- * 并能处理物品的点击事件。每页显示的物品数量取决于提供的槽位数量
+ * 分页拼图：在给定槽位上分页展示一组图标，并处理翻页与点击事件。
+ * 每页可展示的数量 = 槽位数量。
  */
 public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> implements PaginatedPuzzle<C> {
     private final List<Icon<C>> allItems;
@@ -29,7 +27,7 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
     private int currentPage = 0;
 
     /**
-     * 构造一个新的分页物品拼图实例（绑定GUI）
+     * 绑定 GUI 的构造函数。
      */
     public PaginatedPuzzleImpl(Collection<Integer> slotList, List<Icon<C>> allItems, @Nullable ItemStack backgroundItem, AbstractGui<C> gui) {
         super(slotList, gui);
@@ -38,54 +36,40 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
     }
 
     /**
-     * 拷贝构造函数，基于另一个PaginatedPuzzleImpl实例创建新实例
-     * <p>
-     * 该构造函数会深拷贝图标列表，为每个图标创建新的实例，
-     * 并复制当前页码
-     *
-     * @param other 需要拷贝的PaginatedPuzzleImpl实例
+     * 拷贝构造（保留原 GUI 绑定），重置页码为 0。
      */
     public PaginatedPuzzleImpl(@NotNull PaginatedPuzzleImpl<C> other) {
         super(other);
         this.allItems = other.allItems.stream()
-                .map(Icon<C>::new)
+                .map(Icon::new)
                 .collect(Collectors.toCollection(ArrayList::new));
-        this.currentPage = 0; // 重置状态
+        this.currentPage = 0;
         this.backgroundItem = other.backgroundItem;
     }
 
     /**
-     * 拷贝构造函数（重新绑定到新的 GUI），并重置页码为 0。
+     * 拷贝构造（绑定到新 GUI），重置页码为 0。
      */
     public PaginatedPuzzleImpl(@NotNull PaginatedPuzzleImpl<C> other, @NotNull AbstractGui<C> gui) {
         super(other, gui);
         this.allItems = other.allItems.stream()
-                .map(Icon<C>::new)
+                .map(Icon::new)
                 .collect(Collectors.toCollection(ArrayList::new));
-        this.currentPage = 0; // 重置状态
+        this.currentPage = 0;
         this.backgroundItem = other.backgroundItem;
     }
 
-
     /**
-     * 渲染当前页的物品到指定库存中
-     * <p>
-     * 首先清空所有槽位或设置背景物品，然后计算当前页应显示的物品范围，
-     * 将对应物品设置��槽位中
-     *
-     * @param context  目标上下文
-     * @param inventory 目标库存
+     * 渲染当前页的物品到指定库存。
+     * 先为所有槽位设置背景物品（或清空），再填入当前页的图标。
      */
     @Override
     public void render(C context, @NotNull Inventory inventory) {
-        // 先为所有槽位设置背景物品或清空
         for (int slot : slots) {
             inventory.setItem(slot, backgroundItem);
         }
-
         int itemsPerPage = slots.length;
         int startIndex = currentPage * itemsPerPage;
-
         for (int i = 0; i < itemsPerPage; i++) {
             int itemIndex = startIndex + i;
             if (itemIndex < allItems.size()) {
@@ -97,47 +81,33 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
     }
 
     /**
-     * 切换到下一页
-     * <p>
-     * 如果存在下一页，则增加当前页码并更新显示
-     *
-     * @param context 目标上下文
-     * @return 如果成功切换到下一��返回true，否则返回false
+     * 下一页。
      */
     @Override
-    public boolean nextPage(C context) {
+    public boolean nextPage() {
         if ((currentPage + 1) * slots.length < allItems.size()) {
             currentPage++;
-            update(context);
+            update();
             return true;
         }
         return false;
     }
 
     /**
-     * 切换到上一页
-     * <p>
-     * 如果存在上一页，则减少当前页码并更新显示
-     *
-     * @param context 目标上下文
-     * @return 如果成功切换到上一页返回true，否则返回false
+     * 上一页。
      */
     @Override
-    public boolean previousPage(C context) {
+    public boolean previousPage() {
         if (currentPage > 0) {
             currentPage--;
-            update(context);
+            update();
             return true;
         }
         return false;
     }
 
     /**
-     * 处理物品点击事件
-     * <p>
-     * 根据点击的槽位确定对应的物品，然后将事件转发给该物品处理
-     *
-     * @param event 库存点击事件
+     * 将点击事件转发给当前页对应的图标处理。
      */
     @Override
     public void onClick(InventoryClickEvent event, C owner) {
@@ -154,17 +124,12 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
     }
 
     /**
-     * 直接跳转到指定页码。
-     *
-     * @param pageNumber 用户输入的页码 (1-based, 即第一页是1)。
-     * @param context     目标上下文。
-     * @return 如果页面成功跳转则返回true，如果目标页码与当前页码相同则返回false。
+     * 跳转到指定页（1-based）。越界会被裁剪到合法范围。
      */
     @Override
-    public boolean jumpToPage(int pageNumber, C context) {
+    public boolean jumpToPage(int pageNumber) {
         int totalPages = getTotalPages();
         int targetPageIndex = pageNumber - 1;
-
         if (targetPageIndex < 0) {
             targetPageIndex = 0;
         } else if (targetPageIndex >= totalPages) {
@@ -173,27 +138,18 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
         if (this.currentPage == targetPageIndex) {
             return false;
         }
-
         this.currentPage = targetPageIndex;
-        update(context);
+        update();
         return true;
     }
 
-    /**
-     * 获取当前页码 (1-based, 用于显示)。
-     *
-     * @return 当前页码，从1开始。
-     */
+    /** 当前页（1-based）。 */
     @Override
     public int getCurrentPage() {
         return this.currentPage + 1;
     }
 
-    /**
-     * 获取总页数。
-     *
-     * @return 总页数，至少为1。
-     */
+    /** 总页数（至少 1）。 */
     @Override
     public int getTotalPages() {
         if (allItems.isEmpty()) {
@@ -201,5 +157,4 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
         }
         return (int) Math.ceil((double) allItems.size() / slots.length);
     }
-
 }
