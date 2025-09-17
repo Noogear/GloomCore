@@ -1,5 +1,6 @@
 package gloomcore.paper.gui.puzzle.impl;
 
+import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import gloomcore.paper.gui.puzzle.abstracts.AbstractPuzzle;
 import gloomcore.paper.scheduler.PaperScheduler;
@@ -15,8 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzzle {
-    private final Consumer<Player> onContentsChanged;
+public class BackgroundPlaceablePuzzleImpl<C extends Context> extends AbstractPuzzle<C> implements PlaceablePuzzle<C> {
+    private final Consumer<C> onContentsChanged;
     private final boolean stackingEnabled;
     private final ItemStack backgroundItem;
 
@@ -28,7 +29,7 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
      * @param onContentsChanged 内容变更时的回调函数，可为null
      * @param stackingEnabled   是否启用物品堆叠功能
      */
-    public BackgroundPlaceablePuzzleImpl(@NotNull Collection<Integer> slotList, @NotNull ItemStack backgroundItem, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
+    public BackgroundPlaceablePuzzleImpl(@NotNull Collection<Integer> slotList, @NotNull ItemStack backgroundItem, @Nullable Consumer<C> onContentsChanged, boolean stackingEnabled) {
         super(slotList);
         this.backgroundItem = backgroundItem;
         this.onContentsChanged = onContentsChanged;
@@ -40,7 +41,7 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
      *
      * @param other 需要拷贝的 BackgroundPlaceablePuzzleImpl 实例
      */
-    public BackgroundPlaceablePuzzleImpl(@NotNull BackgroundPlaceablePuzzleImpl other) {
+    public BackgroundPlaceablePuzzleImpl(@NotNull BackgroundPlaceablePuzzleImpl<C> other) {
         super(other);
         this.onContentsChanged = other.onContentsChanged;
         this.stackingEnabled = other.stackingEnabled;
@@ -52,11 +53,11 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
      * <p>
      * 将所有指定槽位设置为背景物品
      *
-     * @param player    目标玩家
+     * @param context  目标上下文
      * @param inventory 目标库存
      */
     @Override
-    public void render(Player player, @NotNull Inventory inventory) {
+    public void render(C context, @NotNull Inventory inventory) {
         for (int slot : slots) {
             inventory.setItem(slot, backgroundItem.clone());
         }
@@ -74,11 +75,11 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
      * @param event 库存点击事件
      */
     @Override
-    public void onClick(InventoryClickEvent event, Player owner) {
+    public void onClick(InventoryClickEvent event, C owner) {
         ItemStack currentItem = event.getCurrentItem();
         ItemStack cursorItem = event.getCursor();
 
-        if (!cursorItem.isEmpty()) {
+        if (cursorItem != null && !cursorItem.isEmpty()) {
             event.setCancelled(false);
         } else if (currentItem != null && currentItem.isSimilar(backgroundItem)) {
             event.setCancelled(true);
@@ -102,10 +103,10 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
      * <p>
      * 此拼图为静态类型，不需要更新操作
      *
-     * @param player 目标玩家
+     * @param context 目标上下文
      */
     @Override
-    public void update(Player player) {
+    public void update(C context) {
     }
 
     /**
@@ -113,11 +114,11 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
      * <p>
      * 核心逻辑：只归还非背景板的物品。
      *
-     * @param player    关闭GUI的玩家
+     * @param context   关闭GUI的上下文
      * @param inventory 被关闭的GUI的Inventory实例
      */
     @Override
-    public void cleanupOnClose(Player player, Inventory inventory) {
+    public void cleanupOnClose(C context, Inventory inventory) {
         List<ItemStack> itemsToReturn = new ArrayList<>();
         for (int slot : this.getSlots()) {
             ItemStack item = inventory.getItem(slot);
@@ -126,7 +127,7 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
                 inventory.setItem(slot, null);
             }
         }
-        returnItemsToPlayer(player, itemsToReturn);
+        returnItemsToPlayer(context, itemsToReturn);
     }
 
     /**
@@ -134,7 +135,7 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
      * <p>
      * 核心逻辑：将持有背景板的槽位视为空槽位来接受物品。
      *
-     * @param itemToAccept 要接受的物品
+     * @param itemToAccept 要接受的物���
      * @param inventory    GUI库存实例
      * @return 如果成功接受至少一部分物品，返回true
      */
@@ -177,7 +178,7 @@ public class BackgroundPlaceablePuzzleImpl extends AbstractPuzzle implements Pla
     }
 
     @Override
-    public Consumer<Player> getChangedCallBack() {
+    public Consumer<C> getChangedCallBack() {
         return this.onContentsChanged;
     }
 

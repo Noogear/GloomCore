@@ -1,5 +1,6 @@
 package gloomcore.paper.gui.puzzle.impl;
 
+import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.icon.Icon;
 import gloomcore.paper.gui.puzzle.PaginatedPuzzle;
 import gloomcore.paper.gui.puzzle.abstracts.DynamicPuzzle;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
  * 该拼图将一组物品分页显示在指定的槽位中，支持翻页功能，
  * 并能处理物品的点击事件。每页显示的物品数量取决于提供的槽位数量
  */
-public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzle {
+public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> implements PaginatedPuzzle<C> {
     private final List<Icon> allItems;
     private final ItemStack backgroundItem;
     private int currentPage = 0;
@@ -58,7 +59,7 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
      *
      * @param other 需要拷贝的PaginatedPuzzleImpl实例
      */
-    public PaginatedPuzzleImpl(@NotNull PaginatedPuzzleImpl other) {
+    public PaginatedPuzzleImpl(@NotNull PaginatedPuzzleImpl<C> other) {
         super(other);
         this.allItems = other.allItems.stream()
                 .map(Icon::new)
@@ -74,11 +75,11 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
      * 首先清空所有槽位或设置背景物品，然后计算当前页应显示的物品范围，
      * 将对应物品设置到槽位中
      *
-     * @param player    目标玩家
+     * @param context  目标上下文
      * @param inventory 目标库存
      */
     @Override
-    public void render(Player player, @NotNull Inventory inventory) {
+    public void render(C context, @NotNull Inventory inventory) {
         // 先为所有槽位设置背景物品或清空
         for (int slot : slots) {
             inventory.setItem(slot, backgroundItem);
@@ -90,7 +91,7 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
         for (int i = 0; i < itemsPerPage; i++) {
             int itemIndex = startIndex + i;
             if (itemIndex < allItems.size()) {
-                inventory.setItem(slots[i], allItems.get(itemIndex).display());
+                inventory.setItem(slots[i], allItems.get(itemIndex).display(context.player()));
             } else {
                 break;
             }
@@ -102,14 +103,14 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
      * <p>
      * 如果存在下一页，则增加当前页码并更新显示
      *
-     * @param player 目标玩家
+     * @param context 目标上下文
      * @return 如果成功切换到下一页返回true，否则返回false
      */
     @Override
-    public boolean nextPage(Player player) {
+    public boolean nextPage(C context) {
         if ((currentPage + 1) * slots.length < allItems.size()) {
             currentPage++;
-            update(player);
+            update(context);
             return true;
         }
         return false;
@@ -120,14 +121,14 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
      * <p>
      * 如果存在上一页，则减少当前页码并更新显示
      *
-     * @param player 目标玩家
+     * @param context 目标上下文
      * @return 如果成功切换到上一页返回true，否则返回false
      */
     @Override
-    public boolean previousPage(Player player) {
+    public boolean previousPage(C context) {
         if (currentPage > 0) {
             currentPage--;
-            update(player);
+            update(context);
             return true;
         }
         return false;
@@ -141,7 +142,7 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
      * @param event 库存点击事件
      */
     @Override
-    public void onClick(InventoryClickEvent event, Player owner) {
+    public void onClick(InventoryClickEvent event, C owner) {
         int clickedRawSlot = event.getRawSlot();
         int slotIndexInPage = Arrays.binarySearch(slots, clickedRawSlot);
         if (slotIndexInPage >= 0) {
@@ -149,7 +150,8 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
             int globalItemIndex = (currentPage * itemsPerPage) + slotIndexInPage;
             if (globalItemIndex < allItems.size()) {
                 Icon clickedItem = allItems.get(globalItemIndex);
-                clickedItem.onClick(event.getClick(), owner);
+                Player player = owner.player();
+                clickedItem.onClick(event.getClick(), player);
             }
         }
     }
@@ -158,11 +160,11 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
      * 直接跳转到指定页码。
      *
      * @param pageNumber 用户输入的页码 (1-based, 即第一页是1)。
-     * @param player     目标玩家。
+     * @param context     目标上下文。
      * @return 如果页面成功跳转则返回true，如果目标页码与当前页码相同则返回false。
      */
     @Override
-    public boolean jumpToPage(int pageNumber, Player player) {
+    public boolean jumpToPage(int pageNumber, C context) {
         int totalPages = getTotalPages();
         int targetPageIndex = pageNumber - 1;
 
@@ -176,7 +178,7 @@ public class PaginatedPuzzleImpl extends DynamicPuzzle implements PaginatedPuzzl
         }
 
         this.currentPage = targetPageIndex;
-        update(player);
+        update(context);
         return true;
     }
 

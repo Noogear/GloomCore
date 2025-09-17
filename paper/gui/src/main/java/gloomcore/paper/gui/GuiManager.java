@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 同时监听相关事件并转发给对应的GUI视图处理
  */
 public class GuiManager implements Listener {
-    private final ConcurrentHashMap<UUID, Deque<AbstractGui>> history = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, Deque<AbstractGui<?>>> history = new ConcurrentHashMap<>();
     private final Set<UUID> navigatingPlayers = ConcurrentHashMap.newKeySet();
 
     /**
@@ -48,8 +48,8 @@ public class GuiManager implements Listener {
      * @param view         要打开的GUI
      * @param storeHistory 是否将当前打开的GUI存入历史
      */
-    public void open(Player player, AbstractGui view, boolean storeHistory) {
-        if (storeHistory && player.getOpenInventory().getTopInventory().getHolder(false) instanceof AbstractGui currentHolder) {
+    public void open(Player player, AbstractGui<?> view, boolean storeHistory) {
+        if (storeHistory && player.getOpenInventory().getTopInventory().getHolder(false) instanceof AbstractGui<?> currentHolder) {
             history.computeIfAbsent(player.getUniqueId(), k -> new ArrayDeque<>()).push(currentHolder);
         }
         navigatingPlayers.add(player.getUniqueId());
@@ -62,7 +62,7 @@ public class GuiManager implements Listener {
      * @param player 玩家
      * @param view   要打开的GUI视图
      */
-    public void open(Player player, AbstractGui view) {
+    public void open(Player player, AbstractGui<?> view) {
         history.remove(player.getUniqueId());
         navigatingPlayers.add(player.getUniqueId());
         view.open(player);
@@ -75,9 +75,9 @@ public class GuiManager implements Listener {
      * @return 如果成功返回，返回true
      */
     public boolean back(Player player) {
-        Deque<AbstractGui> playerHistory = history.get(player.getUniqueId());
+        Deque<AbstractGui<?>> playerHistory = history.get(player.getUniqueId());
         if (playerHistory != null && !playerHistory.isEmpty()) {
-            AbstractGui previousView = playerHistory.pop();
+            AbstractGui<?> previousView = playerHistory.pop();
             navigatingPlayers.add(player.getUniqueId());
             previousView.open(player);
             return true;
@@ -92,7 +92,7 @@ public class GuiManager implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getInventory().getHolder(false) instanceof AbstractGui gui)) {
+        if (!(event.getInventory().getHolder(false) instanceof AbstractGui<?> gui)) {
             return;
         }
         gui.handleClick(event);
@@ -108,12 +108,12 @@ public class GuiManager implements Listener {
         Player player = event.getPlayer();
         UUID playerUuid = player.getUniqueId();
         navigatingPlayers.remove(playerUuid);
-        Deque<AbstractGui> playerHistory = history.remove(playerUuid);
+        Deque<AbstractGui<?>> playerHistory = history.remove(playerUuid);
         if (playerHistory == null || playerHistory.isEmpty()) {
             return;
         }
-        for (AbstractGui historicalView : playerHistory) {
-            if (playerUuid.equals(historicalView.getOwner().getUniqueId())) {
+        for (AbstractGui<?> historicalView : playerHistory) {
+            if (playerUuid.equals(historicalView.getOwner().playerId())) {
                 historicalView.cleanupOnClose();
             }
         }
@@ -126,7 +126,7 @@ public class GuiManager implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (!(event.getInventory().getHolder(false) instanceof AbstractGui closedView)) {
+        if (!(event.getInventory().getHolder(false) instanceof AbstractGui<?> closedView)) {
             return;
         }
         UUID playerUuid = event.getPlayer().getUniqueId();
@@ -134,7 +134,7 @@ public class GuiManager implements Listener {
             return;
         }
         history.remove(playerUuid);
-        if (playerUuid.equals(closedView.getOwner().getUniqueId())) {
+        if (playerUuid.equals(closedView.getOwner().playerId())) {
             closedView.handleClose(event);
         }
     }
@@ -146,7 +146,7 @@ public class GuiManager implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (!(event.getInventory().getHolder(false) instanceof AbstractGui gui)) {
+        if (!(event.getInventory().getHolder(false) instanceof AbstractGui<?> gui)) {
             return;
         }
         gui.handleDrag(event);
@@ -154,7 +154,7 @@ public class GuiManager implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
-        if (!(event.getInventory().getHolder(false) instanceof AbstractGui gui)) {
+        if (!(event.getInventory().getHolder(false) instanceof AbstractGui<?> gui)) {
             return;
         }
         gui.handleOpen(event);

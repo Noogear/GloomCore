@@ -1,5 +1,6 @@
 package gloomcore.paper.gui.puzzle.impl;
 
+import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.puzzle.abstracts.StaticPuzzle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -15,7 +16,7 @@ import java.util.function.Function;
  * 该类表示一个静态物品拼图，用于在GUI中显示不可交互的静态图标
  * 图标可以在多个槽位中显示，但不处理用户的点击事件
  */
-public class SingleItemPuzzleImpl extends StaticPuzzle {
+public class SingleItemPuzzleImpl<C extends Context> extends StaticPuzzle<C> {
     private final Function<Player, ItemStack> display;
 
     /**
@@ -36,14 +37,14 @@ public class SingleItemPuzzleImpl extends StaticPuzzle {
      *
      * @param other 需要拷贝的StaticItemsPuzzleImpl实例
      */
-    public SingleItemPuzzleImpl(@NotNull SingleItemPuzzleImpl other) {
+    public SingleItemPuzzleImpl(@NotNull SingleItemPuzzleImpl<C> other) {
         super(other);
         this.display = other.display;
     }
 
     @Override
-    public void render(Player player, @NotNull Inventory inventory) {
-        ItemStack itemStack = display.apply(player);
+    public void render(C context, @NotNull Inventory inventory) {
+        ItemStack itemStack = display.apply(context.player());
         for (int slot : slots) {
             inventory.setItem(slot, itemStack);
         }

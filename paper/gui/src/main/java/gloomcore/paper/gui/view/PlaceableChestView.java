@@ -1,5 +1,6 @@
 package gloomcore.paper.gui.view;
 
+import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.layout.ChestLayout;
 import gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import gloomcore.paper.gui.puzzle.Puzzle;
@@ -25,8 +26,8 @@ import java.util.function.Function;
  * 每个GUI视图都有一个唯一的“所有者” (owner)。所有的渲染、事件回调和状态变更都将以所有者的视角和名义进行，
  * 即使有多个玩家（观察者）可以同时查看此界面。
  */
-public class PlaceableChestView extends AbstractGui {
-    private final List<PlaceablePuzzle> placeablePuzzles = new ArrayList<>();
+public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
+    private final List<PlaceablePuzzle<C>> placeablePuzzles = new ArrayList<>();
     private final ChestLayout menuLayout;
     private long lastActionTime = 0L;
 
@@ -35,8 +36,9 @@ public class PlaceableChestView extends AbstractGui {
      *
      * @param menuLayout 菜单布局定义
      */
-    public PlaceableChestView(ChestLayout menuLayout, Function<Player, Component> title, Player owner) {
-        super(owner, title, new Puzzle[menuLayout.getSize()]);
+    @SuppressWarnings("unchecked")
+    public PlaceableChestView(ChestLayout menuLayout, Function<Player, Component> title, C owner) {
+        super(owner, title, (Puzzle<C>[]) new Puzzle<?>[menuLayout.getSize()]);
         this.menuLayout = menuLayout;
     }
 
@@ -49,7 +51,7 @@ public class PlaceableChestView extends AbstractGui {
      * @param puzzle 要添加的拼图组件
      * @throws IllegalArgumentException 当槽位已被占用时抛出
      */
-    public PlaceableChestView addPuzzle(Puzzle puzzle) {
+    public PlaceableChestView<C> addPuzzle(Puzzle<C> puzzle) {
         this.puzzles.add(puzzle);
         for (int slot : puzzle.getSlots()) {
             if (slot >= 0 && slot < this.slotPuzzleArray.length) {
@@ -59,7 +61,7 @@ public class PlaceableChestView extends AbstractGui {
                 this.slotPuzzleArray[slot] = puzzle;
             }
         }
-        if (puzzle instanceof PlaceablePuzzle placeablePuzzle) {
+        if (puzzle instanceof PlaceablePuzzle<C> placeablePuzzle) {
             this.placeablePuzzles.add(placeablePuzzle);
         }
         return this;
@@ -102,8 +104,8 @@ public class PlaceableChestView extends AbstractGui {
                 if (itemToMove == null || itemToMove.isEmpty()) {
                     return;
                 }
-                Set<PlaceablePuzzle> puzzlesToUpdate = new ObjectOpenHashSet<>();
-                for (PlaceablePuzzle puzzle : this.placeablePuzzles) {
+                Set<PlaceablePuzzle<C>> puzzlesToUpdate = new ObjectOpenHashSet<>();
+                for (PlaceablePuzzle<C> puzzle : this.placeablePuzzles) {
                     if (puzzle.tryAcceptItem(itemToMove, this.getInventory())) {
                         if (puzzle.hasChangedCallBack()) {
                             puzzlesToUpdate.add(puzzle);
@@ -116,7 +118,7 @@ public class PlaceableChestView extends AbstractGui {
                 }
                 if (!puzzlesToUpdate.isEmpty()) {
                     PaperScheduler.INSTANCE.entity(event.getWhoClicked()).runDelayed((task) -> {
-                        for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
+                        for (PlaceablePuzzle<C> puzzle : puzzlesToUpdate) {
                             puzzle.getChangedCallBack().accept(owner);
                         }
                     }, 1L);
@@ -152,10 +154,11 @@ public class PlaceableChestView extends AbstractGui {
             }
         }
         PaperScheduler.INSTANCE.entity(event.getWhoClicked()).runDelayed((task) -> {
-            Set<PlaceablePuzzle> puzzlesToUpdate = new ObjectOpenHashSet<>();
+            Set<PlaceablePuzzle<C>> puzzlesToUpdate = new ObjectOpenHashSet<>();
             for (int slot : event.getRawSlots()) {
                 if (slot < size) {
-                    PlaceablePuzzle puzzle = (PlaceablePuzzle) slotPuzzleArray[slot];
+                    @SuppressWarnings("unchecked")
+                    PlaceablePuzzle<C> puzzle = (PlaceablePuzzle<C>) slotPuzzleArray[slot];
                     if (puzzle.hasChangedCallBack()) {
                         puzzlesToUpdate.add(puzzle);
                     }
@@ -165,7 +168,7 @@ public class PlaceableChestView extends AbstractGui {
                 task.cancel();
                 return;
             }
-            for (PlaceablePuzzle puzzle : puzzlesToUpdate) {
+            for (PlaceablePuzzle<C> puzzle : puzzlesToUpdate) {
                 puzzle.getChangedCallBack().accept(owner);
             }
         }, 1L);
@@ -204,7 +207,7 @@ public class PlaceableChestView extends AbstractGui {
     @Override
     public void cleanupOnClose() {
         if (!placeablePuzzles.isEmpty()) {
-            for (PlaceablePuzzle placeablePuzzle : placeablePuzzles) {
+            for (PlaceablePuzzle<C> placeablePuzzle : placeablePuzzles) {
                 placeablePuzzle.cleanupOnClose(owner, inventory);
             }
         }

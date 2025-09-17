@@ -1,9 +1,9 @@
 package gloomcore.paper.gui.puzzle.impl;
 
+import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import gloomcore.paper.gui.puzzle.abstracts.AbstractPuzzle;
 import gloomcore.paper.scheduler.PaperScheduler;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,8 +22,8 @@ import java.util.function.Consumer;
  * 并能监听内容变化事件。主要用于制作需要玩家放置物品的界面，
  * 如合成界面、物品选择界面等
  */
-public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzzle {
-    private final Consumer<Player> onContentsChanged;
+public class PlaceablePuzzleImpl<C extends Context> extends AbstractPuzzle<C> implements PlaceablePuzzle<C> {
+    private final Consumer<C> onContentsChanged;
     private final boolean stackingEnabled;
 
     /**
@@ -33,7 +33,7 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
      * @param onContentsChanged 内容变更时的回调函数，可为null
      * @param stackingEnabled   是否启用物品堆叠功能
      */
-    public PlaceablePuzzleImpl(@NotNull Collection<Integer> slotList, @Nullable Consumer<Player> onContentsChanged, boolean stackingEnabled) {
+    public PlaceablePuzzleImpl(@NotNull Collection<Integer> slotList, @Nullable Consumer<C> onContentsChanged, boolean stackingEnabled) {
         super(slotList);
         this.onContentsChanged = onContentsChanged;
         this.stackingEnabled = stackingEnabled;
@@ -47,7 +47,7 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
      *
      * @param other 需要拷贝的PlaceablePuzzleImpl实例
      */
-    public PlaceablePuzzleImpl(@NotNull PlaceablePuzzleImpl other) {
+    public PlaceablePuzzleImpl(@NotNull PlaceablePuzzleImpl<C> other) {
         super(other);
         this.onContentsChanged = other.onContentsChanged;
         this.stackingEnabled = other.stackingEnabled;
@@ -59,11 +59,11 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
      * <p>
      * 将所有指定槽位清空，使其变为空槽位供玩家放置物品
      *
-     * @param player    目标玩家
+     * @param context   目标上下文
      * @param inventory 目标库存
      */
     @Override
-    public void render(Player player, @NotNull Inventory inventory) {
+    public void render(C context, @NotNull Inventory inventory) {
         for (int slot : slots) {
             inventory.setItem(slot, null);
         }
@@ -75,10 +75,10 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
      * 允许玩家放置或取出物品，并在内容变化后触发回调函数
      *
      * @param event 库存点击事件
-     * @param owner GUI界面的所有者玩家
+     * @param owner GUI界面的所有者上下文
      */
     @Override
-    public void onClick(InventoryClickEvent event, Player owner) {
+    public void onClick(InventoryClickEvent event, C owner) {
         event.setCancelled(false);
         if (onContentsChanged != null) {
             PaperScheduler.INSTANCE.entity(event.getWhoClicked()).runDelayed(() -> onContentsChanged.accept(owner), 1L);
@@ -91,10 +91,10 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
      * <p>
      * 此拼图为静态类型，不需要更新操作
      *
-     * @param player 目标玩家
+     * @param context 目标上下文
      */
     @Override
-    public void update(Player player) {
+    public void update(C context) {
     }
 
 
@@ -103,11 +103,11 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
      * <p>
      * 如果玩家背包已满，则将物品掉落在玩家位置
      *
-     * @param player    关闭GUI的玩家
+     * @param context   关闭GUI的上下文
      * @param inventory 被关闭的GUI的Inventory实例
      */
     @Override
-    public void cleanupOnClose(Player player, Inventory inventory) {
+    public void cleanupOnClose(C context, Inventory inventory) {
         List<ItemStack> itemsToReturn = new ArrayList<>();
         for (int slot : this.getSlots()) {
             ItemStack item = inventory.getItem(slot);
@@ -116,7 +116,7 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
                 inventory.setItem(slot, null);
             }
         }
-        returnItemsToPlayer(player, itemsToReturn);
+        returnItemsToPlayer(context, itemsToReturn);
     }
 
     /**
@@ -172,10 +172,10 @@ public class PlaceablePuzzleImpl extends AbstractPuzzle implements PlaceablePuzz
     /**
      * 获取变更回调函数
      *
-     * @return 玩家变更回调函数的Consumer实例
+     * @return 上下文变更回调函数的Consumer实例
      */
     @Override
-    public Consumer<Player> getChangedCallBack() {
+    public Consumer<C> getChangedCallBack() {
         return this.onContentsChanged;
     }
 

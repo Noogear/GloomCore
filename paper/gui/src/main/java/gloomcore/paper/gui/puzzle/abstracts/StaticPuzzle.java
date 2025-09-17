@@ -1,6 +1,6 @@
 package gloomcore.paper.gui.puzzle.abstracts;
 
-import org.bukkit.entity.Player;
+import gloomcore.paper.gui.context.Context;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.Collection;
@@ -11,7 +11,7 @@ import java.util.Collection;
  * 静态拼图通常用于显示静态内容，不响应点击事件或更新操作。
  * 该类默认取消所有点击事件并不执行任何更新操作
  */
-public abstract class StaticPuzzle extends AbstractPuzzle {
+public abstract class StaticPuzzle<C extends Context> extends AbstractPuzzle<C> {
 
     protected StaticPuzzle(Collection<Integer> slotList) {
         super(slotList);
@@ -22,7 +22,7 @@ public abstract class StaticPuzzle extends AbstractPuzzle {
      *
      * @param other 要拷贝的源 StaticPuzzle 对象
      */
-    protected StaticPuzzle(StaticPuzzle other) {
+    protected StaticPuzzle(StaticPuzzle<C> other) {
         super(other);
     }
 
@@ -34,7 +34,7 @@ public abstract class StaticPuzzle extends AbstractPuzzle {
      * @param event 库存点击事件
      */
     @Override
-    public void onClick(InventoryClickEvent event, Player owner) {
+    public void onClick(InventoryClickEvent event, C context) {
         event.setCancelled(true);
     }
 
@@ -43,10 +43,10 @@ public abstract class StaticPuzzle extends AbstractPuzzle {
      * <p>
      * 静态拼图的内容不会发生变化，因此此方法为空实现
      *
-     * @param player 目标玩家
+     * @param context 目标上下文
      */
     @Override
-    public void update(Player player) {
+    public void update(C context) {
     }
 
 

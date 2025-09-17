@@ -1,5 +1,6 @@
 package gloomcore.paper.gui.view;
 
+import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.puzzle.Puzzle;
 import gloomcore.paper.scheduler.PaperScheduler;
 import net.kyori.adventure.text.Component;
@@ -18,21 +19,22 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-public abstract class AbstractGui implements InventoryHolder {
-    protected final List<Puzzle> puzzles = new ArrayList<>();
-    protected final Player owner;
+public abstract class AbstractGui<C extends Context> implements InventoryHolder {
+    protected final List<Puzzle<C>> puzzles = new ArrayList<>();
+    protected final C owner;
     protected final Function<Player, Component> title;
-    protected final Puzzle[] slotPuzzleArray;
+    protected final Puzzle<C>[] slotPuzzleArray;
     protected @Nullable Inventory inventory;
 
-    protected AbstractGui(Player owner, Function<Player, Component> title, Puzzle[] slotPuzzleArray) {
+    @SuppressWarnings("unchecked")
+    protected AbstractGui(C owner, Function<Player, Component> title, Puzzle<C>[] slotPuzzleArray) {
         this.owner = owner;
         this.title = title;
         this.slotPuzzleArray = slotPuzzleArray;
     }
 
     /**
-     * 根据GUI所有者(owner)的视角，渲染所有拼图组件。
+     * 根据GUI所有者(owner)的视角，渲染所有拼图���件。
      * 例如，某些拼图可能会根据所有者的权限或数据显示不同的状态。
      */
     protected void renderAll() {
@@ -55,7 +57,7 @@ public abstract class AbstractGui implements InventoryHolder {
      * @return 菜单标题组件
      */
     protected Component parsedMenuTitle() {
-        return title.apply(owner);
+        return title.apply(owner.player());
     }
 
     /**
@@ -64,14 +66,14 @@ public abstract class AbstractGui implements InventoryHolder {
      * @param slot 槽位索引
      * @return 包含拼图组件的Optional对象，如果未找到则为空
      */
-    protected Optional<Puzzle> findPuzzleBySlot(int slot) {
+    protected Optional<Puzzle<C>> findPuzzleBySlot(int slot) {
         if (slot >= 0 && slot < this.slotPuzzleArray.length) {
             return Optional.ofNullable(this.slotPuzzleArray[slot]);
         }
         return Optional.empty();
     }
 
-    public Player getOwner() {
+    public C getOwner() {
         return owner;
     }
 

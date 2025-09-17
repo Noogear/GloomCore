@@ -1,5 +1,6 @@
 package gloomcore.paper.gui.puzzle.impl;
 
+import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.icon.Icon;
 import gloomcore.paper.gui.puzzle.abstracts.DynamicPuzzle;
 import org.bukkit.entity.Player;
@@ -15,7 +16,7 @@ import java.util.Collection;
  * 该类表示一个按钮拼图，用于在GUI中显示一个可点击的按钮
  * 按钮可以在多个槽位中显示，并处理用户的点击事件
  */
-public class ButtonPuzzleImpl extends DynamicPuzzle {
+public class ButtonPuzzleImpl<C extends Context> extends DynamicPuzzle<C> {
     private final Icon icon;
 
     /**
@@ -34,14 +35,15 @@ public class ButtonPuzzleImpl extends DynamicPuzzle {
      *
      * @param other 需要拷贝的ButtonPuzzleImpl实例
      */
-    public ButtonPuzzleImpl(ButtonPuzzleImpl other) {
+    public ButtonPuzzleImpl(ButtonPuzzleImpl<C> other) {
         super(other);
         this.icon = new Icon(other.icon);
     }
 
 
     @Override
-    public void render(Player player, @NotNull Inventory inventory) {
+    public void render(C context, @NotNull Inventory inventory) {
+        Player player = context.player();
         for (int slot : slots) {
             inventory.setItem(slot, icon.display(player));
         }
@@ -49,8 +51,8 @@ public class ButtonPuzzleImpl extends DynamicPuzzle {
 
 
     @Override
-    public void onClick(InventoryClickEvent event, Player owner) {
-        icon.onClick(event.getClick(), owner);
+    public void onClick(InventoryClickEvent event, C owner) {
+        icon.onClick(event.getClick(), owner.player());
     }
 
     @Override

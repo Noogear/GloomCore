@@ -1,6 +1,6 @@
 package gloomcore.paper.gui.puzzle;
 
-import org.bukkit.entity.Player;
+import gloomcore.paper.gui.context.Context;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
  * 拼图接口，定义了GUI中可交互组件的基本行为
  * <p>
  * 拼图是GUI界面的基本组成单元，每个拼图可以占据一个或多个槽位，
- * 并能处理点击事件、渲染内容和更新显示
+ * 并能处理点击事件、渲染内��和更新显示
  */
-public interface Puzzle {
+public interface Puzzle<C extends Context> {
 
     /**
      * 获取拼图占据的所有槽位
@@ -23,10 +23,10 @@ public interface Puzzle {
     /**
      * 渲染拼图内容到指定库存中
      *
-     * @param player    目标玩家
+     * @param context   业务上下文（由玩家 UUID 构造）
      * @param inventory 目标库存
      */
-    void render(Player player, @NotNull Inventory inventory);
+    void render(C context, @NotNull Inventory inventory);
 
     /**
      * 处理库存点击事件
@@ -34,17 +34,17 @@ public interface Puzzle {
      * 当玩家点击与该拼图相关的槽位时调用此方法，
      * 具体实现类应根据拼图类型和功能需求处理点击逻辑
      *
-     * @param event 库存点击事件，包含点击的详细信息
-     * @param owner 拥有此拼图的玩家
+     * @param event   库存点击事件，包含点击的详细信息
+     * @param context 拥有此拼图的上下文
      */
-    void onClick(InventoryClickEvent event, Player owner);
+    void onClick(InventoryClickEvent event, C context);
 
     /**
      * 更新拼图显示内容
      *
-     * @param player 目标玩家
+     * @param context 目标上下文
      */
-    void update(Player player);
+    void update(C context);
 
     /**
      * 获取拼图类型

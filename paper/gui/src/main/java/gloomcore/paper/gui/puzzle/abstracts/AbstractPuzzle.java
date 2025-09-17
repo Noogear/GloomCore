@@ -1,5 +1,6 @@
 package gloomcore.paper.gui.puzzle.abstracts;
 
+import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.puzzle.Puzzle;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +12,7 @@ import java.util.Collection;
  * 该类提供了拼图的基本实现，包括槽位管理等通用功能。
  * </p>
  */
-public abstract class AbstractPuzzle implements Puzzle {
+public abstract class AbstractPuzzle<C extends Context> implements Puzzle<C> {
     protected final int[] slots;
 
     /**
@@ -36,7 +37,7 @@ public abstract class AbstractPuzzle implements Puzzle {
      *
      * @param other 要拷贝的源 AbstractPuzzle 对象
      */
-    protected AbstractPuzzle(AbstractPuzzle other) {
+    protected AbstractPuzzle(AbstractPuzzle<C> other) {
         this.slots = other.slots.clone();
     }
 

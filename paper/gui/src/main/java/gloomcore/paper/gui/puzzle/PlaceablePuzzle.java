@@ -1,5 +1,6 @@
 package gloomcore.paper.gui.puzzle;
 
+import gloomcore.paper.gui.context.Context;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -13,15 +14,15 @@ import java.util.function.Consumer;
  * 一个接口，用于标识那些在GUI关闭时需要执行清理操作的拼图。
  * 例如，退还玩家放置在输入槽中的物品。
  */
-public interface PlaceablePuzzle extends Puzzle {
+public interface PlaceablePuzzle<C extends Context> extends Puzzle<C> {
 
     /**
      * 当GUI被关闭时执行的清理逻辑。
      *
-     * @param player    关闭GUI的玩家
+     * @param context   关闭GUI的上下文
      * @param inventory 被关闭的GUI的Inventory实例
      */
-    void cleanupOnClose(Player player, Inventory inventory);
+    void cleanupOnClose(C context, Inventory inventory);
 
     /**
      * 尝试接受物品到拼图中
@@ -35,9 +36,9 @@ public interface PlaceablePuzzle extends Puzzle {
     /**
      * 获取变更回调函数
      *
-     * @return 玩家变更回调函数的Consumer实例
+     * @return 上下文变更回调函数的Consumer实例
      */
-    Consumer<Player> getChangedCallBack();
+    Consumer<C> getChangedCallBack();
 
     /**
      * 检查是否有变更回调函数
@@ -52,17 +53,19 @@ public interface PlaceablePuzzle extends Puzzle {
     }
 
     /**
-     * 将物品归还给玩家
+     * 将物品归还给上下文的玩家
      *
-     * @param player        玩家实例
+     * @param context       上下文
      * @param itemsToReturn 需要归还的物品列表
      */
-    default void returnItemsToPlayer(Player player, List<ItemStack> itemsToReturn) {
+    default void returnItemsToPlayer(C context, List<ItemStack> itemsToReturn) {
+        Player player = context.player();
+        if (player == null || itemsToReturn.isEmpty()) return;
         Location location = player.getLocation();
         World world = location.getWorld();
         Inventory playerInventory = player.getInventory();
         for (ItemStack item : itemsToReturn) {
-            if (!playerInventory.addItem(item).isEmpty()) {
+            if (!playerInventory.addItem(item).isEmpty() && world != null) {
                 world.dropItem(location, item);
             }
         }
