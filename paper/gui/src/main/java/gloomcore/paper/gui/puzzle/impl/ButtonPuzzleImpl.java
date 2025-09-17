@@ -3,7 +3,7 @@ package gloomcore.paper.gui.puzzle.impl;
 import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.icon.Icon;
 import gloomcore.paper.gui.puzzle.abstracts.DynamicPuzzle;
-import org.bukkit.entity.Player;
+import gloomcore.paper.gui.view.AbstractGui;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
@@ -17,16 +17,17 @@ import java.util.Collection;
  * 按钮可以在多个槽位中显示，并处理用户的点击事件
  */
 public class ButtonPuzzleImpl<C extends Context> extends DynamicPuzzle<C> {
-    private final Icon icon;
+    private final Icon<C> icon;
 
     /**
-     * 构造函数，创建一个按钮拼图实例
+     * 构造函数，创建一个按钮拼图实例（绑定GUI）
      *
      * @param slotList 拼图占据的槽位列表
      * @param icon     需要显示的按钮图标
+     * @param gui      绑定的GUI
      */
-    public ButtonPuzzleImpl(Collection<Integer> slotList, Icon icon) {
-        super(slotList);
+    public ButtonPuzzleImpl(Collection<Integer> slotList, Icon<C> icon, AbstractGui<C> gui) {
+        super(slotList, gui);
         this.icon = icon;
     }
 
@@ -37,22 +38,28 @@ public class ButtonPuzzleImpl<C extends Context> extends DynamicPuzzle<C> {
      */
     public ButtonPuzzleImpl(ButtonPuzzleImpl<C> other) {
         super(other);
-        this.icon = new Icon(other.icon);
+        this.icon = new Icon<>(other.icon);
     }
 
+    /**
+     * 带 GUI 的拷贝构造器：复制按钮拼图，并重新绑定到新的 GUI。
+     */
+    public ButtonPuzzleImpl(ButtonPuzzleImpl<C> other, AbstractGui<C> gui) {
+        super(other, gui);
+        this.icon = new Icon<>(other.icon);
+    }
 
     @Override
     public void render(C context, @NotNull Inventory inventory) {
-        Player player = context.player();
         for (int slot : slots) {
-            inventory.setItem(slot, icon.display(player));
+            inventory.setItem(slot, icon.display(context));
         }
     }
 
 
     @Override
     public void onClick(InventoryClickEvent event, C owner) {
-        icon.onClick(event.getClick(), owner.player());
+        icon.onClick(event, owner);
     }
 
     @Override

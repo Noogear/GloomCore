@@ -1,6 +1,6 @@
 package gloomcore.paper.gui.icon;
 
-import org.bukkit.entity.Player;
+import gloomcore.paper.gui.context.Context;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -14,16 +14,16 @@ import java.util.function.Function;
  * <p>
  * 包含图标的显示内容和点击时的响应动作
  */
-public class Icon {
-    protected Function<Player, ItemStack> display;
-    protected IconAction iconAction;
+public class Icon<C extends Context> {
+    protected Function<C, ItemStack> display;
+    protected IconAction<C> iconAction;
 
     /**
      * 构造函数，创建一个只有显示内容的图标
      *
      * @param display 图标的显示内容
      */
-    public Icon(@NotNull Function<Player, ItemStack> display) {
+    public Icon(@NotNull Function<C, ItemStack> display) {
         this.display = display;
     }
 
@@ -32,7 +32,7 @@ public class Icon {
      *
      * @param other 要拷贝的源 Icon 对象
      */
-    public Icon(@NotNull Icon other) {
+    public Icon(@NotNull Icon<C> other) {
         this.display = other.display;
         this.iconAction = other.iconAction;
     }
@@ -43,7 +43,7 @@ public class Icon {
      * @param display    图标的显示内容
      * @param iconAction 图标的点击动作
      */
-    public Icon(@NotNull Function<Player, ItemStack> display, @Nullable IconAction iconAction) {
+    public Icon(@NotNull Function<C, ItemStack> display, @Nullable IconAction<C> iconAction) {
         this.display = display;
         this.iconAction = iconAction;
     }
@@ -51,12 +51,13 @@ public class Icon {
     /**
      * 处理图标的点击事件
      *
-     * @param event 点击事件
+     * @param event   点击事件
+     * @param context 上下文
      * @return 当前图标实例，支持链式调用
      */
-    public Icon onClick(InventoryClickEvent event) {
+    public Icon<C> onClick(InventoryClickEvent event, C context) {
         if (iconAction != null) {
-            iconAction.onClick(event);
+            iconAction.onClick(event, context);
         }
         return this;
     }
@@ -65,12 +66,12 @@ public class Icon {
      * 处理指定点击类型的点击事件
      *
      * @param clickType 点击类型
-     * @param player    点击的玩家
+     * @param context   点击上下文
      * @return 当前图标实例，支持链式调用
      */
-    public Icon onClick(@NotNull ClickType clickType, @Nullable Player player) {
+    public Icon<C> onClick(@NotNull ClickType clickType, @Nullable C context) {
         if (iconAction != null) {
-            iconAction.onClick(clickType, player);
+            iconAction.onClick(clickType, context);
         }
         return this;
     }
@@ -81,7 +82,7 @@ public class Icon {
      * @param iconAction 点击动作
      * @return 当前图标实例，支持链式调用
      */
-    public Icon setClickAction(@Nullable IconAction iconAction) {
+    public Icon<C> setClickAction(@Nullable IconAction<C> iconAction) {
         this.iconAction = iconAction;
         return this;
     }
@@ -92,7 +93,7 @@ public class Icon {
      * @param display 显示内容
      * @return 当前图标实例，支持链式调用
      */
-    public Icon setDisplay(@NotNull Function<Player, ItemStack> display) {
+    public Icon<C> setDisplay(@NotNull Function<C, ItemStack> display) {
         this.display = display;
         return this;
     }
@@ -100,15 +101,10 @@ public class Icon {
     /**
      * 获取图标的显示物品
      *
+     * @param context 上下文
      * @return 图标的物品堆实例
      */
-    public ItemStack display() {
-        return display(null);
+    public ItemStack display(C context) {
+        return display.apply(context);
     }
-
-    public ItemStack display(Player player) {
-        return display.apply(player);
-    }
-
-
 }

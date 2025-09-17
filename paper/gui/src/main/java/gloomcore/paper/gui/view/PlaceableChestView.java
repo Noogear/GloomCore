@@ -8,7 +8,6 @@ import gloomcore.paper.scheduler.PaperScheduler;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -37,7 +36,7 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
      * @param menuLayout 菜单布局定义
      */
     @SuppressWarnings("unchecked")
-    public PlaceableChestView(ChestLayout menuLayout, Function<Player, Component> title, C owner) {
+    public PlaceableChestView(ChestLayout menuLayout, Function<C, Component> title, C owner) {
         super(owner, title, (Puzzle<C>[]) new Puzzle<?>[menuLayout.getSize()]);
         this.menuLayout = menuLayout;
     }
@@ -179,7 +178,7 @@ public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
      * <p>
      * 当前实现为空，可由子类重写以提供具体功能
      *
-     * @param event 库存打开事件
+     * @param event 库存打开��件
      */
     @Override
     public void handleOpen(InventoryOpenEvent event) {

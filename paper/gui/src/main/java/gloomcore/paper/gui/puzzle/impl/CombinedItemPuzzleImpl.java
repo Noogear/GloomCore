@@ -2,7 +2,6 @@ package gloomcore.paper.gui.puzzle.impl;
 
 import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.puzzle.abstracts.StaticPuzzle;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -18,15 +17,15 @@ import java.util.function.Function;
  * 它通过遍历父类 AbstractPuzzle 提供的、经过排序和去重的 slots 数组来保证渲染的稳定性和一致性。
  */
 public class CombinedItemPuzzleImpl<C extends Context> extends StaticPuzzle<C> {
-    private final Map<Integer, Function<Player, ItemStack>> slotIconMap;
+    private final Map<Integer, Function<C, ItemStack>> slotIconMap;
 
     /**
      * 构造函数，创建一个复合静态物品拼图实例。
      *
-     * @param slotIconMap 一个映射，其中 Key 是槽位索引 (Integer)，Value 是��显示在该槽位的图标 (IconDisplay)。
+     * @param slotIconMap ���个映射，其中 Key 是槽位索引 (Integer)，Value 是��显示在该槽位的图标 (IconDisplay)。
      *                    拼图将自动占据所有 Map 中定义的槽位。
      */
-    public CombinedItemPuzzleImpl(@NotNull Map<Integer, Function<Player, ItemStack>> slotIconMap) {
+    public CombinedItemPuzzleImpl(@NotNull Map<Integer, Function<C, ItemStack>> slotIconMap) {
         super(slotIconMap.keySet());
         this.slotIconMap = slotIconMap;
     }
@@ -53,11 +52,10 @@ public class CombinedItemPuzzleImpl<C extends Context> extends StaticPuzzle<C> {
      */
     @Override
     public void render(C context, @NotNull Inventory inventory) {
-        Player player = context.player();
         for (int slot : this.slots) {
-            Function<Player, ItemStack> display = this.slotIconMap.get(slot);
+            Function<C, ItemStack> display = this.slotIconMap.get(slot);
             if (display != null) {
-                inventory.setItem(slot, display.apply(player));
+                inventory.setItem(slot, display.apply(context));
             } else {
                 inventory.setItem(slot, null);
             }

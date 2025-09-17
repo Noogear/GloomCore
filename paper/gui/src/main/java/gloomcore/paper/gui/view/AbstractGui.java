@@ -22,12 +22,12 @@ import java.util.function.Function;
 public abstract class AbstractGui<C extends Context> implements InventoryHolder {
     protected final List<Puzzle<C>> puzzles = new ArrayList<>();
     protected final C owner;
-    protected final Function<Player, Component> title;
+    protected final Function<C, Component> title;
     protected final Puzzle<C>[] slotPuzzleArray;
     protected @Nullable Inventory inventory;
 
     @SuppressWarnings("unchecked")
-    protected AbstractGui(C owner, Function<Player, Component> title, Puzzle<C>[] slotPuzzleArray) {
+    protected AbstractGui(C owner, Function<C, Component> title, Puzzle<C>[] slotPuzzleArray) {
         this.owner = owner;
         this.title = title;
         this.slotPuzzleArray = slotPuzzleArray;
@@ -57,7 +57,7 @@ public abstract class AbstractGui<C extends Context> implements InventoryHolder 
      * @return 菜单标题组件
      */
     protected Component parsedMenuTitle() {
-        return title.apply(owner.player());
+        return title.apply(owner);
     }
 
     /**

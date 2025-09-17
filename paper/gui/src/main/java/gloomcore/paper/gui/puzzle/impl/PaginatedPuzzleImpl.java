@@ -4,7 +4,7 @@ import gloomcore.paper.gui.context.Context;
 import gloomcore.paper.gui.icon.Icon;
 import gloomcore.paper.gui.puzzle.PaginatedPuzzle;
 import gloomcore.paper.gui.puzzle.abstracts.DynamicPuzzle;
-import org.bukkit.entity.Player;
+import gloomcore.paper.gui.view.AbstractGui;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -24,29 +24,15 @@ import java.util.stream.Collectors;
  * 并能处理物品的点击事件。每页显示的物品数量取决于提供的槽位数量
  */
 public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> implements PaginatedPuzzle<C> {
-    private final List<Icon> allItems;
+    private final List<Icon<C>> allItems;
     private final ItemStack backgroundItem;
     private int currentPage = 0;
 
     /**
-     * 构造一个新的分页物品拼图实例
-     *
-     * @param slotList 用于显示物品的槽位列表
-     * @param allItems 所有需要分页显示的物品图标列表
+     * 构造一个新的分页物品拼图实例（绑定GUI）
      */
-    public PaginatedPuzzleImpl(Collection<Integer> slotList, List<Icon> allItems) {
-        this(slotList, allItems, null);
-    }
-
-    /**
-     * 构造一个新的分页物品拼图实例
-     *
-     * @param slotList       用于显示物品的槽位列表
-     * @param allItems       所有需要分页显示的物品图标列表
-     * @param backgroundItem 背景物品，用于填充没有内容的槽位
-     */
-    public PaginatedPuzzleImpl(Collection<Integer> slotList, List<Icon> allItems, @Nullable ItemStack backgroundItem) {
-        super(slotList);
+    public PaginatedPuzzleImpl(Collection<Integer> slotList, List<Icon<C>> allItems, @Nullable ItemStack backgroundItem, AbstractGui<C> gui) {
+        super(slotList, gui);
         this.allItems = allItems;
         this.backgroundItem = backgroundItem;
     }
@@ -62,9 +48,21 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
     public PaginatedPuzzleImpl(@NotNull PaginatedPuzzleImpl<C> other) {
         super(other);
         this.allItems = other.allItems.stream()
-                .map(Icon::new)
+                .map(Icon<C>::new)
                 .collect(Collectors.toCollection(ArrayList::new));
-        this.currentPage = other.currentPage;
+        this.currentPage = 0; // 重置状态
+        this.backgroundItem = other.backgroundItem;
+    }
+
+    /**
+     * 拷贝构造函数（重新绑定到新的 GUI），并重置页码为 0。
+     */
+    public PaginatedPuzzleImpl(@NotNull PaginatedPuzzleImpl<C> other, @NotNull AbstractGui<C> gui) {
+        super(other, gui);
+        this.allItems = other.allItems.stream()
+                .map(Icon<C>::new)
+                .collect(Collectors.toCollection(ArrayList::new));
+        this.currentPage = 0; // 重置状态
         this.backgroundItem = other.backgroundItem;
     }
 
@@ -73,7 +71,7 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
      * 渲染当前页的物品到指定库存中
      * <p>
      * 首先清空所有槽位或设置背景物品，然后计算当前页应显示的物品范围，
-     * 将对应物品设置到槽位中
+     * 将对应物品设置��槽位中
      *
      * @param context  目标上下文
      * @param inventory 目标库存
@@ -91,7 +89,7 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
         for (int i = 0; i < itemsPerPage; i++) {
             int itemIndex = startIndex + i;
             if (itemIndex < allItems.size()) {
-                inventory.setItem(slots[i], allItems.get(itemIndex).display(context.player()));
+                inventory.setItem(slots[i], allItems.get(itemIndex).display(context));
             } else {
                 break;
             }
@@ -104,7 +102,7 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
      * 如果存在下一页，则增加当前页码并更新显示
      *
      * @param context 目标上下文
-     * @return 如果成功切换到下一页返回true，否则返回false
+     * @return 如果成功切换到下一��返回true，否则返回false
      */
     @Override
     public boolean nextPage(C context) {
@@ -149,9 +147,8 @@ public class PaginatedPuzzleImpl<C extends Context> extends DynamicPuzzle<C> imp
             int itemsPerPage = this.slots.length;
             int globalItemIndex = (currentPage * itemsPerPage) + slotIndexInPage;
             if (globalItemIndex < allItems.size()) {
-                Icon clickedItem = allItems.get(globalItemIndex);
-                Player player = owner.player();
-                clickedItem.onClick(event.getClick(), player);
+                Icon<C> clickedItem = allItems.get(globalItemIndex);
+                clickedItem.onClick(event, owner);
             }
         }
     }
