@@ -113,7 +113,7 @@ public class GuiManager implements Listener {
             return;
         }
         for (AbstractGui<?> historicalView : playerHistory) {
-            if (playerUuid.equals(historicalView.getOwner().playerId())) {
+            if (playerUuid.equals(historicalView.getOwner().id())) {
                 historicalView.cleanupOnClose();
             }
         }
@@ -134,7 +134,7 @@ public class GuiManager implements Listener {
             return;
         }
         history.remove(playerUuid);
-        if (playerUuid.equals(closedView.getOwner().playerId())) {
+        if (playerUuid.equals(closedView.getOwner().id())) {
             closedView.handleClose(event);
         }
     }

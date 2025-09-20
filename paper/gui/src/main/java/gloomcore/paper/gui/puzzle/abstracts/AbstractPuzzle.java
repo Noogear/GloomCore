@@ -1,7 +1,8 @@
 package gloomcore.paper.gui.puzzle.abstracts;
 
-import gloomcore.paper.gui.context.Context;
+import gloomcore.contract.Context;
 import gloomcore.paper.gui.puzzle.Puzzle;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -12,7 +13,7 @@ import java.util.Collection;
  * 该类提供了拼图的基本实现，包括槽位管理等通用功能。
  * </p>
  */
-public abstract class AbstractPuzzle<C extends Context> implements Puzzle<C> {
+public abstract class AbstractPuzzle<C extends Context<Player>> implements Puzzle<C> {
     protected final int[] slots;
 
     /**

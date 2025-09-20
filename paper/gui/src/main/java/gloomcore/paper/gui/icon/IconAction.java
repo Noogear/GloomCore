@@ -1,7 +1,8 @@
 package gloomcore.paper.gui.icon;
 
-import gloomcore.contract.action.Action;
-import gloomcore.paper.gui.context.Context;
+import gloomcore.contract.Action;
+import gloomcore.contract.Context;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import java.util.EnumMap;
  * 点击事件接口，用于处理用户UI界面的点击事件
  */
 @FunctionalInterface
-public interface IconAction<C extends Context> {
+public interface IconAction<C extends Context<Player>> {
 
     /**
      * 创建一个ClickAction实例，当点击类型与指定类型匹配时执行相应操作
@@ -21,7 +22,7 @@ public interface IconAction<C extends Context> {
      * @param clickMap 指定的点击类型与操作的映射
      * @return ClickAction实例
      */
-    static <C extends Context> @NotNull IconAction<C> of(@NotNull EnumMap<ClickType, Action<C, Void>> clickMap) {
+    static <C extends Context<Player>> @NotNull IconAction<C> of(@NotNull EnumMap<ClickType, Action<C, Void>> clickMap) {
         return (type, context) -> {
             if (clickMap.containsKey(type)) {
                 clickMap.get(type).execute(context);
@@ -36,7 +37,7 @@ public interface IconAction<C extends Context> {
      * @param contextAction 需要执行的操作
      * @return ClickAction实例
      */
-    static <C extends Context> @NotNull IconAction<C> of(@NotNull ClickType clickType, @NotNull Action<C, Void> contextAction) {
+    static <C extends Context<Player>> @NotNull IconAction<C> of(@NotNull ClickType clickType, @NotNull Action<C, Void> contextAction) {
         return (type, context) -> {
             if (type == clickType) {
                 contextAction.execute(context);

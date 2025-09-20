@@ -1,3 +1,4 @@
 dependencies {
     compileOnly libs.papi.api
+    implementation(project(":contract:context"))
 }

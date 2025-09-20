@@ -1,9 +1,10 @@
 package gloomcore.paper.gui.puzzle.impl;
 
-import gloomcore.paper.gui.context.Context;
+import gloomcore.contract.Context;
 import gloomcore.paper.gui.icon.Icon;
 import gloomcore.paper.gui.puzzle.abstracts.DynamicPuzzle;
 import gloomcore.paper.gui.view.AbstractGui;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,7 @@ import java.util.Collection;
  * 该类表示一个按钮拼图，用于在GUI中显示一个可点击的按钮
  * 按钮可以在多个槽位中显示，并处理用户的点击事件
  */
-public class ButtonPuzzleImpl<C extends Context> extends DynamicPuzzle<C> {
+public class ButtonPuzzleImpl<C extends Context<Player>> extends DynamicPuzzle<C> {
     private final Icon<C> icon;
 
     /**

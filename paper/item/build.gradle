@@ -1,5 +1,4 @@
 dependencies {
     implementation(project(":paper:scheduler"))
     implementation(project(":contract:builder"))
-    implementation(project(":contract:template"))
 }

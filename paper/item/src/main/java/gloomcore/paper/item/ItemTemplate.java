@@ -1,6 +1,5 @@
 package gloomcore.paper.item;
 
-import gloomcore.contract.template.ITemplate;
 import gloomcore.paper.scheduler.PaperScheduler;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * @param <C> 上下文类型，用于延迟操作的参数
  */
 
-public class ItemTemplate<C> implements ITemplate<C, ItemStack> {
+public class ItemTemplate<C> implements Function<C, ItemStack> {
 
     private final ItemBuilder prebuiltBuilder;
     private final List<BiConsumer<ItemBuilder, C>> delayedActions;
@@ -55,7 +55,6 @@ public class ItemTemplate<C> implements ITemplate<C, ItemStack> {
      * @param context 上下文参数，用于执行延迟操作
      * @return 包含构建完成物品的CompletableFuture
      */
-    @Override
     public CompletableFuture<ItemStack> applyAsync(C context) {
         return CompletableFuture.supplyAsync(() -> build(context), PaperScheduler.INSTANCE.async().executor());
     }

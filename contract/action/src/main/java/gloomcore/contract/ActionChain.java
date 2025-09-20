@@ -1,4 +1,4 @@
-package gloomcore.contract.action;
+package gloomcore.contract;
 
 import org.jetbrains.annotations.Nullable;
 

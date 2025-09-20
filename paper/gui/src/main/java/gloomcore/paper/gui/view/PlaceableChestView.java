@@ -1,6 +1,6 @@
 package gloomcore.paper.gui.view;
 
-import gloomcore.paper.gui.context.Context;
+import gloomcore.contract.Context;
 import gloomcore.paper.gui.layout.ChestLayout;
 import gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import gloomcore.paper.gui.puzzle.Puzzle;
@@ -8,6 +8,7 @@ import gloomcore.paper.scheduler.PaperScheduler;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +25,7 @@ import java.util.function.Function;
  * 管理拼图（Puzzle）的渲染与交互，将事件分发给对应拼图；
  * 同时在 GUI 关闭时负责触发可放置拼图的清理逻辑。
  */
-public class PlaceableChestView<C extends Context> extends AbstractGui<C> {
+public class PlaceableChestView<C extends Context<Player>> extends AbstractGui<C> {
     private final List<PlaceablePuzzle<C>> placeablePuzzles = new ArrayList<>();
     private final ChestLayout menuLayout;
     private long lastActionTime = 0L;
