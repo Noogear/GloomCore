@@ -56,13 +56,13 @@ public interface PlaceablePuzzle<C extends Context<Player>> extends Puzzle<C> {
      * @param itemsToReturn 需要归还的物品列表
      */
     default void returnItemsToPlayer(C context, List<ItemStack> itemsToReturn) {
-        Player player = context.player();
+        Player player = context.user();
         if (player == null || itemsToReturn.isEmpty()) return;
         Location location = player.getLocation();
         World world = location.getWorld();
         Inventory playerInventory = player.getInventory();
         for (ItemStack item : itemsToReturn) {
-            if (!playerInventory.addItem(item).isEmpty() && world != null) {
+            if (!playerInventory.addItem(item).isEmpty()) {
                 world.dropItem(location, item);
             }
         }

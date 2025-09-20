@@ -26,7 +26,7 @@ public class PlaceholderTag implements TagResolver {
         if (!has(name)) {
             return null;
         }
-        final String placeholder = arguments.popOr("papi tag requires an argument").value();
+        final String placeholder = arguments.popOr("No argument papi key provided").value();
         final int index = placeholder.indexOf('_');
         if (index != -1) {
             final PlaceholderExpansion expansion = EXPANSION_MANAGER.getExpansion(placeholder.substring(0, index));

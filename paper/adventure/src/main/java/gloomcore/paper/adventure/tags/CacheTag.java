@@ -1,5 +1,6 @@
 package gloomcore.paper.adventure.tags;
 
+import gloomcore.paper.adventure.utils.TagUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.ParsingException;
@@ -17,7 +18,7 @@ public abstract class CacheTag implements TagResolver {
 
     protected CacheTag(String tagName) {
         this.tagName = tagName;
-        this.errorMessage = "No argument " + tagName + " key provided";
+        this.errorMessage = TagUtil.parseErrorMsg(tagName);
     }
 
     @Override
