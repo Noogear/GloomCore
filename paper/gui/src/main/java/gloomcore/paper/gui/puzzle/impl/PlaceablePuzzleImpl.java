@@ -1,10 +1,9 @@
 package gloomcore.paper.gui.puzzle.impl;
 
-import gloomcore.contract.Context;
+import gloomcore.paper.contract.PlayerContext;
 import gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import gloomcore.paper.gui.puzzle.abstracts.PlaceableBasePuzzle;
 import gloomcore.paper.gui.view.AbstractGui;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +15,7 @@ import java.util.function.Consumer;
  * 可放置槽位拼图：提供一组空槽位，允许玩家放置/取出物品。
  * 交互、清理与搬运逻辑复用 PlaceableBasePuzzle。
  */
-public class PlaceablePuzzleImpl<C extends Context<Player>> extends PlaceableBasePuzzle<C> implements PlaceablePuzzle<C> {
+public class PlaceablePuzzleImpl<C extends PlayerContext> extends PlaceableBasePuzzle<C> implements PlaceablePuzzle<C> {
 
     public PlaceablePuzzleImpl(@NotNull Collection<Integer> slotList,
                                @Nullable Consumer<C> onContentsChanged,

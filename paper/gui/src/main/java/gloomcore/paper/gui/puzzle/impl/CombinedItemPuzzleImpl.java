@@ -1,8 +1,7 @@
 package gloomcore.paper.gui.puzzle.impl;
 
-import gloomcore.contract.Context;
+import gloomcore.paper.contract.PlayerContext;
 import gloomcore.paper.gui.puzzle.abstracts.StaticPuzzle;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +16,7 @@ import java.util.function.Function;
  * 该类用于在一个拼图对象中管理多个不同的静态图标，并将它们精确地渲染到各自指定的槽位上。
  * 它通过遍历父类 AbstractPuzzle 提供的、经过排序和去重的 slots 数组来保证渲染的稳定性和一致性。
  */
-public class CombinedItemPuzzleImpl<C extends Context<Player>> extends StaticPuzzle<C> {
+public class CombinedItemPuzzleImpl<C extends PlayerContext> extends StaticPuzzle<C> {
     private final Map<Integer, Function<C, ItemStack>> slotIconMap;
 
     /**

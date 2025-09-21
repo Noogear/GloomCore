@@ -1,6 +1,6 @@
 package gloomcore.paper.gui.view;
 
-import gloomcore.contract.Context;
+import gloomcore.paper.contract.PlayerContext;
 import gloomcore.paper.gui.puzzle.Puzzle;
 import gloomcore.paper.scheduler.PaperScheduler;
 import net.kyori.adventure.text.Component;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-public abstract class AbstractGui<C extends Context<Player>> implements InventoryHolder {
+public abstract class AbstractGui<C extends PlayerContext> implements InventoryHolder {
     protected final List<Puzzle<C>> puzzles = new ArrayList<>();
     protected final C owner;
     protected final Function<C, Component> title;

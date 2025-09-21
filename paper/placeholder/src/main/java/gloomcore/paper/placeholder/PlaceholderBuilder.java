@@ -1,6 +1,6 @@
 package gloomcore.paper.placeholder;
 
-import gloomcore.contract.builder.SelfBuilder;
+import gloomcore.paper.contract.builder.SelfBuilder;
 import gloomcore.paper.placeholder.decorator.PlayerCacheDecorator;
 import gloomcore.paper.placeholder.decorator.SharedFixedCacheDecorator;
 import gloomcore.paper.placeholder.decorator.SharedParmCacheDecorator;

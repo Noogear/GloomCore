@@ -1,7 +1,6 @@
 package gloomcore.paper.gui.puzzle;
 
-import gloomcore.contract.Context;
-import org.bukkit.entity.Player;
+import gloomcore.paper.contract.PlayerContext;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * 每个拼图可以占据一个或多个槽位，能够将自身渲染到指定的 Inventory，
  * 并在对应槽位被点击时处理交互事件。
  */
-public interface Puzzle<C extends Context<Player>> {
+public interface Puzzle<C extends PlayerContext> {
 
     /**
      * 获取拼图占用的所有槽位。

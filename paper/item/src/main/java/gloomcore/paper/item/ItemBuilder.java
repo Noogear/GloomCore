@@ -1,6 +1,6 @@
 package gloomcore.paper.item;
 
-import gloomcore.contract.builder.SelfBuilder;
+import gloomcore.paper.contract.builder.SelfBuilder;
 import io.papermc.paper.datacomponent.DataComponentType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;

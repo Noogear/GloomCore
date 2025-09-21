@@ -12,3 +12,7 @@ file('paper').listFiles()?.findAll { it.isDirectory() }?.each {
 file('contract').listFiles()?.findAll { it.isDirectory() }?.each {
     include "contract:${it.name}"
 }
+
+file('paper-adventure').listFiles()?.findAll { it.isDirectory() }?.each {
+    include "paper-adventure:${it.name}"
+}

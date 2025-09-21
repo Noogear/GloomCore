@@ -1,11 +1,10 @@
 package gloomcore.paper.gui.puzzle.impl;
 
-import gloomcore.contract.Context;
+import gloomcore.paper.contract.PlayerContext;
 import gloomcore.paper.gui.icon.Icon;
 import gloomcore.paper.gui.puzzle.PaginatedPuzzle;
 import gloomcore.paper.gui.puzzle.abstracts.DynamicPuzzle;
 import gloomcore.paper.gui.view.AbstractGui;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
  * 分页拼图：在给定槽位上分页展示一组图标，并处理翻页与点击事件。
  * 每页可展示的数量 = 槽位数量。
  */
-public class PaginatedPuzzleImpl<C extends Context<Player>> extends DynamicPuzzle<C> implements PaginatedPuzzle<C> {
+public class PaginatedPuzzleImpl<C extends PlayerContext> extends DynamicPuzzle<C> implements PaginatedPuzzle<C> {
     private final List<Icon<C>> allItems;
     private final ItemStack backgroundItem;
     private int currentPage = 0;

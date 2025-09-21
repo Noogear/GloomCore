@@ -1,10 +1,9 @@
 package gloomcore.paper.gui.puzzle.abstracts;
 
-import gloomcore.contract.Context;
+import gloomcore.paper.contract.PlayerContext;
 import gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import gloomcore.paper.gui.view.AbstractGui;
 import gloomcore.paper.scheduler.PaperScheduler;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -20,7 +19,7 @@ import java.util.function.Consumer;
  * 可放置类拼图的抽象基类：抽取变更回调、清理归还、堆叠与放置等共性逻辑。
  * 子类仅需实现渲染与（如需）自定义点击行为；也可覆写判定背景/可堆叠/是否归还的钩子以改变策略。
  */
-public abstract class PlaceableBasePuzzle<C extends Context<Player>> extends AbstractPuzzle<C> implements PlaceablePuzzle<C> {
+public abstract class PlaceableBasePuzzle<C extends PlayerContext> extends AbstractPuzzle<C> implements PlaceablePuzzle<C> {
     protected final @Nullable Consumer<C> onContentsChanged;
     protected final boolean stackingEnabled;
     protected final AbstractGui<C> gui;
