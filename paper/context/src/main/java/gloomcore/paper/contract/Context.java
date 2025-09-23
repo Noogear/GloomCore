@@ -1,11 +1,9 @@
 package gloomcore.paper.contract;
 
-import java.util.UUID;
+import net.kyori.adventure.audience.Audience;
 
-public interface Context<U> {
+public interface Context<U extends Audience> {
 
-    UUID id();
-
-    U user();
+    U audience();
 
 }

@@ -1,7 +1,8 @@
 package gloomcore.paper.gui.puzzle.abstracts;
 
-import gloomcore.paper.contract.PlayerContext;
+import gloomcore.paper.contract.Context;
 import gloomcore.paper.gui.view.AbstractGui;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -11,7 +12,7 @@ import java.util.Collection;
  * <p>
  * 动态/可变拼图在构造时必须与其所属 GUI 绑定。
  */
-public abstract class DynamicPuzzle<C extends PlayerContext> extends AbstractPuzzle<C> {
+public abstract class DynamicPuzzle<C extends Context<Player>> extends AbstractPuzzle<C> {
 
     protected final AbstractGui<C> gui;
 

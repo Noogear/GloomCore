@@ -1,6 +1,7 @@
 package gloomcore.paper.gui.icon;
 
-import gloomcore.paper.contract.PlayerContext;
+import gloomcore.paper.contract.Context;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +15,7 @@ import java.util.function.Function;
  * <p>
  * 包含图标的显示内容和点击时的响应动作
  */
-public class Icon<C extends PlayerContext> {
+public class Icon<C extends Context<Player>> {
     protected Function<C, ItemStack> display;
     protected IconAction<C> iconAction;
 

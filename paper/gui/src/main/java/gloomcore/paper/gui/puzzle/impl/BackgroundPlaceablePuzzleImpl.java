@@ -1,10 +1,11 @@
 package gloomcore.paper.gui.puzzle.impl;
 
-import gloomcore.paper.contract.PlayerContext;
+import gloomcore.paper.contract.Context;
 import gloomcore.paper.gui.puzzle.PlaceablePuzzle;
 import gloomcore.paper.gui.puzzle.abstracts.PlaceableBasePuzzle;
 import gloomcore.paper.gui.view.AbstractGui;
 import gloomcore.paper.scheduler.PaperScheduler;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public class BackgroundPlaceablePuzzleImpl<C extends PlayerContext> extends PlaceableBasePuzzle<C> implements PlaceablePuzzle<C> {
+public class BackgroundPlaceablePuzzleImpl<C extends Context<Player>> extends PlaceableBasePuzzle<C> implements PlaceablePuzzle<C> {
     private final ItemStack backgroundItem;
 
     public BackgroundPlaceablePuzzleImpl(@NotNull Collection<Integer> slotList,

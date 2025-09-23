@@ -1,8 +1,9 @@
 package gloomcore.paper.gui.puzzle;
 
-import gloomcore.paper.contract.PlayerContext;
+import gloomcore.paper.contract.Context;
+import org.bukkit.entity.Player;
 
-public interface PaginatedPuzzle<C extends PlayerContext> extends Puzzle<C> {
+public interface PaginatedPuzzle<C extends Context<Player>> extends Puzzle<C> {
 
     /**
      * 切换到下一页。

@@ -1,5 +1,6 @@
-package gloomcore.adventure.i18n;
+package gloomcore.adventure.i18n.tags;
 
+import gloomcore.adventure.i18n.I18nManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.ParsingException;
@@ -15,7 +16,7 @@ public class i18nTag implements TagResolver {
     private final Locale locale;
 
     public i18nTag(Locale locale) {
-        this.locale = i18nUtil.intern(locale);
+        this.locale =  I18nManager.INSTANCE.getOrDefaultLocale(locale);
     }
 
     @Override

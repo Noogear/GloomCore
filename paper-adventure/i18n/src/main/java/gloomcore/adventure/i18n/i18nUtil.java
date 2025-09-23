@@ -3,7 +3,6 @@ package gloomcore.adventure.i18n;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Collection;
@@ -20,7 +19,7 @@ public class i18nUtil {
             String langCode = locale.toLanguageTag().replace("-", "_").toLowerCase();
             tempMap.put(langCode, i18nUtil.intern(locale));
         }
-        AVAILABLE_LOCALES = Object2ObjectMaps.unmodifiable(tempMap);
+        AVAILABLE_LOCALES = tempMap;
     }
 
     public static Locale normalize(final String langCode) {

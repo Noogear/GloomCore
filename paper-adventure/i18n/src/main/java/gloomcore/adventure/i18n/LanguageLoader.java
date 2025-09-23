@@ -1,7 +1,6 @@
 package gloomcore.adventure.i18n;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -134,6 +133,6 @@ public final class LanguageLoader {
                 map.put(key, config.getString(key));
             }
         }
-        return Object2ObjectMaps.unmodifiable(map);
+        return map;
     }
 }
