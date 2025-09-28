@@ -42,7 +42,7 @@ public class PlaceholderTag implements TagResolver {
         final StringBuilder placeholderBuilder = new StringBuilder();
         placeholderBuilder.append(arguments.pop().value());
         while (arguments.hasNext()) {
-            placeholderBuilder.append('_');
+            placeholderBuilder.append(':');
             placeholderBuilder.append(arguments.pop().value());
         }
         return placeholderBuilder.toString();
