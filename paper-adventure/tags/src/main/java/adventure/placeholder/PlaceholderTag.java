@@ -21,18 +21,31 @@ public class PlaceholderTag implements TagResolver {
         this.player = player;
     }
 
-    Tag createTag(final String argument) {
-        final int index = argument.indexOf('_');
+    Tag createTag(final String placeholder) {
+        final int index = placeholder.indexOf('_');
         if (index != -1) {
-            final PlaceholderExpansion expansion = EXPANSION_MANAGER.getExpansion(argument.substring(0, index));
+            final PlaceholderExpansion expansion = EXPANSION_MANAGER.getExpansion(placeholder.substring(0, index));
             if (expansion != null) {
-                final String result = expansion.onRequest(player, argument.substring(index + 1));
+                final String result = expansion.onRequest(player, placeholder.substring(index + 1));
                 if (result != null) {
                     return Tag.inserting(Component.text(result));
                 }
             }
         }
-        return Tag.inserting(Component.text(argument));
+        return Tag.inserting(Component.text(placeholder));
+    }
+
+    String parsePlaceholder(final @NotNull ArgumentQueue arguments, final @NotNull Context ctx) {
+        if (!arguments.hasNext()) {
+            throw ctx.newException("No argument papi key provided");
+        }
+        final StringBuilder placeholderBuilder = new StringBuilder();
+        placeholderBuilder.append(arguments.pop().value());
+        while (arguments.hasNext()) {
+            placeholderBuilder.append('_');
+            placeholderBuilder.append(arguments.pop().value());
+        }
+        return placeholderBuilder.toString();
     }
 
     @Override
@@ -40,8 +53,7 @@ public class PlaceholderTag implements TagResolver {
         if (!has(name)) {
             return null;
         }
-        final String placeholder = arguments.popOr("No argument papi key provided").value();
-        return createTag(placeholder);
+        return createTag(parsePlaceholder(arguments, ctx));
     }
 
     @Override

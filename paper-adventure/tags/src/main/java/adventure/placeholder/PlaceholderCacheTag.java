@@ -1,5 +1,6 @@
 package adventure.placeholder;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.ParsingException;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PlaceholderCacheTag extends PlaceholderTag {
-    private final Object2ObjectOpenHashMap<String, Tag> cache = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectMap<String, Tag> cache = new Object2ObjectOpenHashMap<>();
 
     public PlaceholderCacheTag(Player player) {
         super(player);
@@ -21,7 +22,7 @@ public class PlaceholderCacheTag extends PlaceholderTag {
         if (!has(name)) {
             return null;
         }
-        final String placeholder = arguments.popOr("No argument papi key provided").value();
+        final String placeholder = parsePlaceholder(arguments, ctx);
         return cache.computeIfAbsent(placeholder, _ -> createTag(placeholder));
     }
 
