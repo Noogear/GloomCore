@@ -127,14 +127,11 @@ public class LanguageBundle {
      * @param loadedLanguages 应用当前实际加载的语言集合
      */
     public LanguageBundle(@NotNull Set<Locale> loadedLanguages) {
-        if (loadedLanguages.isEmpty()) {
-            throw new IllegalArgumentException("Loaded languages cannot be empty.");
-        }
         this.loadedLanguages = loadedLanguages;
     }
 
     public void clearCache() {
-        this.loadedLanguages.clear();
+        this.resolveCache.clear();
     }
 
     /**
