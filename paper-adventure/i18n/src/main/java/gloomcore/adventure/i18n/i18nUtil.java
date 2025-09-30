@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.Set;
 
 public class i18nUtil {
-    public static final Set<String> ALL_LANG = Set.of(
+    private static final Set<String> ALL_LANG = Set.of(
             "af_za", "ar_sa", "ast_es", "az_az", "ba_ru", "bar", "be_by", "be_latn",
             "bg_bg", "br_fr", "brb", "bs_ba", "ca_es", "cs_cz", "cy_gb", "da_dk",
             "de_at", "de_ch", "de_de", "el_gr", "en_au", "en_ca", "en_gb", "en_nz",
@@ -30,27 +30,29 @@ public class i18nUtil {
             "yo_ng", "zh_cn", "zh_hk", "zh_tw", "zlm_arab"
     );
     private static final Interner<Locale> INTERNER = Interners.newWeakInterner();
-    private static final Object2ObjectMap<String, Locale> AVAILABLE_LOCALES;
+    private static final Object2ObjectMap<String, Locale> STRING_2_LOCALE;
 
     static {
-        Object2ObjectOpenHashMap<String, Locale> tempMap = new Object2ObjectOpenHashMap<>();
+        Object2ObjectMap<String, Locale> tempMap = new Object2ObjectOpenHashMap<>();
         for (String langCode : ALL_LANG) {
             Locale locale = Locale.forLanguageTag(langCode.replace('_', '-'));
             tempMap.put(langCode, INTERNER.intern(locale));
         }
-        AVAILABLE_LOCALES = tempMap;
+        STRING_2_LOCALE = tempMap;
     }
 
+    private i18nUtil() {}
+
     public static Locale normalize(final String langCode) {
-        return AVAILABLE_LOCALES.get(langCode);
+        return STRING_2_LOCALE.get(langCode);
     }
 
     public static Set<String> getAvailableLangCodes() {
-        return AVAILABLE_LOCALES.keySet();
+        return STRING_2_LOCALE.keySet();
     }
 
     public static Collection<Locale> getAvailableLocales() {
-        return AVAILABLE_LOCALES.values();
+        return STRING_2_LOCALE.values();
     }
 
     public static Locale intern(Locale locale) {

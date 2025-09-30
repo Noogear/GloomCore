@@ -18,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -27,6 +29,8 @@ public class MiniMessageTranslatorImpl implements Examinable, MinimessageTransla
     private final Object2ObjectMap<String, Object2ObjectMap<Locale, String>> translations = new Object2ObjectOpenHashMap<>();
     private final MiniMessage miniMessage;
     private final Key name;
+    private final Set<Locale> loadedLanguages = ConcurrentHashMap.newKeySet();
+    private final LanguageBundle languageBundle = new LanguageBundle(loadedLanguages);
     private Locale defaultLocale = i18nUtil.intern(Locale.US);
 
     public MiniMessageTranslatorImpl(Key name, MiniMessage miniMessage) {
@@ -42,7 +46,9 @@ public class MiniMessageTranslatorImpl implements Examinable, MinimessageTransla
     @Override
     public void register(final @NotNull String key, final @NotNull Locale locale, final @NotNull String format) {
         Object2ObjectMap<Locale, String> localeMap = this.translations.computeIfAbsent(key, _ -> new Object2ObjectOpenHashMap<>());
-        localeMap.put(i18nUtil.intern(locale), format);
+        Locale internLocale = i18nUtil.intern(locale);
+        localeMap.put(internLocale, format);
+        loadedLanguages.add(internLocale);
     }
 
     @Override
@@ -67,7 +73,11 @@ public class MiniMessageTranslatorImpl implements Examinable, MinimessageTransla
             return null;
         }
         if (!translation.containsKey(locale)) {
-            return translation.get(defaultLocale);
+            final Locale targetLocale = languageBundle.resolve(locale);
+            if (targetLocale == null) {
+                return translation.get(defaultLocale);
+            }
+            return translation.get(targetLocale);
         } else {
             return translation.get(locale);
         }
