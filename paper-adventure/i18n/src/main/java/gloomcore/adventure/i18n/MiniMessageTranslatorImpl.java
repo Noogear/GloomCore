@@ -27,7 +27,7 @@ public class MiniMessageTranslatorImpl implements Examinable, MinimessageTransla
     private final Object2ObjectMap<String, Object2ObjectMap<Locale, String>> translations = new Object2ObjectOpenHashMap<>();
     private final MiniMessage miniMessage;
     private final Key name;
-    private Locale fallback = i18nUtil.intern(Locale.US);
+    private Locale defaultLocale = i18nUtil.intern(Locale.US);
 
     public MiniMessageTranslatorImpl(Key name, MiniMessage miniMessage) {
         this.name = name;
@@ -67,7 +67,7 @@ public class MiniMessageTranslatorImpl implements Examinable, MinimessageTransla
             return null;
         }
         if (!translation.containsKey(locale)) {
-            return translation.get(fallback);
+            return translation.get(defaultLocale);
         } else {
             return translation.get(locale);
         }
@@ -75,7 +75,7 @@ public class MiniMessageTranslatorImpl implements Examinable, MinimessageTransla
 
     @Override
     public void defaultLocale(@NotNull Locale defaultLocale) {
-        this.fallback = i18nUtil.intern(requireNonNull(defaultLocale, "defaultLocale"));
+        this.defaultLocale = i18nUtil.intern(requireNonNull(defaultLocale, "defaultLocale"));
     }
 
     @Override
@@ -120,7 +120,7 @@ public class MiniMessageTranslatorImpl implements Examinable, MinimessageTransla
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.name, this.translations, this.fallback);
+        return Objects.hash(this.name, this.translations, this.defaultLocale);
     }
 
     @Override
