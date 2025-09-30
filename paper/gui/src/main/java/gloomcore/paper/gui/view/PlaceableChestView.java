@@ -35,7 +35,7 @@ public class PlaceableChestView<C extends Context<Player>> extends AbstractGui<C
      */
     @SuppressWarnings("unchecked")
     public PlaceableChestView(ChestLayout menuLayout, Function<C, Component> title, C owner) {
-        super(owner, title, (Puzzle<C>[]) new Puzzle<?>[menuLayout.getSize()]);
+        super(owner, title, (Puzzle<C>[]) new Puzzle<?>[menuLayout.size()]);
         this.menuLayout = menuLayout;
     }
 
@@ -126,7 +126,7 @@ public class PlaceableChestView<C extends Context<Player>> extends AbstractGui<C
             return;
         }
         this.lastActionTime = currentTime;
-        int size = menuLayout.getSize();
+        int size = menuLayout.size();
         for (int slot : event.getRawSlots()) {
             if (slot < size) {
                 if (!(this.slotPuzzleArray[slot] instanceof PlaceablePuzzle)) {
@@ -192,7 +192,7 @@ public class PlaceableChestView<C extends Context<Player>> extends AbstractGui<C
     @Override
     public @NotNull Inventory getInventory() {
         if (inventory == null) {
-            inventory = Bukkit.createInventory(this, menuLayout.getSize(), parsedMenuTitle());
+            inventory = Bukkit.createInventory(this, menuLayout.size(), parsedMenuTitle());
         }
         return inventory;
     }
