@@ -2,6 +2,7 @@ package gloomcore.adventure.i18n;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.renderer.TranslatableComponentRenderer;
 import net.kyori.adventure.translation.Translator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +26,8 @@ public interface MinimessageTranslator extends Translator {
     @Nullable String getMiniMessageString(final @NotNull String key, final @NotNull Locale locale);
 
     void defaultLocale(@NotNull Locale defaultLocale);
+
+    @NotNull TranslatableComponentRenderer<Locale> renderer();
 
     default void registerAll(final @NotNull Locale locale, final @NotNull Map<String, String> bundle) {
         IllegalArgumentException firstError = null;

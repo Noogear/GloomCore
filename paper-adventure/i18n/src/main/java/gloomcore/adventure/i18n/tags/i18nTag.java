@@ -1,6 +1,7 @@
 package gloomcore.adventure.i18n.tags;
 
-import gloomcore.adventure.i18n.I18nManager;
+import gloomcore.adventure.i18n.MinimessageTranslator;
+import gloomcore.adventure.i18n.i18nUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.ParsingException;
@@ -14,9 +15,11 @@ import java.util.Locale;
 
 public class i18nTag implements TagResolver {
     private final Locale locale;
+    private final MinimessageTranslator source;
 
-    public i18nTag(Locale locale) {
-        this.locale =  I18nManager.INSTANCE.getOrDefaultLocale(locale);
+    public i18nTag(MinimessageTranslator source, Locale locale) {
+        this.source = source;
+        this.locale = i18nUtil.intern(locale);
     }
 
     @Override
@@ -25,7 +28,7 @@ public class i18nTag implements TagResolver {
             return null;
         }
         String i18nKey = arguments.popOr("No argument i18n key provided").value();
-        String translation = I18nManager.INSTANCE.translate(i18nKey, locale);
+        String translation = source.getMiniMessageString(i18nKey, locale);
         if (translation == null) {
             return Tag.inserting(Component.text(i18nKey));
         }
