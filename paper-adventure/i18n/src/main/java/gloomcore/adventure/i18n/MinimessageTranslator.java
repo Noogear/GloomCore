@@ -29,6 +29,8 @@ public interface MinimessageTranslator extends Translator {
 
     @NotNull TranslatableComponentRenderer<Locale> renderer();
 
+    Locale validateLocale(@NotNull Locale locale);
+
     default void registerAll(final @NotNull Locale locale, final @NotNull Map<String, String> bundle) {
         IllegalArgumentException firstError = null;
         int errorCount = 0;

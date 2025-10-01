@@ -19,7 +19,7 @@ public class i18nTag implements TagResolver {
 
     public i18nTag(MinimessageTranslator source, Locale locale) {
         this.source = source;
-        this.locale = i18nUtil.intern(locale);
+        this.locale = source.validateLocale(locale);
     }
 
     @Override

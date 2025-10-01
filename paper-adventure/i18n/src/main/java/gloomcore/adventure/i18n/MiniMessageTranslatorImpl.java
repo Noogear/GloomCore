@@ -73,7 +73,7 @@ public class MiniMessageTranslatorImpl implements Examinable, MinimessageTransla
             return null;
         }
         if (!translation.containsKey(locale)) {
-            final Locale targetLocale = languageBundle.resolve(locale);
+            final Locale targetLocale = validateLocale(locale);
             if (targetLocale == null) {
                 return translation.get(defaultLocale);
             }
@@ -91,6 +91,11 @@ public class MiniMessageTranslatorImpl implements Examinable, MinimessageTransla
     @Override
     public @NotNull TranslatableComponentRenderer<Locale> renderer() {
         return renderer;
+    }
+
+    @Override
+    public Locale validateLocale(@NotNull Locale locale) {
+        return languageBundle.resolve(locale);
     }
 
     @Override
